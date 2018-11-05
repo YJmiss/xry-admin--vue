@@ -19,7 +19,7 @@ http://webpack.css88.com/
 
 ```
 1、克隆项目
-git clone https://github.com/asd821300801/oservice-admin-vue.git
+git clone https://github.com/YJmiss/xry-admin--vue.git
 ```
 <br>
 
