@@ -3,8 +3,8 @@
     <div class="site-content__wrapper">
       <div class="site-content">
         <div class="brand-info">
-          <h2 class="brand-info__text">os-admin</h2>
-          <p class="brand-info__intro">基于 Spring Boot 2.0 + Shiro + Mybatis + Vue2.0 + Element 实现的权限系统</p>
+          <h2 class="brand-info__text">学而用</h2>
+          <p class="brand-info__intro">后台管理系统</p>
         </div>
         <div class="login-main">
           <h3 class="login-title">管理员登录</h3>
