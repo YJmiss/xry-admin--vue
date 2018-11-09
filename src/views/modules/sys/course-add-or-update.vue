@@ -89,10 +89,11 @@
         this.dataForm.id = id || 0
         if (this.dataForm.id) {
             this.$http({
-              url: this.$http.adornUrl(`/xey/course/info/${this.dataForm.id}`),
+              url: this.$http.adornUrl(`/xry/course/info/${this.dataForm.id}`),
               method: 'get',
               params: this.$http.adornParams()
             }).then(({ data }) => {
+              console.log(data);
               if (data && data.code === 0) {
                 this.dataForm.title = data.course.title
                 this.dataForm.image = data.course.image
@@ -110,7 +111,7 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/xey/course/${!this.dataForm.id ? 'save' : 'update'}`),
+              url: this.$http.adornUrl(`/xry/course/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',
               data: this.$http.adornData({
                 'courseId': this.dataForm.id || undefined,
