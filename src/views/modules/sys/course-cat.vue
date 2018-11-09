@@ -1,0 +1,94 @@
+<template>
+  <div class="mod-course-cat">
+    <el-form :inline="true" :model="dataForm">
+      <el-form-item>
+        <el-button v-if="isAuth('xry:course:cat:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+      </el-form-item>
+    </el-form>
+    <el-table :data="dataList" border style="width: 100%;">
+      <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
+      <el-table-column prop="parentId" header-align="center" align="center" width="80" label="父类目ID"> </el-table-column>
+      <el-table-column prop="name"  header-align="center" align="center" width="120" label="类目名称"> </el-table-column>
+      <el-table-column prop="sortOrder"  header-align="center" align="center" width="120" label="排列序号"> </el-table-column>
+      <el-table-column prop="isParent" header-align="center" align="center" width="150" label="是否为父目录"></el-table-column>
+      <el-table-column prop="status" header-align="center" align="center" width="80" label="状态"></el-table-column>
+      <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+        <template slot-scope="scope">
+          <el-button v-if="isAuth('xry:course:cat:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.menuId)">修改</el-button>
+          <el-button v-if="isAuth('xry:course:cat:delete')" type="text" size="small" @click="deleteHandle(scope.row.menuId)">删除</el-button>
+        </template>
+      </el-table-column>
+    </el-table>
+    <!-- 弹窗, 新增 / 修改 -->
+    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+  </div>
+</template>
+
+<script>
+  import AddOrUpdate from './course-cat-add-or-update'
+  import { treeDataTranslate } from '@/utils'
+  export default {
+    data () {
+      return {
+        dataForm: {},
+        dataList: [],
+        dataListLoading: false,
+        addOrUpdateVisible: false
+      }
+    },
+    components: {
+      AddOrUpdate
+    },
+    activated () {
+      this.getDataList()
+    },
+    methods: {
+      // 获取数据列表
+      getDataList () {
+        this.dataListLoading = true
+        this.$http({
+          url: this.$http.adornUrl('/xry/course/cat/list'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({ data }) => {
+          this.dataList = treeDataTranslate(data, 'id')
+          this.dataListLoading = false
+        })
+      },
+      // 新增 / 修改
+      addOrUpdateHandle (id) {
+        this.addOrUpdateVisible = true
+        this.$nextTick(() => {
+          this.$refs.addOrUpdate.init(id)
+        })
+      },
+      // 删除
+      deleteHandle (id) {
+        this.$confirm(`确定对[id=${id}]进行[删除]操作?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl(`/xry/course/cat/delete/${id}`),
+            method: 'post',
+            data: this.$http.adornData()
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }).catch(() => {})
+      }
+    }
+  }
+</script>
