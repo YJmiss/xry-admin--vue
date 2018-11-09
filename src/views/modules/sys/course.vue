@@ -17,7 +17,7 @@
       <el-table-column prop="title" header-align="center" align="center" label="课程标题"></el-table-column>
       <el-table-column prop="tid" header-align="center" align="center" label="所属讲师ID"></el-table-column>
       <el-table-column prop="price" header-align="center" align="center" label="课程价格"></el-table-column>
-      <el-table-column prop="status" header-align="center" align="center" label="审核审核状态">
+      <el-table-column prop="status" header-align="center" align="center" label="审核状态">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === 1" size="small" type="warning">未审核</el-tag>
           <el-tag v-else-if="scope.row.status === 2" size="small" type="danger">审核中</el-tag>
