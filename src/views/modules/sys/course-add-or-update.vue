@@ -13,7 +13,7 @@
       <el-form-item label="所属课程" prop="cid"> 
         <el-input v-model="dataForm.cid" type="cid" placeholder="所属课程"></el-input>
       </el-form-item>
-      <el-form-item label="所属讲师" prop="text">
+      <el-form-item label="所属讲师" prop="tid">
         <el-input v-model="dataForm.tid" placeholder="所属讲师"></el-input>
       </el-form-item>
       <el-form-item label="课程属性" prop="property">
