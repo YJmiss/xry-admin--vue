@@ -55,12 +55,8 @@
           parentId: [
             { required: true, message: '上级类目不能为空', trigger: 'change' }
           ]
-        },
-        menuList: []
+        }
       }
-    },
-    created () {
-      this.iconList = Icon.getNameList()
     },
     methods: {
       init (id) {
