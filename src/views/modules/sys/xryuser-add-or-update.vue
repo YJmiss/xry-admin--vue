@@ -99,7 +99,7 @@
               url: this.$http.adornUrl(`/xry/user/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',
               data: this.$http.adornData({
-                'courseId': this.dataForm.id || undefined,
+                'id': this.dataForm.id || undefined,
                 'usercode': this.dataForm.usercode,
                 'usercode': this.dataForm.usercode,
                 'password': this.dataForm.password,

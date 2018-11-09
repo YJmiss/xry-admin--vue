@@ -25,7 +25,7 @@
       <el-table-column prop="phone" header-align="center" align="center" label="注册手机号"></el-table-column>
       <el-table-column prop="email" header-align="center" align="center" label="注册邮箱"></el-table-column>
       <el-table-column prop="loginToken" header-align="center" align="center" label="登录令牌"></el-table-column>
-      <el-table-column prop="socialSource" header-align="center" align="center" label="注册邮箱">
+      <el-table-column prop="socialSource" header-align="center" align="center" label="第三方登录来源">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.socialSource === 0" size="small" type="warning">手机号</el-tag>
           <el-tag v-else-if="scope.row.socialSource === 1" size="small" type="danger">微信</el-tag>
