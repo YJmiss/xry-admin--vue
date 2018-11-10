@@ -40,18 +40,22 @@
     methods: {
       init (id) {
         this.dataForm.id = id || 0
-        if (this.dataForm.id) {
-            this.$http({
+        if (!this.dataForm.id) {
+          // 新增
+          this.visible = true
+        } else {
+          this.$http({
               url: this.$http.adornUrl(`/xry/role/info/${this.dataForm.id}`),
               method: 'get',
               params: this.$http.adornParams()
             }).then(({ data }) => {
+              this.visible = true
               if (data && data.code === 0) {
                 this.dataForm.name = data.role.name
                 this.dataForm.available = data.role.available
               }
             })
-          }
+        }
       },
       // 表单提交
       dataFormSubmit () {

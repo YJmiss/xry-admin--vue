@@ -62,7 +62,13 @@
           method: 'get',
           params: this.$http.adornParams()
         }).then(({ data }) => {
-          this.dataList = treeDataTranslate(data, 'id')
+          if (data && data.code === 0) {
+            this.dataList = data.page.list
+            this.totalPage = data.page.totalCount
+          } else {
+            this.dataList = []
+            this.totalPage = 0
+          }
           this.dataListLoading = false
         })
       },

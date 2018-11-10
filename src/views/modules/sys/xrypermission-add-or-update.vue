@@ -43,19 +43,23 @@
     methods: {
       init (id) {
         this.dataForm.id = id || 0
-        if (this.dataForm.id) {
-            this.$http({
+        if (!this.dataForm.id) {
+          // 新增
+          this.visible = true
+        } else {
+          this.$http({
               url: this.$http.adornUrl(`/xry/permission/info/${this.dataForm.id}`),
               method: 'get',
               params: this.$http.adornParams()
             }).then(({ data }) => {
               if (data && data.code === 0) {
+                this.visible = true
                 this.dataForm.name = data.permission.name
                 this.dataForm.url = data.permission.url
                 this.dataForm.available = data.permission.available
               }
-            })
-          }
+          })
+        }
       },
       // 表单提交
       dataFormSubmit () {

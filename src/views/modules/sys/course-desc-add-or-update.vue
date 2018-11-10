@@ -43,18 +43,20 @@
         this.dataForm.id = id || 0
         if (!this.dataForm.id) {
             // 新增
-          } else {
-            // 修改
-            this.$http({
-              url: this.$http.adornUrl(`/xry/course/desc/info/${this.dataForm.id}`),
-              method: 'get',
-              params: this.$http.adornParams()
-            }).then(({ data }) => {
-              this.dataForm.id = data.coursedesc.id
-              this.dataForm.courseId = data.courseDesc.courseId
-              this.dataForm.courseDesc = data.courseDesc.courseDesc
-            })
-          }
+            this.visible = true
+        } else {
+          // 修改
+          this.$http({
+            url: this.$http.adornUrl(`/xry/course/desc/info/${this.dataForm.id}`),
+            method: 'get',
+            params: this.$http.adornParams()
+          }).then(({ data }) => {
+            this.visible = true
+            this.dataForm.id = data.coursedesc.id
+            this.dataForm.courseId = data.courseDesc.courseId
+            this.dataForm.courseDesc = data.courseDesc.courseDesc
+          })
+        }
       },
       // 表单提交
       dataFormSubmit () {

@@ -42,7 +42,8 @@
       init (id) {
         this.dataForm.id = id || 0
         if (!this.dataForm.id) {
-            // 新增
+          // 新增
+          this.visible = true
           } else {
             // 修改
             this.$http({
@@ -50,6 +51,7 @@
               method: 'get',
               params: this.$http.adornParams()
             }).then(({ data }) => {
+              this.visible = true
               this.dataForm.id = data.courseCatalog.id
               this.dataForm.title = data.courseCatalog.title
               this.dataForm.courseid = data.courseCatalog.courseid

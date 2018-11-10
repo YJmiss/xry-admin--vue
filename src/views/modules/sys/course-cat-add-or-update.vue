@@ -1,23 +1,26 @@
 <template>
-  <el-dialog
-    :title="!dataForm.id ? '新增' : '修改'"
-    :close-on-click-modal="false"
-    :visible.sync="visible">
+  <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-      <el-form-item v-if="dataForm.parentId === 0" label="父类目" prop="parentId">
-        <el-input v-model="dataForm.parentId" placeholder="父类目"></el-input>
-      </el-form-item>
       <el-form-item v-if="dataForm.name" label="类目名称" prop="name">
         <el-input v-model="dataForm.name" placeholder="类目名称"></el-input>
       </el-form-item>
-      <el-form-item v-if="dataForm.status !== 1" label="状态" prop="status">
-        <el-input-number v-model="dataForm.status" controls-position="right" placeholder="状态"></el-input-number>
+      <el-form-item label="父类目" size="mini" prop="status">
+        <el-radio-group v-model="dataForm.status">
+          <el-radio :label="0">否</el-radio>
+          <el-radio :label="1">是</el-radio>
+        </el-radio-group>
       </el-form-item>
-      <el-form-item v-if="dataForm.sortOrder !== 0" label="排列序号" prop="sortOrder">
-        <el-input-number v-model="dataForm.sortOrder" controls-position="right" placeholder="排列序号"></el-input-number>
+      <el-form-item v-if="dataForm.parentId === 0" label="类目选择" prop="parentId">
+        <el-input v-model="dataForm.parentId" placeholder="类目选择"></el-input>
       </el-form-item>
-      <el-form-item v-if="dataForm.isParent !== 1" label="是否是父类目" prop="isParent">
-        <el-input-number v-model="dataForm.isParent" controls-position="right" placeholder="是否是父类目"></el-input-number>
+      <el-form-item v-if="dataForm.sortOrder" label="排列序号" prop="sortOrder">
+        <el-input-number v-model="dataForm.sortOrder" controls-position="right" :min="0" placeholder="排列序号"></el-input-number>
+      </el-form-item>
+      <el-form-item label="状态" size="mini" prop="status">
+        <el-radio-group v-model="dataForm.status">
+          <el-radio :label="1">正常</el-radio>
+          <el-radio :label="2">删除</el-radio>
+        </el-radio-group>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -31,19 +34,12 @@
   import Icon from '@/icons'
   export default {
     data () {
-      var validateUrl = (rule, value, callback) => {
-        if (this.dataForm.type === 1 && !/\S/.test(value)) {
-          callback(new Error('菜单URL不能为空'))
-        } else {
-          callback()
-        }
-      }
       return {
         visible: false,
         dataForm: {
           id: 0,
           parentId: 0,
-          name: '',
+          name: '667',
           status: 1,
           sortOrder: 0,
           isParent: 1,
@@ -61,23 +57,26 @@
     methods: {
       init (id) {
         this.dataForm.id = id || 0
-        if (!this.dataForm.id) {
-            // 新增
-          } else {
-            // 修改
+        this.visible = true
+        this.$nextTick(() => {
+          this.$refs['dataForm'].resetFields()
+          if (this.dataForm.id) {
             this.$http({
               url: this.$http.adornUrl(`/xry/course/cat/info/${this.dataForm.id}`),
               method: 'get',
               params: this.$http.adornParams()
             }).then(({ data }) => {
-              this.dataForm.id = data.course.id
-              this.dataForm.parentId = course.menu.parentId
-              this.dataForm.name = data.course.name
-              this.dataForm.status = data.course.status
-              this.dataForm.sortOrder = data.course.sortOrder
-              this.dataForm.isParent = data.course.isParent
+              if (data && data.code === 0) {
+                console.log(data);
+                this.dataForm.parentId = courseCat.menu.parent_id
+                this.dataForm.name = data.courseCat.name
+                this.dataForm.status = data.courseCat.status
+                this.dataForm.sortOrder = data.courseCat.sort_order
+                this.dataForm.isParent = data.courseCat.is_parent
+              }
             })
           }
+        })
       },
       // 表单提交
       dataFormSubmit () {

@@ -81,13 +81,16 @@
     methods: {
       init (id) {
         this.dataForm.id = id || 0
-        if (this.dataForm.id) {
-            this.$http({
+        if (!this.dataForm.id) {
+          // 新增
+          this.visible = true
+        } else {
+          this.$http({
               url: this.$http.adornUrl(`/xry/video/info/${this.dataForm.id}`),
               method: 'get',
               params: this.$http.adornParams()
             }).then(({ data }) => {
-              console.log(data);
+              this.visible = true
               if (data && data.code === 0) {
                 this.dataForm.title = data.video.title
                 this.dataForm.videoUrl = data.video.videoUrl
@@ -97,8 +100,8 @@
                 this.dataForm.status = data.video.status
                 this.dataForm.paramData = data.video.paramData
               }
-            })
-          }
+          })
+        }  
       },
       // 表单提交
       dataFormSubmit () {

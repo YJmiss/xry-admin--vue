@@ -70,26 +70,30 @@
     methods: {
       init (id) {
         this.dataForm.id = id || 0
-        if (this.dataForm.id) {
-            this.$http({
-              url: this.$http.adornUrl(`/xry/user/info/${this.dataForm.id}`),
-              method: 'get',
-              params: this.$http.adornParams()
-            }).then(({ data }) => {
-              if (data && data.code === 0) {
-                this.dataForm.usercode = data.user.usercode
-                this.dataForm.nickname = data.user.usercode
-                this.dataForm.password = data.user.password
-                this.dataForm.intro = data.user.intro
-                this.dataForm.avatar = data.user.avatar
-                this.dataForm.phone = data.user.phone
-                this.dataForm.email = data.user.email
-                this.dataForm.socialSource = data.user.socialSource
-                this.dataForm.loginToken = data.user.loginToken
-                this.dataForm.openuserId = data.user.openuserId
-              }
-            })
-          }
+        if (!this.dataForm.id) {
+          // 新增
+          this.visible = true
+        } else {
+          this.$http({
+            url: this.$http.adornUrl(`/xry/user/info/${this.dataForm.id}`),
+            method: 'get',
+            params: this.$http.adornParams()
+          }).then(({ data }) => {
+            this.visible = true
+            if (data && data.code === 0) {
+              this.dataForm.usercode = data.user.usercode
+              this.dataForm.nickname = data.user.usercode
+              this.dataForm.password = data.user.password
+              this.dataForm.intro = data.user.intro
+              this.dataForm.avatar = data.user.avatar
+              this.dataForm.phone = data.user.phone
+              this.dataForm.email = data.user.email
+              this.dataForm.socialSource = data.user.socialSource
+              this.dataForm.loginToken = data.user.loginToken
+              this.dataForm.openuserId = data.user.openuserId
+            }
+          })
+        }
       },
       // 表单提交
       dataFormSubmit () {

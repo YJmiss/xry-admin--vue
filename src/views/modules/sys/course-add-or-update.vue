@@ -1,8 +1,6 @@
 <template>
   <el-dialog
-    :title="!dataForm.id ? '新增' : '修改'"
-    :close-on-click-modal="false"
-    :visible.sync="visible">
+    :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
       <el-form-item label="课程标题" prop="title">
         <el-input v-model="dataForm.title" type="text"placeholder="课程标题"></el-input>
@@ -39,16 +37,8 @@
 </template>
 
 <script>
-  import { isEmail, isMobile } from '@/utils/validate'
   export default {
     data () {
-      var validatePassword = (rule, value, callback) => {
-        if (!this.dataForm.id && !/\S/.test(value)) {
-          callback(new Error('标题不能为空'))
-        } else {
-          callback()
-        }
-      }
       return {
         visible: false,
         roleList: [],
@@ -56,9 +46,9 @@
           id: 0,
           title: '',
           image: '',
-          cid: '',
-          tid: '',
-          property: '',
+          cid: 1,
+          tid: 1,
+          property: 1,
           status: 1,
           price: ''
         },
@@ -93,7 +83,7 @@
               method: 'get',
               params: this.$http.adornParams()
             }).then(({ data }) => {
-              console.log(data);
+              this.visible = true
               if (data && data.code === 0) {
                 this.dataForm.title = data.course.title
                 this.dataForm.image = data.course.image
