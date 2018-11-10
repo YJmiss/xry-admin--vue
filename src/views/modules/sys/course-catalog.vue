@@ -5,6 +5,9 @@
         <el-input v-model="dataForm.title" placeholder="目录名称" clearable></el-input>
       </el-form-item>
       <el-form-item>
+        <el-input v-model="dataForm.courseid" placeholder="所属课程" clearable></el-input>
+      </el-form-item>
+      <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('xry:course:catalog:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('xry:course:catalog:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
@@ -15,7 +18,9 @@
       </el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
       <el-table-column prop="title" header-align="center" align="center" label="目录名称"></el-table-column>
-      <el-table-column prop="courseid" header-align="center" align="center" label="所属课程"></el-table-column>
+      <el-table-column prop="courseid" header-align="center" align="center" label="所属课程">
+      
+      </el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">

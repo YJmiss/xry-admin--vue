@@ -1,11 +1,17 @@
 <template>
   <el-dialog
-    :title="!dataForm.id ? '新增' : '修改'"
+    :title="!dataForm.courseId ? '新增' : '修改'"
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-      <el-form-item v-if="dataForm.courseId" label="所属课程" prop="courseId">
-        <el-input v-model="dataForm.courseId" placeholder="所属课程"></el-input>
+      <el-form-item label="所属课程" prop="parentName"> 
+        <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
+          <el-tree :data="courseList" :props="courseListTreeProps" node-key="courseId" ref="courseListTree"
+            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
+            :highlight-current="true" :expand-on-click-node="false">
+          </el-tree>
+        </el-popover>
+        <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item v-if="dataForm.courseDesc" label="课程描述" prop="courseDesc">
         <el-input v-model="dataForm.courseDesc" controls-position="right" placeholder="课程描述"></el-input>
@@ -19,14 +25,15 @@
 </template>
 
 <script>
+  import { treeDataTranslate } from '@/utils'
   export default {
     data () {
       return {
         visible: false,
         dataForm: {
-          id: 0,
-          courseId: '',
-          courseDesc: '',
+          courseId: 0,
+          parentName: '',
+          courseDesc: '453',
         },
         dataRule: {
           courseId: [
@@ -35,28 +42,55 @@
           courseDesc: [
             { required: true, message: '课程描述不能为空', trigger: 'blur' }
           ]
+        },
+        courseList: [],
+        courseListTreeProps: {
+          label: 'title',
+          children: 'children'
         }
       }
     },
     methods: {
-      init (id) {
-        this.dataForm.id = id || 0
-        if (!this.dataForm.id) {
-            // 新增
-            this.visible = true
-        } else {
-          // 修改
-          this.$http({
-            url: this.$http.adornUrl(`/xry/course/desc/info/${this.dataForm.id}`),
-            method: 'get',
-            params: this.$http.adornParams()
-          }).then(({ data }) => {
-            this.visible = true
-            this.dataForm.id = data.coursedesc.id
-            this.dataForm.courseId = data.courseDesc.courseId
-            this.dataForm.courseDesc = data.courseDesc.courseDesc
+      init (courseId) {
+        this.dataForm.courseId = courseId || 0
+        this.$http({
+          url: this.$http.adornUrl('/xry/course/desc/select'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({ data }) => {
+          this.courseList = treeDataTranslate(data.courseList, 'courseId')
+        }).then(() => {
+          this.visible = true
+          this.$nextTick(() => {
+            this.$refs['dataForm'].resetFields()
           })
-        }
+        }).then(() => {
+          if (this.dataForm.courseId) {
+            this.$http({
+              url: this.$http.adornUrl(`/xry/course/desc/info/${this.dataForm.courseId}`),
+              method: 'get',
+              params: this.$http.adornParams()
+            }).then(({ data }) => {
+              this.visible = true
+              this.dataForm.courseId = data.courseDesc.courseId
+              this.dataForm.courseDesc = data.courseDesc.courseDesc
+              this.courseListTreeSetCurrentNode()
+            })
+          } else {
+            // 新增
+            this.courseListTreeSetCurrentNode()
+          }
+        })
+      },
+      // 课程树选中
+      courseListTreeCurrentChangeHandle (data, node) {
+        this.dataForm.parentId = data.courseId
+        this.dataForm.parentName = data.title
+      },
+      // 课程树设置当前选中节点
+      courseListTreeSetCurrentNode () {
+        this.$refs.courseListTree.setCurrentKey(this.dataForm.parentId)
+        this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
       },
       // 表单提交
       dataFormSubmit () {
@@ -66,9 +100,8 @@
               url: this.$http.adornUrl(`/xry/course/desc/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',
               data: this.$http.adornData({
-                'id': this.dataForm.id || undefined,
-                'title': this.dataForm.courseId,
-                'courseid': this.dataForm.courseDesc
+                'courseId': this.dataForm.courseId || undefined,
+                'courseDesc': this.dataForm.courseDesc
               })
             }).then(({ data }) => {
               if (data && data.code === 0) {

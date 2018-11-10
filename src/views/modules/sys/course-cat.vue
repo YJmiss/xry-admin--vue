@@ -5,7 +5,12 @@
         <el-input v-model="dataForm.name" placeholder="类目名称" clearable></el-input>
       </el-form-item>
       <el-form-item>
+        <el-input v-model="dataForm.status" placeholder="状态" clearable></el-input>
+      </el-form-item>
+      <el-form-item>
+        <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('xry:course:cat:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('xry:course:cat:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
@@ -44,6 +49,7 @@
         pageSize: 10,
         totalPage: 0,
         dataListLoading: false,
+        dataListSelections: [],
         addOrUpdateVisible: false
       }
     },
