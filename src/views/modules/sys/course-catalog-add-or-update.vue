@@ -7,8 +7,14 @@
       <el-form-item v-if="dataForm.title" label="目录名称" prop="title">
         <el-input v-model="dataForm.title" placeholder="目录名称"></el-input>
       </el-form-item>
-      <el-form-item v-if="dataForm.courseid" label="所属课程" prop="courseid">
-        <el-input v-model="dataForm.courseid" controls-position="right" placeholder="所属课程"></el-input>
+      <el-form-item label="所属课程" prop="parentName"> 
+        <el-popover ref="courseCatListPopover" placement="bottom-start" trigger="click">
+          <el-tree :data="courseCatList" :props="courseCatListTreeProps" node-key="id" ref="courseCatListTree"
+            @current-change="courseCatListTreeCurrentChangeHandle" :default-expand-all="true"
+            :highlight-current="true" :expand-on-click-node="false">
+          </el-tree>
+        </el-popover>
+        <el-input v-model="dataForm.parentName" v-popover:courseCatListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -19,6 +25,7 @@
 </template>
 
 <script>
+  import { treeDataTranslate } from '@/utils'
   export default {
     data () {
       return {
@@ -27,6 +34,7 @@
           id: 0,
           title: '',
           courseid: '',
+          parentName: ''
         },
         dataRule: {
           name: [
@@ -35,15 +43,32 @@
           courseid: [
             { required: true, message: '所属课程不能为空', trigger: 'change' }
           ]
+        },
+        courseCatList: [],
+        courseCatListTreeProps: {
+          label: 'name',
+          children: 'children'
         }
       }
     },
     methods: {
       init (id) {
         this.dataForm.id = id || 0
-        if (!this.dataForm.id) {
-          // 新增
+        this.$http({
+          url: this.$http.adornUrl('/xry/course/catalog/select'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({ data }) => {
+          this.courseCatList = treeDataTranslate(data.courseCatList, 'id')
+        }).then(() => {
           this.visible = true
+          this.$nextTick(() => {
+            this.$refs['dataForm'].resetFields()
+          })
+        }).then(() => {
+          if (!this.dataForm.id) {
+            // 新增
+            this.courseCatListTreeSetCurrentNode()
           } else {
             // 修改
             this.$http({
@@ -55,8 +80,21 @@
               this.dataForm.id = data.courseCatalog.id
               this.dataForm.title = data.courseCatalog.title
               this.dataForm.courseid = data.courseCatalog.courseid
+              this.courseCatListTreeSetCurrentNode()
             })
           }
+
+        })
+      },
+      // 课程类目树选中
+      courseCatListTreeCurrentChangeHandle (data, node) {
+        this.dataForm.parentId = data.id
+        this.dataForm.parentName = data.name
+      },
+      // 课程类目树设置当前选中节点
+      courseCatListTreeSetCurrentNode () {
+        this.$refs.courseCatListTree.setCurrentKey(this.dataForm.parentId)
+        this.dataForm.parentName = (this.$refs.courseCatListTree.getCurrentNode() || {})['name']
       },
       // 表单提交
       dataFormSubmit () {

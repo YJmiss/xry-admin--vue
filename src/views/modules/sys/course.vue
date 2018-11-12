@@ -70,7 +70,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/xry/course/cat/list'),
+          url: this.$http.adornUrl('/xry/course/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
@@ -121,7 +121,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/xry/course/cat/delete'),
+            url: this.$http.adornUrl('/xry/course/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({ data }) => {

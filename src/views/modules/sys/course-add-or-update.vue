@@ -5,9 +5,6 @@
       <el-form-item label="课程标题" prop="title">
         <el-input v-model="dataForm.title" type="text"placeholder="课程标题"></el-input>
       </el-form-item>
-      <el-form-item label="课程图片" prop="image">
-        <el-input v-model="dataForm.image" type="text" placeholder="课程图片"></el-input>
-      </el-form-item>
       <el-form-item label="所属类目" prop="parentName"> 
         <el-popover ref="courseCatListPopover" placement="bottom-start" trigger="click">
           <el-tree :data="courseCatList" :props="courseCatListTreeProps" node-key="id" ref="courseCatListTree"
@@ -36,6 +33,9 @@
           <el-radio :label="3">已审核</el-radio>
           <el-radio :label="4">未通过</el-radio>
         </el-radio-group>
+      </el-form-item>
+      <el-form-item label="课程图片" prop="image">
+        <el-input v-model="dataForm.image" type="text" placeholder="课程图片"></el-input>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -113,7 +113,7 @@
               params: this.$http.adornParams()
             }).then(({ data }) => {
               if (data && data.code === 0) {
-                this.dataForm.id = data.menu.id
+                this.dataForm.id = data.course.id
                 this.dataForm.title = data.course.title
                 this.dataForm.image = data.course.image
                 this.dataForm.cid = data.course.cid

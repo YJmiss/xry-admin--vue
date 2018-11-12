@@ -1,8 +1,14 @@
 <template>
   <div class="mod-course-desc">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item>
-        <el-input v-model="dataForm.courseId" placeholder="课程名字" clearable></el-input>
+      <el-form-item label="所属课程" prop="parentName"> 
+        <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
+          <el-tree :data="courseList" :props="courseListTreeProps" node-key="courseId" ref="courseListTree"
+            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
+            :highlight-current="true" :expand-on-click-node="false">
+          </el-tree>
+        </el-popover>
+        <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
@@ -13,14 +19,13 @@
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column>
-      <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
-      <el-table-column prop="courseId" header-align="center" align="center" label="课程名字"></el-table-column>
+      <el-table-column prop="courseId" header-align="center" align="center" width="80" label="ID"></el-table-column>
       <el-table-column prop="courseDesc" header-align="center" align="center" label="课程描述"></el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('xry:course:desc:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button v-if="isAuth('xry:course:desc:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button v-if="isAuth('xry:course:desc:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.courseId)">修改</el-button>
+          <el-button v-if="isAuth('xry:course:desc:delete')" type="text" size="small" @click="deleteHandle(scope.row.courseId)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -33,11 +38,13 @@
 </template>
 
 <script>
+  import { treeDataTranslate } from '@/utils'
   import AddOrUpdate from './course-desc-add-or-update'
   export default {
     data () {
       return {
         dataForm: {
+          parentName: '',
           courseId: ''
         },
         dataList: [],
@@ -46,7 +53,12 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        courseList: [],
+        courseListTreeProps: {
+          label: 'title',
+          children: 'children'
+        }
       }
     },
     components: {
@@ -60,23 +72,42 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/xry/course/desc/list'),
+          url: this.$http.adornUrl('/xry/course/treeCourse'),
           method: 'get',
-          params: this.$http.adornParams({
-            'page': this.pageIndex,
-            'limit': this.pageSize,
-            'courseId': this.dataForm.courseId
-          })
+          params: this.$http.adornParams()
         }).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.dataList = data.page.list
-            this.totalPage = data.page.totalCount
-          } else {
-            this.dataList = []
-            this.totalPage = 0
-          }
-          this.dataListLoading = false
+          this.courseList = treeDataTranslate(data.courseList, 'courseId')
+        }).then(() => {
+          this.visible = true
+          this.$http({
+            url: this.$http.adornUrl('/xry/course/desc/list'),
+            method: 'get',
+            params: this.$http.adornParams({
+              'page': this.pageIndex,
+              'limit': this.pageSize,
+              'courseId': this.dataForm.courseId
+            })
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.dataList = data.page.list
+              this.totalPage = data.page.totalCount
+            } else {
+              this.dataList = []
+              this.totalPage = 0
+            }
+            this.dataListLoading = false
+          })
         })
+      },
+      // 课程树选中
+      courseListTreeCurrentChangeHandle (data, node) {
+        this.dataForm.parentId = data.courseId
+        this.dataForm.parentName = data.title
+      },
+      // 课程树设置当前选中节点
+      courseListTreeSetCurrentNode () {
+        this.$refs.courseListTree.setCurrentKey(this.dataForm.parentId)
+        this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
       },
       // 每页数
       sizeChangeHandle (val) {

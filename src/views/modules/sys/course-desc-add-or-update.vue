@@ -13,7 +13,7 @@
         </el-popover>
         <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
       </el-form-item>
-      <el-form-item v-if="dataForm.courseDesc" label="课程描述" prop="courseDesc">
+      <el-form-item label="课程描述" prop="courseDesc">
         <el-input v-model="dataForm.courseDesc" controls-position="right" placeholder="课程描述"></el-input>
       </el-form-item>
     </el-form>
@@ -33,7 +33,7 @@
         dataForm: {
           courseId: 0,
           parentName: '',
-          courseDesc: '453',
+          courseDesc: '',
         },
         dataRule: {
           courseId: [
@@ -54,7 +54,7 @@
       init (courseId) {
         this.dataForm.courseId = courseId || 0
         this.$http({
-          url: this.$http.adornUrl('/xry/course/desc/select'),
+          url: this.$http.adornUrl('/xry/course/treeCourse'),
           method: 'get',
           params: this.$http.adornParams()
         }).then(({ data }) => {
@@ -71,10 +71,11 @@
               method: 'get',
               params: this.$http.adornParams()
             }).then(({ data }) => {
-              this.visible = true
-              this.dataForm.courseId = data.courseDesc.courseId
-              this.dataForm.courseDesc = data.courseDesc.courseDesc
-              this.courseListTreeSetCurrentNode()
+              if (data && data.code === 0) {
+                this.dataForm.courseId = data.courseDesc.courseId
+                this.dataForm.courseDesc = data.courseDesc.courseDesc
+                this.courseListTreeSetCurrentNode()
+              }
             })
           } else {
             // 新增
@@ -89,6 +90,7 @@
       },
       // 课程树设置当前选中节点
       courseListTreeSetCurrentNode () {
+        console.log((this.$refs.courseListTree.getCurrentNode() || {})['title'])
         this.$refs.courseListTree.setCurrentKey(this.dataForm.parentId)
         this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
       },

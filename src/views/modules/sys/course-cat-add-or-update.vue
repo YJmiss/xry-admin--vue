@@ -37,7 +37,6 @@
 </template>
 
 <script>
-  import Icon from '@/icons'
   import { treeDataTranslate } from '@/utils'
   export default {
     data () {
