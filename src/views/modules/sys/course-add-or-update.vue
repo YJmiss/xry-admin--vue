@@ -125,7 +125,7 @@
               }
             })
           } else {
-             // 新增
+            // 新增
             this.courseCatListTreeSetCurrentNode()
           }
         })
