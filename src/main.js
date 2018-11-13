@@ -14,6 +14,10 @@ import '@/element-ui' // api: https://github.com/ElemeFE/element
 import '@/element-ui-theme'
 import '@/assets/scss/index.scss'
 import '@/icons' // icon
+import '../static/UE/ueditor.config.js'
+import '../static/UE/ueditor.all.min.js'
+import '../static/UE/lang/zh-cn/zh-cn.js'
+import '../static/UE/ueditor.parse.min.js'
 
 Vue.use(VueCookie)
 Vue.config.productionTip = false
