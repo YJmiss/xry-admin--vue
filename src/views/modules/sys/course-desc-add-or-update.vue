@@ -13,8 +13,8 @@
         </el-popover>
         <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
       </el-form-item>
-      <el-form-item label="课程描述" prop="courseDesc">
-        <el-input v-model="dataForm.courseDesc" controls-position="right" placeholder="课程描述"></el-input>
+      <el-form-item label="课程描述">
+        <UE :defaultMsg=defaultMsg :config=config ref="ue"></UE>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -25,8 +25,10 @@
 </template>
 
 <script>
+  import UE from '@/components/ue/ue.vue'
   import { treeDataTranslate } from '@/utils'
   export default {
+    components: {UE},
     data () {
       return {
         visible: false,
@@ -47,6 +49,11 @@
         courseListTreeProps: {
           label: 'title',
           children: 'children'
+        },
+        defaultMsg: '',
+        config: {
+          initialFrameWidth: null,
+          initialFrameHeight: 350
         }
       }
     },
@@ -122,6 +129,16 @@
             })
           }
         })
+      },
+      // 获取富文本编辑器的数据
+      getUEContent() {
+        let content = this.$refs.ue.getUEContent();
+        this.$notify({
+          title: '获取成功，可在控制台查看！',
+          message: content,
+          type: 'success'
+        });
+        console.log(content)
       }
     }
   }

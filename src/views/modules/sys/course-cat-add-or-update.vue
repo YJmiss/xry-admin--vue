@@ -4,8 +4,8 @@
       <el-form-item label="类目名称" prop="name">
         <el-input v-model="dataForm.name" placeholder="类目名称"></el-input>
       </el-form-item>
-      <el-form-item label="父类目" size="mini" prop="isParent">
-        <el-radio-group v-model="dataForm.isParent">
+      <el-form-item label="父类目" size="mini" prop="flag">
+        <el-radio-group v-model="dataForm.flag">
           <el-radio :label="0">否</el-radio>
           <el-radio :label="1">是</el-radio>
         </el-radio-group>
@@ -49,7 +49,7 @@
           parentName: '',
           status: 1,
           sortOrder: 0,
-          isParent: 0,
+          flag: 0,
         },
         dataRule: {
           name: [
@@ -89,8 +89,9 @@
               params: this.$http.adornParams()
             }).then(({ data }) => {
               if (data && data.code === 0) {
+                console.log(data.courseCat)
                 this.dataForm.parentId = data.courseCat.parentId
-                this.dataForm.isParent = data.courseCat.isParent
+                this.dataForm.flag = data.courseCat.flag
                 this.dataForm.name = data.courseCat.name
                 this.dataForm.status = data.courseCat.status
                 this.dataForm.sortOrder = data.courseCat.sortOrder
@@ -126,7 +127,7 @@
                 'name': this.dataForm.name,
                 'status': this.dataForm.status,
                 'sortOrder': this.dataForm.sortOrder,
-                'isParent': this.dataForm.isParent
+                'flag': this.dataForm.flag
               })
             }).then(({ data }) => {
               if (data && data.code === 0) {
