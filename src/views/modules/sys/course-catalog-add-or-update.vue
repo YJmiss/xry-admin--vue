@@ -4,17 +4,17 @@
     :close-on-click-modal="false"
     :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-      <el-form-item v-if="dataForm.title" label="目录名称" prop="title">
+      <el-form-item label="目录名称" prop="title">
         <el-input v-model="dataForm.title" placeholder="目录名称"></el-input>
       </el-form-item>
       <el-form-item label="所属课程" prop="parentName"> 
-        <el-popover ref="courseCatListPopover" placement="bottom-start" trigger="click">
-          <el-tree :data="courseCatList" :props="courseCatListTreeProps" node-key="id" ref="courseCatListTree"
-            @current-change="courseCatListTreeCurrentChangeHandle" :default-expand-all="true"
+        <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
+          <el-tree :data="courseList" :props="courseListTreeProps" node-key="id" ref="courseListTree"
+            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input v-model="dataForm.parentName" v-popover:courseCatListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
+        <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -33,20 +33,20 @@
         dataForm: {
           id: 0,
           title: '',
-          courseid: '',
+          courseid: 0,
           parentName: ''
         },
         dataRule: {
           name: [
             { required: true, message: '目录名称不能为空', trigger: 'blur' }
           ],
-          courseid: [
+          parentName: [
             { required: true, message: '所属课程不能为空', trigger: 'change' }
           ]
         },
-        courseCatList: [],
-        courseCatListTreeProps: {
-          label: 'name',
+        courseList: [],
+        courseListTreeProps: {
+          label: 'title',
           children: 'children'
         }
       }
@@ -59,7 +59,7 @@
           method: 'get',
           params: this.$http.adornParams()
         }).then(({ data }) => {
-          this.courseCatList = treeDataTranslate(data.courseCatList, 'id')
+          this.courseList = treeDataTranslate(data.courseList, 'id')
         }).then(() => {
           this.visible = true
           this.$nextTick(() => {
@@ -68,7 +68,7 @@
         }).then(() => {
           if (!this.dataForm.id) {
             // 新增
-            this.courseCatListTreeSetCurrentNode()
+            this.courseListTreeSetCurrentNode()
           } else {
             // 修改
             this.$http({
@@ -80,21 +80,21 @@
               this.dataForm.id = data.courseCatalog.id
               this.dataForm.title = data.courseCatalog.title
               this.dataForm.courseid = data.courseCatalog.courseid
-              this.courseCatListTreeSetCurrentNode()
+              this.courseListTreeSetCurrentNode()
             })
           }
 
         })
       },
       // 课程类目树选中
-      courseCatListTreeCurrentChangeHandle (data, node) {
-        this.dataForm.parentId = data.id
-        this.dataForm.parentName = data.name
+      courseListTreeCurrentChangeHandle (data, node) {
+        this.dataForm.courseid = data.id
+        this.dataForm.parentName = data.title
       },
       // 课程类目树设置当前选中节点
-      courseCatListTreeSetCurrentNode () {
-        this.$refs.courseCatListTree.setCurrentKey(this.dataForm.parentId)
-        this.dataForm.parentName = (this.$refs.courseCatListTree.getCurrentNode() || {})['name']
+      courseListTreeSetCurrentNode () {
+        this.$refs.courseListTree.setCurrentKey(this.dataForm.courseid)
+        this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
       },
       // 表单提交
       dataFormSubmit () {

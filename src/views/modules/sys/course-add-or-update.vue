@@ -115,12 +115,12 @@
               if (data && data.code === 0) {
                 this.dataForm.id = data.course.id
                 this.dataForm.title = data.course.title
-                this.dataForm.image = data.course.image
                 this.dataForm.cid = data.course.cid
                 this.dataForm.tid = data.course.tid
                 this.dataForm.property = data.course.property
                 this.dataForm.price = data.course.price
                 this.dataForm.status = data.course.status
+                this.dataForm.image = data.course.image
                 this.courseCatListTreeSetCurrentNode()
               }
             })
@@ -132,12 +132,12 @@
       },
       // 课程类目树选中
       courseCatListTreeCurrentChangeHandle (data, node) {
-        this.dataForm.parentId = data.id
+        this.dataForm.cid = data.id
         this.dataForm.parentName = data.name
       },
       // 课程类目树设置当前选中节点
       courseCatListTreeSetCurrentNode () {
-        this.$refs.courseCatListTree.setCurrentKey(this.dataForm.parentId)
+        this.$refs.courseCatListTree.setCurrentKey(this.dataForm.cid)
         this.dataForm.parentName = (this.$refs.courseCatListTree.getCurrentNode() || {})['name']
       },
       // 表单提交

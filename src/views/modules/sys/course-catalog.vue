@@ -4,8 +4,14 @@
       <el-form-item>
         <el-input v-model="dataForm.title" placeholder="目录名称" clearable></el-input>
       </el-form-item>
-      <el-form-item>
-        <el-input v-model="dataForm.courseid" placeholder="所属课程" clearable></el-input>
+      <el-form-item label="所属课程" prop="parentName"> 
+        <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
+          <el-tree :data="courseList" :props="courseListTreeProps" node-key="id" ref="courseListTree"
+            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
+            :highlight-current="true" :expand-on-click-node="false">
+          </el-tree>
+        </el-popover>
+        <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
@@ -18,7 +24,7 @@
       </el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
       <el-table-column prop="title" header-align="center" align="center" label="目录名称"></el-table-column>
-      
+      <el-table-column prop="courseid" header-align="center" align="center" label="课程ID"></el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
@@ -36,12 +42,14 @@
 </template>
 
 <script>
+  import { treeDataTranslate } from '@/utils'
   import AddOrUpdate from './course-catalog-add-or-update'
   export default {
     data () {
       return {
         dataForm: {
-          title: ''
+          title: '',
+          parentName: ''
         },
         dataList: [],
         pageIndex: 1,
@@ -49,7 +57,12 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        courseList: [],
+        courseListTreeProps: {
+          label: 'title',
+          children: 'children'
+        }
       }
     },
     components: {
@@ -63,23 +76,42 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/xry/course/catalog/list'),
+          url: this.$http.adornUrl('/xry/course/catalog/select'),
           method: 'get',
-          params: this.$http.adornParams({
-            'page': this.pageIndex,
-            'limit': this.pageSize,
-            'title': this.dataForm.title
-          })
+          params: this.$http.adornParams()
         }).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.dataList = data.page.list
-            this.totalPage = data.page.totalCount
-          } else {
-            this.dataList = []
-            this.totalPage = 0
-          }
-          this.dataListLoading = false
+          this.courseList = treeDataTranslate(data.courseList, 'id')
+        }).then(() => {
+          this.visible = true
+          this.$http({
+            url: this.$http.adornUrl('/xry/course/catalog/list'),
+            method: 'get',
+            params: this.$http.adornParams({
+              'page': this.pageIndex,
+              'limit': this.pageSize,
+              'title': this.dataForm.title
+            })
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.dataList = data.page.list
+              this.totalPage = data.page.totalCount
+            } else {
+              this.dataList = []
+              this.totalPage = 0
+            }
+            this.dataListLoading = false
+          })
         })
+      },
+       // 课程类目树选中
+      courseListTreeCurrentChangeHandle (data, node) {
+        this.dataForm.courseid = data.id
+        this.dataForm.parentName = data.title
+      },
+      // 课程类目树设置当前选中节点
+      courseListTreeSetCurrentNode () {
+        this.$refs.courseListTree.setCurrentKey(this.dataForm.courseid)
+        this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
       },
       // 每页数
       sizeChangeHandle (val) {
