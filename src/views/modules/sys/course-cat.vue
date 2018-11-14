@@ -49,7 +49,8 @@
     data () {
       return {
         dataForm: {
-          parentName: ''
+          parentName: '',
+          status:''
         },
         courseCatList: [],
         courseCatListTreeProps: {
