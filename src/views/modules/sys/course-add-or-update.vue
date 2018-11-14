@@ -95,7 +95,7 @@
         this.dataForm.id = id || 0
         // 查询所有课程类目，构造成一棵树
         this.$http({
-          url: this.$http.adornUrl('sys:course:cat:treeCourseCat'),
+          url: this.$http.adornUrl('/xry/course/cat/treeCourseCat'),
           method: 'get',
           params: this.$http.adornParams()
         }).then(({ data }) => {
@@ -142,13 +142,14 @@
       },
       // 表单提交
       dataFormSubmit () {
+        console.log(this.dataForm.id);
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
               url: this.$http.adornUrl(`/xry/course/${!this.dataForm.id ? 'save' : 'update'}`),
               method: 'post',
               data: this.$http.adornData({
-                'courseId': this.dataForm.id || undefined,
+                'id': this.dataForm.id || undefined,
                 'title': this.dataForm.title,
                 'image': this.dataForm.image,
                 'cid': this.dataForm.cid,

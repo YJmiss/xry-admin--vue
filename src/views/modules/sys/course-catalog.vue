@@ -76,7 +76,7 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('xry/course/treeCourse'),
+          url: this.$http.adornUrl('/xry/course/treeCourse'),
           method: 'get',
           params: this.$http.adornParams()
         }).then(({ data }) => {

@@ -3,7 +3,7 @@
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
       <el-form-item label="所属课程" prop="parentName"> 
         <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
-          <el-tree :data="courseList" :props="courseListTreeProps" node-key="courseId" ref="courseListTree"
+          <el-tree :data="courseList" :props="courseListTreeProps" node-key="id" ref="courseListTree"
             @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
@@ -62,7 +62,7 @@
           method: 'get',
           params: this.$http.adornParams()
         }).then(({ data }) => {
-          this.courseList = treeDataTranslate(data.courseList, 'courseId')
+          this.courseList = treeDataTranslate(data.courseList, 'id')
         }).then(() => {
           this.visible = true
           this.$nextTick(() => {
@@ -89,7 +89,7 @@
       },
       // 课程树选中
       courseListTreeCurrentChangeHandle (data, node) {
-        this.dataForm.courseId = data.courseId
+        this.dataForm.courseId = data.id
         this.dataForm.parentName = data.title
       },
       // 课程树设置当前选中节点
@@ -99,10 +99,12 @@
       },
       // 表单提交
       dataFormSubmit () {
+        // 获取富文本编辑器的数据
+        this.dataForm.courseDesc = this.$refs.ue.getUEContent();
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/xry/course/desc/${!this.dataForm.id ? 'save' : 'update'}`),
+              url: this.$http.adornUrl(`/xry/course/desc/${!this.dataForm.courseId ? 'save' : 'save'}`),
               method: 'post',
               data: this.$http.adornData({
                 'courseId': this.dataForm.courseId || undefined,
@@ -125,16 +127,6 @@
             })
           }
         })
-      },
-      // 获取富文本编辑器的数据
-      getUEContent() {
-        let content = this.$refs.ue.getUEContent();
-        this.$notify({
-          title: '获取成功，可在控制台查看！',
-          message: content,
-          type: 'success'
-        });
-        console.log(content)
       }
     }
   }

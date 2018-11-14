@@ -56,7 +56,7 @@
         this.dataForm.id = id || 0
         // 查询目录所属课程
         this.$http({
-          url: this.$http.adornUrl('xry/course/treeCourse'),
+          url: this.$http.adornUrl('/xry/course/treeCourse'),
           method: 'get',
           params: this.$http.adornParams()
         }).then(({ data }) => {
