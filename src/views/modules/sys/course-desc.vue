@@ -21,6 +21,7 @@
       </el-table-column>
       <el-table-column prop="courseId" header-align="center" align="center" width="80" label="ID"></el-table-column>
       <el-table-column prop="courseDesc" header-align="center" align="center" label="课程描述"></el-table-column>
+      <el-table-column prop="courseDesc" header-align="center" align="center" label="课程描述"></el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">

@@ -1,8 +1,5 @@
 <template>
-  <el-dialog
-    :title="!dataForm.courseId ? '新增' : '修改'"
-    :close-on-click-modal="false"
-    :visible.sync="visible">
+  <el-dialog :title="!dataForm.courseId ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
       <el-form-item label="所属课程" prop="parentName"> 
         <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
@@ -92,13 +89,12 @@
       },
       // 课程树选中
       courseListTreeCurrentChangeHandle (data, node) {
-        this.dataForm.parentId = data.courseId
+        this.dataForm.courseId = data.courseId
         this.dataForm.parentName = data.title
       },
       // 课程树设置当前选中节点
       courseListTreeSetCurrentNode () {
-        console.log((this.$refs.courseListTree.getCurrentNode() || {})['title'])
-        this.$refs.courseListTree.setCurrentKey(this.dataForm.parentId)
+        this.$refs.courseListTree.setCurrentKey(this.dataForm.courseId)
         this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
       },
       // 表单提交

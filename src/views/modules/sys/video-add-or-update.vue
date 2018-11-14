@@ -4,18 +4,18 @@
       <el-form-item label="视频标题" prop="title">
         <el-input v-model="dataForm.title" type="text"placeholder="视频标题"></el-input>
       </el-form-item>
-      <el-form-item label="所属课程" prop="parentName"> 
+      <el-form-item label="所属课程" prop="courseName"> 
         <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
-          <el-tree :data="courseList" :props="courseListTreeProps" node-key="id" ref="courseListTree"
+          <el-tree :data="courseList" :props="courseListTreeProps" node-key="courseId" ref="courseListTree"
             @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择所属课程" class="cat-list__input"></el-input>
+        <el-input v-model="dataForm.courseName" v-popover:courseListPopover :readonly="true" placeholder="点击选择所属课程" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="所属目录" prop="catalogName"> 
         <el-popover ref="courseCatalogListPopover" placement="bottom-start" trigger="click">
-          <el-tree :data="courseCatalogList" :props="courseCatalogListTreeProps" node-key="id" ref="courseCatalogListTree"
+          <el-tree :data="courseCatalogList" :props="courseCatalogListTreeProps" node-key="catalogId" ref="courseCatalogListTree"
             @current-change="courseCatalogListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
@@ -62,22 +62,22 @@
           id: 0,
           title: '',
           videoUrl: '',
-          courseId: '',
-          catalogId: '',
+          courseId: 0,
+          catalogId: 0,
           property: 1,
           status: 1,
           paramData: '',
-          parentName: '',
+          courseName: '',
           catalogName: ''
         },
         dataRule: {
           title: [
             { required: true, message: '请填写视频标题', trigger: 'blur' }
           ],
-          courseId: [
+          courseName: [
             { required: true, message: '请选择视频所属课程', trigger: 'blur' }
           ],
-          catalogId: [
+          catalogName: [
             { required: true, message: '请选择视频所属目录', trigger: 'blur' }
           ],
           property: [
@@ -118,13 +118,13 @@
             this.$refs['dataForm'].resetFields()
           })
         }).then(() => {
-          // 查询目录树
+          // 查询目录树，需要根据选中课程的id查询出目录树
           this.$http({
             url: this.$http.adornUrl('/xry/course/catalog/treeCourseCatalog'),
             method: 'get',
             params: this.$http.adornParams()
           }).then(({ data }) => {
-            this.courseList = treeDataTranslate(data.courseList, 'id')
+            this.courseCatalogList = treeDataTranslate(data.courseCatalogList, 'id')
           }).then(() => {
             this.visible = true
             this.$nextTick(() => {
@@ -143,7 +143,7 @@
               }).then(({ data }) => {
                 this.visible = true
                 if (data && data.code === 0) {
-                  this.dataForm.id = data.menu.id
+                  this.dataForm.id = data.video.id
                   this.dataForm.title = data.video.title
                   this.dataForm.videoUrl = data.video.videoUrl
                   this.dataForm.courseId = data.video.courseId
@@ -161,23 +161,23 @@
       },
       // 课程树选中
       courseListTreeCurrentChangeHandle (data, node) {
-        this.dataForm.parentId = data.id
-        this.dataForm.parentName = data.title
-      },
-      // 课程目录树选中
-      courseCatalogListTreeCurrentChangeHandle (data, node) {
-        this.dataForm.parentId = data.id
-        this.dataForm.catalogName = data.title
+        this.dataForm.courseId = data.id
+        this.dataForm.courseName = data.title
       },
       // 课程树设置当前选中节点
       courseListTreeSetCurrentNode () {
-        this.$refs.courseListTree.setCurrentKey(this.dataForm.parentId)
-        this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
+        this.$refs.courseListTree.setCurrentKey(this.dataForm.courseId)
+        this.dataForm.courseName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
+      },
+      // 课程目录树选中
+      courseCatalogListTreeCurrentChangeHandle (data, node) {
+        this.dataForm.catalogId = data.id
+        this.dataForm.catalogName = data.title
       },
       // 课程目录树设置当前选中节点
       courseCatalogListTreeSetCurrentNode () {
-        this.$refs.courseListTree.setCurrentKey(this.dataForm.parentId)
-        this.dataForm.catalogName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
+        this.$refs.courseCatalogListTree.setCurrentKey(this.dataForm.catalogId)
+        this.dataForm.catalogName = (this.$refs.courseCatalogListTree.getCurrentNode() || {})['title']
       },
       // 表单提交
       dataFormSubmit () {

@@ -77,7 +77,7 @@
         this.dataListLoading = true
         // 查询所有课程类目，构造成一棵树
         this.$http({
-          url: this.$http.adornUrl('/xry/course/select'),
+          url: this.$http.adornUrl('/xry/course/cat/treeCourseCat'),
           method: 'get',
           params: this.$http.adornParams()
         }).then(({ data }) => {
