@@ -35,17 +35,16 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="课程图片" prop="image">
-        <el-upload class="upload-demo" 
+        <el-upload class="upload-demo" v-model="dataForm.fileList"
+          action="http://localhost:9527/" ref="upload" 
           :limit='5' 
           :auto-upload="false" 
-          action="http://localhost:9527" 
           :on-exceed='uploadOverrun' 
-          ref="upload" 
-          :http-request='submitUpload' 
           :on-change='changeUpload'>
-          <el-button size="small" type="primary">点击上传</el-button>
+          <el-button size="small" type="primary">选择图片</el-button>
           <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-        </el-upload>
+      </el-upload>
+      <el-button size="small" type="success" @click="submitUpload(fileList)">上传服务器</el-button>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -61,7 +60,7 @@
     data () {
       return {
         visible: false,
-        roleList: [],
+        fileList: [],
         dataForm: {
           id: 0,
           title: '',
@@ -186,49 +185,49 @@
           }
         })
       },
-      // 上传图片错误信息提示
-      uploadOverrun: function() {
-          this.$message({
-              type: 'error',
-              message: '上传文件个数超出限制!最多上传5张图片!'
-          });
-      },
-      // 预览图片
-      changeUpload: function(file, fileList) {
-          this.fileList = fileList;
-          this.$nextTick(() => {
-              let upload_list_li = document.getElementsByClassName('el-upload-list')[0].children;
-              for (let i = 0; i < upload_list_li.length; i++) {
-                  let li_a = upload_list_li[i].children[0];
-                  let imgElement = document.createElement("img");
-                  imgElement.setAttribute('src', fileList[i].url);
-                  imgElement.setAttribute('style', "max-width:50%;padding-left:25%");
-                  if (li_a.lastElementChild.nodeName !== 'IMG') {
-                      li_a.appendChild(imgElement);
-                  }
-              }
+      // 自定义的上传图片的方法
+      submitUpload(fileList) {
+        console.log(fileList)
+        let formData = new FormData; 
+        formData.append('fileList', fileList);
+        console.log(formData.get('fileList'))
+        this.$http({
+          url: this.$http.adornUrl('/xry/course/upload/img'),
+          method: 'post',
+          params: this.$http.adornParams({
+            'formData': formData,
+            'type': 'course',
+            'config': {'Content-Type': 'multipart/form-data'}
           })
-      },
-      //自定义的上传图片的方法
-      submitUpload: function(content) {
-          //1. 创建formData 利用AXIOS传递
-          let formData = new FormData;
-          formData.append('file', content.file);
-          let config = { 'Content-Type': 'multipart/form-data' }
-          this.$http({
-            url: this.$http.adornUrl(`/sys/oss/upload/img`),
-            method: 'post',
-            data: this.$http.adornData({
-              'formData': formData,
-              'config': config
-            })
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-            
-            }
-          }).catch(function(error) {
+        }).then(({ data }) => {
+
+        }).catch(function(error) {
               console.log(error);
-          })
+        }) 
+      },
+      // 上传后预览图片
+      changeUpload: function(file, fileList) {
+        this.fileList = fileList;
+        this.$nextTick(() => {
+          let upload_list_li = document.getElementsByClassName('el-upload-list')[0].children;
+          for (let i = 0; i < upload_list_li.length; i++) {
+              let li_a = upload_list_li[i].children[0];
+              let imgElement = document.createElement("img");
+              imgElement.setAttribute('src', fileList[i].url);
+              imgElement.setAttribute('style', "max-width:50%;padding-left:25%");
+              if (li_a.lastElementChild.nodeName !== 'IMG') {
+                  li_a.appendChild(imgElement);
+              }
+          }
+        })
+        this.dataForm.fileList = fileList
+      },
+      // 长传出错、图片数量超过限制信息提示
+      uploadOverrun: function() {
+        this.$message({
+          type: 'error',
+          message: '上传文件个数超出限制!最多上传5张图片!'
+        });
       }
     }
   }
