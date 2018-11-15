@@ -35,7 +35,17 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="课程图片" prop="image">
-        <el-input v-model="dataForm.image" type="text" placeholder="课程图片"></el-input>
+        <el-upload class="upload-demo" 
+          :limit='5' 
+          :auto-upload="false" 
+          action="http://localhost:9527" 
+          :on-exceed='uploadOverrun' 
+          ref="upload" 
+          :http-request='submitUpload' 
+          :on-change='changeUpload'>
+          <el-button size="small" type="primary">点击上传</el-button>
+          <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+        </el-upload>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -175,6 +185,50 @@
             })
           }
         })
+      },
+      // 上传图片错误信息提示
+      uploadOverrun: function() {
+          this.$message({
+              type: 'error',
+              message: '上传文件个数超出限制!最多上传5张图片!'
+          });
+      },
+      // 预览图片
+      changeUpload: function(file, fileList) {
+          this.fileList = fileList;
+          this.$nextTick(() => {
+              let upload_list_li = document.getElementsByClassName('el-upload-list')[0].children;
+              for (let i = 0; i < upload_list_li.length; i++) {
+                  let li_a = upload_list_li[i].children[0];
+                  let imgElement = document.createElement("img");
+                  imgElement.setAttribute('src', fileList[i].url);
+                  imgElement.setAttribute('style', "max-width:50%;padding-left:25%");
+                  if (li_a.lastElementChild.nodeName !== 'IMG') {
+                      li_a.appendChild(imgElement);
+                  }
+              }
+          })
+      },
+      //自定义的上传图片的方法
+      submitUpload: function(content) {
+          //1. 创建formData 利用AXIOS传递
+          let formData = new FormData;
+          formData.append('file', content.file);
+          let config = { 'Content-Type': 'multipart/form-data' }
+          this.$http({
+            url: this.$http.adornUrl(`/sys/oss/upload/img`),
+            method: 'post',
+            data: this.$http.adornData({
+              'formData': formData,
+              'config': config
+            })
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+            
+            }
+          }).catch(function(error) {
+              console.log(error);
+          })
       }
     }
   }
