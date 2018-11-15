@@ -36,7 +36,7 @@
       </el-form-item>
       <el-form-item label="课程图片" prop="image">
         <el-upload class="upload-demo" v-model="dataForm.fileList"
-          action="http://localhost:9527/" ref="upload" 
+          action="http://localhost:9527/xry/course/upload/img" ref="upload" 
           :limit='5' 
           :auto-upload="false" 
           :on-exceed='uploadOverrun' 
@@ -188,25 +188,32 @@
       // 自定义的上传图片的方法
       submitUpload(fileList) {
         console.log(fileList)
-        let formData = new FormData; 
-        formData.append('fileList', fileList);
-        console.log(formData.get('fileList'))
-        this.$http({
-          url: this.$http.adornUrl('/xry/course/upload/img'),
-          method: 'post',
-          params: this.$http.adornParams({
-            'formData': formData,
-            'type': 'course',
-            'config': {'Content-Type': 'multipart/form-data'}
-          })
-        }).then(({ data }) => {
-
-        }).catch(function(error) {
-              console.log(error);
-        }) 
+        for (let i=0;i<fileList.length;i++) {
+          let imgName = fileList[i].name
+          let imgUrl = fileList[i].url
+          let imgFile = fileList[i].raw
+          this.$http({
+            url: this.$http.adornUrl('/xry/course/upload/img'),
+            method: 'post',
+            params: this.$http.adornParams({
+              'imgName': imgName,
+              'imgUrl': imgUrl,
+              'imgFile': imgFile,
+              'type': 'course',
+              'config': {'Content-Type': 'multipart/form-data'}
+            })
+          }).then(({ data }) => {
+            console.log(data);
+            // 成功后返回url
+            this.dataForm.image = data.msg
+          }).catch(function(error) {
+                console.log(error);
+          }) 
+        } 
       },
       // 上传后预览图片
       changeUpload: function(file, fileList) {
+        console.log(fileList);
         this.fileList = fileList;
         this.$nextTick(() => {
           let upload_list_li = document.getElementsByClassName('el-upload-list')[0].children;
