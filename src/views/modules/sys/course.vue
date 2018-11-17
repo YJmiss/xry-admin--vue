@@ -8,6 +8,8 @@
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('xry:course:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('xry:course:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('xry:course:update:status')" type="primary" @click="updateStatus(1)" :disabled="dataListSelections.length <= 0">课程上架</el-button>
+        <el-button v-if="isAuth('xry:course:update:status')" type="warning" @click="updateStatus(2)" :disabled="dataListSelections.length <= 0">课程下架</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
@@ -139,6 +141,10 @@
             }
           })
         }).catch(() => {})
+      },
+      // 课程上、下架
+      updateStatus (flag) {
+        console.log(flag)
       }
     }
   }

@@ -19,7 +19,10 @@ import '../static/UE/ueditor.config.js'
 import '../static/UE/ueditor.all.min.js'
 import '../static/UE/lang/zh-cn/zh-cn.js'
 import '../static/UE/ueditor.parse.min.js'
-//多图上传插件
+//
+import axios from 'axios'
+Vue.prototype.$ajax = axios;
+
  
 Vue.use(VueCookie)
 Vue.config.productionTip = false

@@ -35,16 +35,14 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="课程图片" prop="image">
-        <el-upload class="upload-demo" v-model="dataForm.fileList"
-          action="http://localhost:9527/xry/course/upload/img" ref="upload" 
-          :limit='5' 
-          :auto-upload="false" 
-          :on-exceed='uploadOverrun' 
-          :on-change='changeUpload'>
-          <el-button size="small" type="primary">选择图片</el-button>
-          <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-      </el-upload>
-      <el-button size="small" type="success" @click="submitUpload(fileList)">上传服务器</el-button>
+        <form id="upload" method="post" action="http://127.0.0.1:9527/xry/xry/course/upload/img" enctype="multipart/form-data">
+            <div align="left">
+                <div>
+                    <input type="file" name="file" id="file">
+                    <input type="submit" value="上传">
+                </div>
+            </div>
+        </form>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -70,7 +68,8 @@
           tid: 1,
           property: 1,
           status: 1,
-          price: 0
+          price: 0,
+          file: ''
         },
         dataRule: {
           title: [
@@ -185,56 +184,34 @@
           }
         })
       },
-      // 自定义的上传图片的方法
-      submitUpload(fileList) {
-        console.log(fileList)
-        for (let i=0;i<fileList.length;i++) {
-          let imgName = fileList[i].name
-          let imgUrl = fileList[i].url
-          let imgFile = fileList[i].raw
-          this.$http({
-            url: this.$http.adornUrl('/xry/course/upload/img'),
-            method: 'post',
-            params: this.$http.adornParams({
-              'imgName': imgName,
-              'imgUrl': imgUrl,
-              'imgFile': imgFile,
-              'type': 'course',
-              'config': {'Content-Type': 'multipart/form-data'}
-            })
-          }).then(({ data }) => {
-            console.log(data);
-            // 成功后返回url
-            this.dataForm.image = data.msg
-          }).catch(function(error) {
-                console.log(error);
-          }) 
-        } 
+      // 选择图片文件后赋值
+      getFile: function (event) {
+        this.file = event.target.files[0];
+        console.log(this.file);
       },
-      // 上传后预览图片
-      changeUpload: function(file, fileList) {
-        console.log(fileList);
-        this.fileList = fileList;
-        this.$nextTick(() => {
-          let upload_list_li = document.getElementsByClassName('el-upload-list')[0].children;
-          for (let i = 0; i < upload_list_li.length; i++) {
-              let li_a = upload_list_li[i].children[0];
-              let imgElement = document.createElement("img");
-              imgElement.setAttribute('src', fileList[i].url);
-              imgElement.setAttribute('style', "max-width:50%;padding-left:25%");
-              if (li_a.lastElementChild.nodeName !== 'IMG') {
-                  li_a.appendChild(imgElement);
-              }
-          }
-        })
-        this.dataForm.fileList = fileList
+      // 提交、上传图片到服务器
+      submit: function (event) {
+        //阻止元素发生默认的行为
+        event.preventDefault();
+        let formData = new FormData();
+        formData.append("file", this.file);
+        let config = {'Content-Type': 'multipart/form-data'}
+        formData.append("config", this.config);
+        this.$http({
+          url: this.$http.adornUrl(`/xry/course/upload/img`),
+          method: 'post',
+          data: this.$http.adornData(formData)
+        }).then(({ data }) => {
+          console.log(data)
+				})
       },
-      // 长传出错、图片数量超过限制信息提示
-      uploadOverrun: function() {
-        this.$message({
-          type: 'error',
-          message: '上传文件个数超出限制!最多上传5张图片!'
-        });
+      // 上传出错信息
+      handlerError(err,file,fileList) {
+        console.log(err);
+      },
+      // 上传成功信息
+      handlerSuccess(response,file,fileList) {
+        console.log(err);
       }
     }
   }
