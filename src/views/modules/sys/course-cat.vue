@@ -11,7 +11,9 @@
         <el-input v-model="dataForm.parentName" v-popover:courseCatListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item>
-        <el-input v-model="dataForm.status" placeholder="状态" clearable></el-input>
+        <el-select v-model="dataForm.status" placeholder="请选择审核状态" @change="currentSel">
+          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
+        </el-select>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
@@ -25,7 +27,13 @@
       <el-table-column prop="parentId" header-align="center" align="center" label="父类目ID"></el-table-column>
       <el-table-column prop="name" header-align="center" align="center" label="类目名称"></el-table-column>
       <el-table-column prop="sortOrder" header-align="center" align="center" label="排列序号"></el-table-column>
-      <el-table-column prop="status" header-align="center" align="center" label="状态"></el-table-column>
+      <el-table-column prop="status" header-align="center" align="center" label="审核状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.status === 1" size="small" type="success">正常</el-tag>
+          <el-tag v-else-if="scope.row.status === 2" size="small" type="danger">删除</el-tag>
+          <el-tag v-else size="small" type="warning">正常</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
@@ -50,7 +58,7 @@
       return {
         dataForm: {
           parentName: '',
-          status:''
+          status: ''
         },
         courseCatList: [],
         courseCatListTreeProps: {
@@ -63,7 +71,12 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        options: [
+          { value: '1', label: '正常' }, 
+          { value: '2', label: '删除' }
+        ],
+        value: ''
       }
     },
     components: {
@@ -75,6 +88,7 @@
     methods: {
       // 获取数据列表
       getDataList () {
+        console.log(this.status)
         this.dataListLoading = true
         // 查询所有课程类目，构造成一棵树
         this.$http({
@@ -88,7 +102,12 @@
           this.$http({
             url: this.$http.adornUrl('/xry/course/cat/list'),
             method: 'get',
-            params: this.$http.adornParams()
+            params: this.$http.adornParams({
+              'page': this.pageIndex,
+              'limit': this.pageSize,
+              'id': this.dataForm.parentId,
+              'status': this.dataForm.status
+            })
           }).then(({ data }) => {
             if (data && data.code === 0) {
               this.dataList = data.page.list
@@ -135,15 +154,18 @@
       },
       // 删除
       deleteHandle (id) {
-        this.$confirm(`确定对[id=${id}]进行[删除]操作?`, '提示', {
+         var ids = id ? [id] : this.dataListSelections.map(item => {
+          return item.id
+        })
+        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl(`/xry/course/cat/delete/${id}`),
+            url: this.$http.adornUrl(`/xry/course/cat/delete`),
             method: 'post',
-            data: this.$http.adornData()
+             data: this.$http.adornData(ids, false)
           }).then(({ data }) => {
             if (data && data.code === 0) {
               this.$message({
@@ -159,6 +181,11 @@
             }
           })
         }).catch(() => {})
+      },
+      // 审核状态下拉选中事件
+      currentSel(selVal){
+        this.status = selVal;
+        this.dialogVisible = true;
       }
     }
   }

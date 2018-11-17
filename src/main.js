@@ -19,10 +19,16 @@ import '../static/UE/ueditor.config.js'
 import '../static/UE/ueditor.all.min.js'
 import '../static/UE/lang/zh-cn/zh-cn.js'
 import '../static/UE/ueditor.parse.min.js'
-//
+// 引入axios
 import axios from 'axios'
 Vue.prototype.$ajax = axios;
-
+// 引入jquery.js
+import $ from 'jquery'
+Vue.prototype.$jquery=$
+// 引入uploadify_html5
+import '../static/uploadify_html5/Huploadify.css'
+import '../static/uploadify_html5/jquery.js'
+import '../static/uploadify_html5/jquery.Huploadify.js'
  
 Vue.use(VueCookie)
 Vue.config.productionTip = false

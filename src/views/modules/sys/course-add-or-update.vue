@@ -1,6 +1,5 @@
 <template>
-  <el-dialog
-    :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
+  <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
       <el-form-item label="课程标题" prop="title">
         <el-input v-model="dataForm.title" type="text"placeholder="课程标题"></el-input>
@@ -32,17 +31,12 @@
           <el-radio :label="2">审核中</el-radio>
           <el-radio :label="3">已审核</el-radio>
           <el-radio :label="4">未通过</el-radio>
+          <el-radio :label="5">通过不上架</el-radio>
+          <el-radio :label="6">未通并上架</el-radio>
         </el-radio-group>
       </el-form-item>
       <el-form-item label="课程图片" prop="image">
-        <form id="upload" method="post" action="http://127.0.0.1:9527/xry/xry/course/upload/img" enctype="multipart/form-data">
-            <div align="left">
-                <div>
-                    <input type="file" name="file" id="file">
-                    <input type="submit" value="上传">
-                </div>
-            </div>
-        </form>
+        <huploadify ref="huploadify"></huploadify>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -53,8 +47,12 @@
 </template>
 
 <script>
+
+  import $ from 'jquery'
+  import huploadify from '@/components/uploadify_html5/huploadify.vue'
   import { treeDataTranslate } from '@/utils'
   export default {
+    components: {huploadify},
     data () {
       return {
         visible: false,
@@ -183,36 +181,8 @@
             })
           }
         })
-      },
-      // 选择图片文件后赋值
-      getFile: function (event) {
-        this.file = event.target.files[0];
-        console.log(this.file);
-      },
-      // 提交、上传图片到服务器
-      submit: function (event) {
-        //阻止元素发生默认的行为
-        event.preventDefault();
-        let formData = new FormData();
-        formData.append("file", this.file);
-        let config = {'Content-Type': 'multipart/form-data'}
-        formData.append("config", this.config);
-        this.$http({
-          url: this.$http.adornUrl(`/xry/course/upload/img`),
-          method: 'post',
-          data: this.$http.adornData(formData)
-        }).then(({ data }) => {
-          console.log(data)
-				})
-      },
-      // 上传出错信息
-      handlerError(err,file,fileList) {
-        console.log(err);
-      },
-      // 上传成功信息
-      handlerSuccess(response,file,fileList) {
-        console.log(err);
       }
     }
   }
+  
 </script>
