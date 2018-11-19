@@ -25,18 +25,14 @@
       <el-form-item label="课程价格" prop="price">
         <el-input v-model="dataForm.price" type="text" placeholder="课程价格"></el-input>
       </el-form-item>
-      <el-form-item label="审核状态" size="mini" prop="status">
+      <!--<el-form-item label="审核状态" size="mini" prop="status">
         <el-radio-group v-model="dataForm.status">
           <el-radio :label="1">未审核</el-radio>
-          <el-radio :label="2">审核中</el-radio>
-          <el-radio :label="3">已审核</el-radio>
-          <el-radio :label="4">未通过</el-radio>
-          <el-radio :label="5">通过不上架</el-radio>
-          <el-radio :label="6">未通并上架</el-radio>
         </el-radio-group>
-      </el-form-item>
+      </el-form-item>-->
       <el-form-item label="课程图片" prop="image">
-        <huploadify ref="huploadify"></huploadify>
+        <!-- <huploadify ref="huploadify"></huploadify> -->
+        <el-button id="upload" type="primary" @click="uploadImg" round>选择图片</el-button>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -49,10 +45,9 @@
 <script>
 
   import $ from 'jquery'
-  import huploadify from '@/components/uploadify_html5/huploadify.vue'
   import { treeDataTranslate } from '@/utils'
   export default {
-    components: {huploadify},
+    
     data () {
       return {
         visible: false,
@@ -180,6 +175,42 @@
               }
             })
           }
+        })
+      },
+      // 文件上传时间绑定
+      uploadImg () {
+        $(function(){
+          $('#upload').Huploadify({
+            auto:false,
+            fileTypeExts:'*.jpg;*.jpeg;*.png;*.gif',
+            multi:true,
+            formData:{pid:'portal',token:'portal',filedesc:''},
+            fileSizeLimit:9999,
+            showUploadedPercent:true,//是否实时显示上传的百分比，如20%
+            showUploadedSize:true,
+            removeTimeout:9999999,
+            uploader : 'http://103.47.82.246:9000/edusoho-vedio-server/UploadImageFileServlet',
+            deleFileUrl:'http://103.47.82.246:9000/edusoho-vedio-server/DeleteImageFileServlet',
+            onUploadStart:function(){
+              //alert('开始上传');
+            },
+            onInit:function(){
+              //alert('初始化');
+            },
+            onUploadComplete:function(){
+              //alert('上传完成');
+            },
+            onUploadSuccess: function(file, data, response) {
+              //上传成功data返回的数据格式为[{"fileWebPath":"/2018/11/16/20181116224750959-69T2GQI8MQ9W.mp4"}]
+              alert(data);
+            },
+            onCancel:function(file){
+              //此处请勿填写内容
+              //删除成功返回{"msg":"delete successed.","success":"true"}
+              console.log('删除的文件：'+file);
+              console.log(file);
+            }
+          });
         })
       }
     }

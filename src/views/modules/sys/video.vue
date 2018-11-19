@@ -1,7 +1,7 @@
 <template>
   <div class="mod-video">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item>
+      <el-form-item label="视频标题">
         <el-input v-model="dataForm.title" placeholder="视频标题" clearable></el-input>
       </el-form-item>
       <el-form-item label="所属课程" prop="courseName"> 
@@ -11,7 +11,7 @@
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择所属课程" class="cat-list__input"></el-input>
+        <el-input v-model="dataForm.courseName" v-popover:courseListPopover :readonly="true" placeholder="点击选择所属课程" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="所属目录" prop="catalogName"> 
         <el-popover ref="courseCatalogListPopover" placement="bottom-start" trigger="click">
@@ -133,6 +133,8 @@
               params: this.$http.adornParams({
                 'page': this.pageIndex,
                 'limit': this.pageSize,
+                'courseId': this.dataForm.courseId,
+                'catalogId': this.dataForm.catalogId,
                 'title': this.dataForm.title
               })
             }).then(({ data }) => {

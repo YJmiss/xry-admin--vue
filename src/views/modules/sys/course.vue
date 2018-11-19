@@ -1,7 +1,16 @@
 <template>
   <div class="mod-course">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item>
+      <el-form-item label="所属类目" prop="parentName"> 
+        <el-popover ref="courseCatListPopover" placement="bottom-start" trigger="click">
+          <el-tree :data="courseCatList" :props="courseCatListTreeProps" node-key="id" ref="courseCatListTree"
+            @current-change="courseCatListTreeCurrentChangeHandle" :default-expand-all="true"
+            :highlight-current="true" :expand-on-click-node="false">
+          </el-tree>
+        </el-popover>
+        <el-input v-model="dataForm.parentName" v-popover:courseCatListPopover :readonly="true" placeholder="点击选择课程类目" class="cat-list__input"></el-input>
+      </el-form-item>
+      <el-form-item label="课程标题">
         <el-input v-model="dataForm.title" placeholder="课程标题" clearable></el-input>
       </el-form-item>
       <el-form-item>
@@ -47,11 +56,13 @@
 </template>
 
 <script>
+  import { treeDataTranslate } from '@/utils'
   import AddOrUpdate from './course-add-or-update'
   export default {
     data () {
       return {
         dataForm: {
+          parentName: '',
           title: ''
         },
         dataList: [],
@@ -60,7 +71,12 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false
+        addOrUpdateVisible: false,
+        courseCatList: [],
+        courseCatListTreeProps: {
+          label: 'name',
+          children: 'children'
+        }
       }
     },
     components: {
@@ -73,24 +89,44 @@
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
+        // 查询所有课程类目，构造成一棵树
         this.$http({
-          url: this.$http.adornUrl('/xry/course/list'),
+          url: this.$http.adornUrl('/xry/course/cat/treeCourseCat'),
           method: 'get',
-          params: this.$http.adornParams({
-            'page': this.pageIndex,
-            'limit': this.pageSize,
-            'title': this.dataForm.title
-          })
+          params: this.$http.adornParams()
         }).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.dataList = data.page.list
-            this.totalPage = data.page.totalCount
-          } else {
-            this.dataList = []
-            this.totalPage = 0
-          }
-          this.dataListLoading = false
+          this.courseCatList = treeDataTranslate(data.courseCatList, 'id')
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl('/xry/course/list'),
+            method: 'get',
+            params: this.$http.adornParams({
+              'page': this.pageIndex,
+              'limit': this.pageSize,
+              'title': this.dataForm.title,
+              'cid': this.dataForm.parentId
+            })
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.dataList = data.page.list
+              this.totalPage = data.page.totalCount
+            } else {
+              this.dataList = []
+              this.totalPage = 0
+            }
+            this.dataListLoading = false
+          })
         })
+      },
+      // 课程类目树选中
+      courseCatListTreeCurrentChangeHandle (data, node) {
+        this.dataForm.parentId = data.id
+        this.dataForm.parentName = data.name
+      },
+      // 课程类目树设置当前选中节点
+      courseCatListTreeSetCurrentNode () {
+        this.$refs.courseCatListTree.setCurrentKey(this.dataForm.parentId)
+        this.dataForm.parentName = (this.$refs.courseCatListTree.getCurrentNode() || {})['name']
       },
       // 每页数
       sizeChangeHandle (val) {

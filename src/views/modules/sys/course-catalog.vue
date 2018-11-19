@@ -1,7 +1,7 @@
 <template>
   <div class="mod-course-catalog">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item>
+      <el-form-item label="目录名称">
         <el-input v-model="dataForm.title" placeholder="目录名称" clearable></el-input>
       </el-form-item>
       <el-form-item label="所属课程" prop="parentName"> 
@@ -102,6 +102,7 @@
             params: this.$http.adornParams({
               'page': this.pageIndex,
               'limit': this.pageSize,
+              'courseid': this.dataForm.courseid,
               'title': this.dataForm.title
             })
           }).then(({ data }) => {

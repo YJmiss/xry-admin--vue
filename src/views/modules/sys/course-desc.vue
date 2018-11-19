@@ -71,6 +71,7 @@
     methods: {
       // 获取数据列表
       getDataList () {
+        console.log(this.dataForm.courseId)
         this.dataListLoading = true
         this.$http({
           url: this.$http.adornUrl('/xry/course/treeCourse'),
@@ -102,12 +103,12 @@
       },
       // 课程树选中
       courseListTreeCurrentChangeHandle (data, node) {
-        this.dataForm.parentId = data.courseId
+        this.dataForm.courseId = data.courseId
         this.dataForm.parentName = data.title
       },
       // 课程树设置当前选中节点
       courseListTreeSetCurrentNode () {
-        this.$refs.courseListTree.setCurrentKey(this.dataForm.parentId)
+        this.$refs.courseListTree.setCurrentKey(this.dataForm.courseId)
         this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
       },
       // 每页数

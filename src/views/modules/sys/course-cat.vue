@@ -10,7 +10,7 @@
         </el-popover>
         <el-input v-model="dataForm.parentName" v-popover:courseCatListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
       </el-form-item>
-      <el-form-item>
+      <el-form-item label="审核状态">
         <el-select v-model="dataForm.status" placeholder="请选择审核状态" @change="currentSel">
           <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
         </el-select>
@@ -88,7 +88,6 @@
     methods: {
       // 获取数据列表
       getDataList () {
-        console.log(this.status)
         this.dataListLoading = true
         // 查询所有课程类目，构造成一棵树
         this.$http({
