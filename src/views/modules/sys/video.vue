@@ -49,6 +49,8 @@
           <el-tag v-else-if="scope.row.status === 2" size="small" type="danger">审核中</el-tag>
           <el-tag v-else-if="scope.row.status === 3" size="small" type="success">已通过</el-tag>
           <el-tag v-else-if="scope.row.status === 4" size="small" type="warning">未通过</el-tag>
+          <el-tag v-else-if="scope.row.status === 5" size="small" type="warning">通过审核未上架</el-tag>
+          <el-tag v-else-if="scope.row.status === 6" size="small" type="success">通过审核已上架</el-tag>
           <el-tag v-else size="small" type="warning">未审核</el-tag>
         </template>
       </el-table-column>

@@ -29,14 +29,14 @@
           <el-radio :label="3">免费</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="审核状态" size="mini" prop="status">
+      <!-- <el-form-item label="审核状态" size="mini" prop="status">
         <el-radio-group v-model="dataForm.status">
           <el-radio :label="1">未审核</el-radio>
           <el-radio :label="2">审核中</el-radio>
           <el-radio :label="3">已审核</el-radio>
           <el-radio :label="4">未通过</el-radio>
         </el-radio-group>
-      </el-form-item>
+      </el-form-item> -->
       <el-form-item label="参数数据" prop="paramData">
         <el-input v-model="dataForm.paramData" type="text"placeholder="参数数据"></el-input>
       </el-form-item>

@@ -32,7 +32,8 @@
       </el-form-item>-->
       <el-form-item label="课程图片" prop="image">
         <!-- <huploadify ref="huploadify"></huploadify> -->
-        <el-button id="upload" type="primary" @click="uploadImg" round>选择图片</el-button>
+        <el-button id="" type="primary" @click="uploadImg" round>选择图片</el-button>
+        <div id="upload"></div>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -41,11 +42,17 @@
     </span>
   </el-dialog>
 </template>
-
+<style scoped>
+  @import "../../../styles/Huploadify.css";
+</style>
+<script src="../../../utils/jquery.Huploadify.js" ></script>
+<script>
+</script>
 <script>
 
   import $ from 'jquery'
-  import { treeDataTranslate } from '@/utils'
+  import { treeDataTranslate} from '@/utils'
+  import {Huploadify} from '@/utils/jquery.Huploadify.js'
   export default {
     
     data () {
@@ -179,8 +186,7 @@
       },
       // 文件上传时间绑定
       uploadImg () {
-        $(function(){
-          $('#upload').Huploadify({
+         var params={
             auto:false,
             fileTypeExts:'*.jpg;*.jpeg;*.png;*.gif',
             multi:true,
@@ -210,9 +216,20 @@
               console.log('删除的文件：'+file);
               console.log(file);
             }
-          });
-        })
+          };
+          console.log(this);
+          var objs=this;
+          //Huploadify(objs,params)
+          // $('#upload').on("click",function(){
+           
+          // var objs=this;
+          // alert(123);
+          // console.log(this);
+          var _this=$("#upload");
+          Huploadify(_this,params);
+          // });
       }
+     
     }
   }
   

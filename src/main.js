@@ -25,10 +25,7 @@ Vue.prototype.$ajax = axios;
 // 引入jquery.js
 import $ from 'jquery'
 Vue.prototype.$jquery=$
-// 引入uploadify_html5
-import '../static/uploadify_html5/Huploadify.css'
-import '../static/uploadify_html5/jquery.js'
-import '../static/uploadify_html5/jquery.Huploadify.js'
+
  
 Vue.use(VueCookie)
 Vue.config.productionTip = false
@@ -47,4 +44,4 @@ new Vue({
   store,
   template: '<App/>',
   render: h => h(App)
-})
+});
