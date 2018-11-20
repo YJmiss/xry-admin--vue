@@ -44,11 +44,11 @@
       </el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="审核状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.status === 1" size="small" type="warning">未审核</el-tag>
-          <el-tag v-else-if="scope.row.status === 2" size="small" type="danger">已审核</el-tag>
-          <el-tag v-else-if="scope.row.status === 3" size="small" type="success">审核通过</el-tag>
-          <el-tag v-else-if="scope.row.status === 4" size="small" type="warning">审核驳回</el-tag>
-          <el-tag v-else size="small" type="warning">未审核</el-tag>
+          <el-buttom v-if="scope.row.status === 1" size="small" type="text">未审核</el-buttom>
+          <el-buttom v-else-if="scope.row.status === 2" size="small" type="text">已审核</el-buttom>
+          <el-buttom v-else-if="scope.row.status === 3" size="small" type="text">审核通过</el-buttom>
+          <el-buttom v-else-if="scope.row.status === 4" size="small" type="text">审核驳回</el-buttom>
+          <el-buttom v-else size="small" type="warning">未审核</el-buttom>
         </template>
       </el-table-column>
       <el-table-column prop="paramData" header-align="center" align="center" label="参数数据"></el-table-column>
@@ -65,7 +65,7 @@
           :page-size="pageSize" :total="totalPage" layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 播放视频内容 -->
-    <video-play v-if="videoPlayVisible" ref="videoPlay" @refreshDataList="getDataList"></video-play>
+    <video-play v-show="videoPlayVisible" ref="videoPlay" @refreshDataList="getDataList"></video-play>
   </div>
 </template>
 
