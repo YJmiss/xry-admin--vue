@@ -3,35 +3,30 @@
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item label="所属类目" prop="courseCatName"> 
         <el-popover ref="courseCatListPopover" placement="bottom-start" trigger="click">
-          <el-tree :data="courseCatList" :props="courseCatListTreeProps" node-key="catalogId" ref="courseCatListTree"
+          <el-tree :data="courseCatList" :props="courseCatListTreeProps" node-key="courseCatId" ref="courseCatListTree"
             @current-change="courseCatListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
         <el-input v-model="dataForm.courseCatName" v-popover:courseCatListPopover :readonly="true" placeholder="点击选择课程类目" class="cat-list__input"></el-input>
       </el-form-item>
-      <el-form-item label="所属课程" prop="parentName"> 
+      <el-form-item label="课程标题" prop="parentName"> 
         <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
-          <el-tree :data="courseList" :props="courseListTreeProps" node-key="courseId" ref="courseListTree"
+          <el-tree :data="courseList" :props="courseListTreeProps" node-key="id" ref="courseListTree"
             @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择课程" class="cat-list__input"></el-input>
+        <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择课程标题" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="审核状态" prop="parentName">
         <el-select v-model="value" placeholder="请选择审核状态">
-          <el-option
-            v-for="item in options"
-            :key="item.value"
-            :label="item.label"
-            :value="item.value">
-          </el-option>
+          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
         </el-select> 
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('xry:course:examine')" type="success" @click="examinePass()" :disabled="dataListSelections.length <= 0">批量审核</el-button>
+        <el-button v-if="isAuth('xry:course:examine:pass')" type="success" @click="examinePass()" :disabled="dataListSelections.length <= 0">批量审核</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
@@ -44,9 +39,11 @@
       <el-table-column prop="status" header-align="center" align="center" label="审核状态">
         <template slot-scope="scope">
           <el-button v-if="scope.row.status === 1" size="small" type="text">未审核</el-button>
-          <el-button v-else-if="scope.row.status === 2" size="small" type="text">已审核</el-button>
-          <el-button v-else-if="scope.row.status === 3" size="small" type="text">审核通过</el-button>
-          <el-button v-else-if="scope.row.status === 4" size="small" type="text">审核驳回</el-button>
+          <el-button v-else-if="scope.row.status === 2" size="small" type="text">审核中</el-button>
+          <el-button v-else-if="scope.row.status === 3" size="small" type="text">已通过</el-button>
+          <el-button v-else-if="scope.row.status === 4" size="small" type="text">未通过</el-button>
+          <el-button v-else-if="scope.row.status === 5" size="small" type="text">通过审核未上架</el-button>
+          <el-button v-else-if="scope.row.status === 6" size="small" type="text">通过审核已上架</el-button>
           <el-button v-else size="small" type="text">未审核</el-button>
         </template>
       </el-table-column>
@@ -54,8 +51,8 @@
       <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作">
         <template slot-scope="scope">
         <el-button v-if="isAuth('xry:course:detail')"  size="small" @click="viewDetail(scope.row.id)">详情</el-button>
-        <el-button v-if="isAuth('xry:course:examine')" type="primary" size="small" @click="examinePass(scope.row.id)" >审核通过</el-button> 
-        <el-button v-if="isAuth('xry:course:examine')" type="danger" size="small" @click="examineReject(scope.row.id)">审核驳回</el-button> 
+        <el-button v-if="isAuth('xry:course:examine:pass')" type="primary" size="small" @click="examinePass(scope.row.id)" >审核通过</el-button> 
+        <el-button v-if="isAuth('xry:course:examine:reject')" type="danger" size="small" @click="examineReject(scope.row.id)">审核驳回</el-button> 
         </template>
       </el-table-column>
     </el-table>
@@ -70,14 +67,18 @@
 <script>
   import { treeDataTranslate } from '@/utils'
   import courseDetail from './course-examine-detail'
-
   export default {
     data () {
       return {
         dataForm: {
+          id:'',
           title: '',
           parentName: '',
-          courseCatName: ''
+          courseCatName: '',
+          courseCatId: '',
+          courseId: '',
+          examinePassBtnStatus: false,
+          examineRejectBtnStatus: false
         },
         dataList: [],
         pageIndex: 1,
@@ -97,17 +98,13 @@
           children: 'children'
         },
         options: [{
-          value: '1',
-          label: '未审核'
+          value: '1', label: '未审核'
         }, {
-          value: '2',
-          label: '审核中'
+          value: '2', label: '审核中'
         }, {
-          value: '3',
-          label: '已通过'
+          value: '3', label: '已通过'
         }, {
-          value: '4',
-          label: '未通过'
+          value: '4', label: '未通过'
         }],
         value: ''
       }
@@ -134,7 +131,7 @@
             method: 'get',
             params: this.$http.adornParams()
           }).then(({ data }) => {
-            this.courseList = treeDataTranslate(data.courseList, 'courseId')
+            this.courseList = treeDataTranslate(data.courseList, 'id')
           }).then(() => {
             this.$http({
                 url: this.$http.adornUrl('/xry/course/list'),
@@ -142,8 +139,8 @@
                 params: this.$http.adornParams({
                 'page': this.pageIndex,
                 'limit': this.pageSize,
-                'catalogId': this.dataForm.catalogId,
-                'courseId': this.dataForm.courseId,
+                'cid': this.dataForm.courseCatId,
+                'courseId': this.dataForm.id,
                 'examineStatus': this.value
                 })
             }).then(({ data }) => {
@@ -161,22 +158,23 @@
       },
       // 课程树选中
       courseListTreeCurrentChangeHandle (data, node) {
-        this.dataForm.courseId = data.courseId
+        console.log(data.title)
+        this.dataForm.id = data.id
         this.dataForm.parentName = data.title
       },
       // 课程树设置当前选中节点
       courseListTreeSetCurrentNode () {
-        this.$refs.courseListTree.setCurrentKey(this.dataForm.courseId)
+        this.$refs.courseListTree.setCurrentKey(this.dataForm.id)
         this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
       },
       // 课程类目树选中
       courseCatListTreeCurrentChangeHandle (data, node) {
-        this.dataForm.catalogId = data.id
+        this.dataForm.courseCatId = data.id
         this.dataForm.courseCatName = data.name
       },
       // 课程类目树设置当前选中节点
       courseCatListTreeSetCurrentNode () {
-        this.$refs.courseCatListTree.setCurrentKey(this.dataForm.catalogId)
+        this.$refs.courseCatListTree.setCurrentKey(this.dataForm.courseCatId)
         this.dataForm.courseCatName = (this.$refs.courseCatListTree.getCurrentNode() || {})['name']
       },
       // 每页数

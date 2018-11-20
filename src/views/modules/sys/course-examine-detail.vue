@@ -2,7 +2,7 @@
   <el-dialog :title="!dataForm.id ? '新增' : '课程详情'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
       <el-form-item label="课程标题" prop="title">
-        <el-input v-model="dataForm.title" disabled="true" type="text"placeholder="课程标题"></el-input>
+        <el-input v-model="dataForm.title" :disabled="true" type="text"placeholder="课程标题"></el-input>
       </el-form-item>
       <el-form-item label="所属类目" prop="parentName"> 
         <el-popover placement="bottom-start" trigger="click">
@@ -10,10 +10,10 @@
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input v-model="dataForm.parentName" disabled="true" v-popover:courseCatListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
+        <el-input v-model="dataForm.parentName" :disabled="true" v-popover:courseCatListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="所属讲师" prop="tid">
-        <el-input v-model="dataForm.tid" disabled="true" placeholder="所属讲师"></el-input>
+        <el-input v-model="dataForm.tid" :disabled="true" placeholder="所属讲师"></el-input>
       </el-form-item>
       <el-form-item label="是否收费" size="mini" prop="property">
         <el-radio-group v-model="dataForm.property">
@@ -22,11 +22,11 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="课程价格" prop="price">
-        <el-input  v-model="dataForm.price" disabled="true" type="text" placeholder="课程价格"></el-input>
+        <el-input  v-model="dataForm.price" :disabled="true" type="text" placeholder="课程价格"></el-input>
       </el-form-item>
       <el-form-item label="课程图片" prop="image">
         <!-- <huploadify ref="huploadify"></huploadify> -->
-        <el-button id="upload" type="primary" @click="uploadImg" round>选择图片</el-button>
+        <el-button id="upload" type="primary" round>选择图片</el-button>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -41,7 +41,6 @@
   import $ from 'jquery'
   import { treeDataTranslate } from '@/utils'
   export default {
-    
     data () {
       return {
         visible: false,
@@ -59,24 +58,7 @@
           file: ''
         },
         dataRule: {
-          title: [
-            { required: true, message: '请填写课程标题', trigger: 'blur' }
-          ],
-          parentName: [
-            { required: true, message: '上级类目不能为空', trigger: 'change' }
-          ],
-          tid: [
-            { required: true, message: '请选择所属讲师', trigger: 'blur' }
-          ],
-          property: [
-            { required: true, message: '请设置课程属性', trigger: 'blur' }
-          ],
-          status: [
-            { required: true, message: '请设置课程审核状态', trigger: 'blur' }
-          ],
-          price: [
-            { required: true, message: '请填写课程价格', trigger: 'blur' }
-          ]
+          
         },
         courseCatList: [],
         courseCatListTreeProps: {
@@ -137,75 +119,7 @@
       },
       // 表单提交
       dataFormSubmit () {
-        console.log(this.dataForm.id);
-        this.$refs['dataForm'].validate((valid) => {
-          if (valid) {
-            this.$http({
-              url: this.$http.adornUrl(`/xry/course/${!this.dataForm.id ? 'save' : 'update'}`),
-              method: 'post',
-              data: this.$http.adornData({
-                'id': this.dataForm.id || undefined,
-                'title': this.dataForm.title,
-                'image': this.dataForm.image,
-                'cid': this.dataForm.cid,
-                'tid': this.dataForm.tid,
-                'property': this.dataForm.property,
-                'price': this.dataForm.price,
-                'status': this.dataForm.status
-              })
-            }).then(({ data }) => {
-              if (data && data.code === 0) {
-                this.$message({
-                  message: '操作成功',
-                  type: 'success',
-                  duration: 1500,
-                  onClose: () => {
-                    this.visible = false
-                    this.$emit('refreshDataList')
-                  }
-                })
-              } else {
-                this.$message.error(data.msg)
-              }
-            })
-          }
-        })
-      },
-      // 文件上传时间绑定
-      uploadImg () {
-        $(function(){
-          $('#upload').Huploadify({
-            auto:false,
-            fileTypeExts:'*.jpg;*.jpeg;*.png;*.gif',
-            multi:true,
-            formData:{pid:'portal',token:'portal',filedesc:''},
-            fileSizeLimit:9999,
-            showUploadedPercent:true,//是否实时显示上传的百分比，如20%
-            showUploadedSize:true,
-            removeTimeout:9999999,
-            uploader : 'http://103.47.82.246:9000/edusoho-vedio-server/UploadImageFileServlet',
-            deleFileUrl:'http://103.47.82.246:9000/edusoho-vedio-server/DeleteImageFileServlet',
-            onUploadStart:function(){
-              //alert('开始上传');
-            },
-            onInit:function(){
-              //alert('初始化');
-            },
-            onUploadComplete:function(){
-              //alert('上传完成');
-            },
-            onUploadSuccess: function(file, data, response) {
-              //上传成功data返回的数据格式为[{"fileWebPath":"/2018/11/16/20181116224750959-69T2GQI8MQ9W.mp4"}]
-              alert(data);
-            },
-            onCancel:function(file){
-              //此处请勿填写内容
-              //删除成功返回{"msg":"delete successed.","success":"true"}
-              console.log('删除的文件：'+file);
-              console.log(file);
-            }
-          });
-        })
+        this.visible = false
       }
     }
   }

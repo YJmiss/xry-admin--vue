@@ -26,7 +26,8 @@
       </el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
       <el-table-column prop="title" header-align="center" align="center" label="课程标题"></el-table-column>
-      <el-table-column prop="tid" header-align="center" align="center" label="所属讲师ID"></el-table-column>
+      <el-table-column prop="courseCatName" header-align="center" align="center" label="所属类目"></el-table-column>
+      <el-table-column prop="tid" header-align="center" align="center" label="所属讲师"></el-table-column>
       <el-table-column prop="price" header-align="center" align="center" label="课程价格（￥：元）"></el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="审核状态">
         <template slot-scope="scope">
@@ -63,7 +64,8 @@
       return {
         dataForm: {
           parentName: '',
-          title: ''
+          title: '',
+          courseCatName: ''
         },
         dataList: [],
         pageIndex: 1,
@@ -109,6 +111,8 @@
           }).then(({ data }) => {
             if (data && data.code === 0) {
               this.dataList = data.page.list
+              // 获取数据成功后，需要把id装换成name
+              this.idToName(this.dataList,this.courseCatList)
               this.totalPage = data.page.totalCount
             } else {
               this.dataList = []
@@ -241,6 +245,16 @@
             }
           })
         }).catch(() => {})
+      },
+      // 把表格中的id转换成name
+      idToName: function (idList,nameList) {
+        for (let i=0;i<idList.length;i++) {
+          for (let j=0;j<nameList.length;j++) {
+            if (idList[i].cid == nameList[j].id) {
+              this.courseCatName = nameList[j].name
+            }
+          }
+        }
       }
     }
   }
