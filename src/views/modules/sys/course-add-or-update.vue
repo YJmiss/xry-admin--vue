@@ -25,15 +25,12 @@
       <el-form-item label="课程价格" prop="price">
         <el-input v-model="dataForm.price" type="text" placeholder="课程价格"></el-input>
       </el-form-item>
-      <!--<el-form-item label="审核状态" size="mini" prop="status">
-        <el-radio-group v-model="dataForm.status">
-          <el-radio :label="1">未审核</el-radio>
-        </el-radio-group>
-      </el-form-item>-->
       <el-form-item label="课程图片" prop="image">
-        <!-- <huploadify ref="huploadify"></huploadify> -->
-        <el-button id="" type="primary" round>选择图片</el-button>
-        <div id="upload"></div>
+        <el-upload class="upload-demo" action="http://localhost:80" :limit='5' :auto-upload="false" :on-exceed='uploadOverrun' ref="upload" :on-change='changeUpload'
+           :on-error="handlerError" :on-success="handlerSuccess">
+          <el-button size="small" type="primary">选择图片</el-button>
+          <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
+        </el-upload>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -174,6 +171,55 @@
             })
           }
         })
+      },
+      // 上传图片后预览图片
+      changeUpload: function(file, fileList) {
+        this.fileList = fileList;
+        this.$nextTick(() => {
+          let upload_list_li = document.getElementsByClassName('el-upload-list')[0].children;
+          for (let i = 0; i < upload_list_li.length; i++) {
+            let li_a = upload_list_li[i].children[0];
+            let imgElement = document.createElement("img");
+            imgElement.setAttribute('src', fileList[i].url);
+            imgElement.setAttribute('style', "max-width:50%;padding-left:25%");
+            if (li_a.lastElementChild.nodeName !== 'IMG') {
+                li_a.appendChild(imgElement);
+            }
+          }
+        })
+        this.uploadImg(this.fileList)
+      },
+      // 提交、上传图片到服务器
+      uploadImg (event) {
+        //阻止元素发生默认的行为
+        //event.preventDefault();
+        let formData = new FormData();
+        formData.append("file", this.file);
+        let config = {'Content-Type': 'multipart/form-data'}
+        formData.append("config", this.config);
+        console.log(formData)
+        this.$http({
+          url: this.$http.adornUrl(`/xry/course/upload/img`),
+          method: 'post',
+          data: this.$http.adornData(formData)
+        }).then(({ data }) => {
+          console.log(data)
+				})
+      },
+      // 上传图片超出限制
+      uploadOverrun: function() {
+        this.$message({
+            type: 'error',
+            message: '上传文件个数超出限制!最多上传5张图片!'
+        });
+      },
+      // 上传出错信息
+      handlerError(err,file,fileList) {
+        console.log(err);
+      },
+      // 上传成功信息
+      handlerSuccess(response,file,fileList) {
+        console.log(err);
       }
     }
   }
