@@ -1,9 +1,9 @@
 <template>
   <div class="mod-home">
-    <h3>项目介绍</h3>
-    <ul>
-      <li>基于 Spring Boot 2.0 + Shiro + Mybatis + Vue2.0 + Element 实现的权限系统</li>
-    </ul>
+    <h3>系统首页</h3>
+    
+   <p style="color:#e52e4c;">学而用欢迎您！尊敬的用户：在这里开始您的系统管理吧~</p>
+  
   </div>
 </template>
 
@@ -15,6 +15,7 @@
 <style>
   .mod-home {
     line-height: 1.5;
+     font-size: 16px;
   }
 </style>
 

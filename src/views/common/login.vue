@@ -3,8 +3,8 @@
     <div class="site-content__wrapper">
       <div class="site-content">
         <div class="brand-info">
-          <h2 class="brand-info__text">os-admin</h2>
-          <p class="brand-info__intro">基于 Spring Boot 2.0 + Shiro + Mybatis + Vue2.0 + Element 实现的权限系统</p>
+          <h2 class="brand-info__text">学而用APP</h2>
+          <p class="brand-info__intro">读书是学习，使用是学习，而且是更重要的学习—毛泽东。<br>学而用—所有努力只为给您带来最实用的课程！</p>
         </div>
         <div class="login-main">
           <h3 class="login-title">管理员登录</h3>
@@ -129,7 +129,7 @@
       margin: 0;
       overflow-x: hidden;
       overflow-y: auto;
-      background-color: transparent;
+     background-color:rgba(10, 0, 0, 0.3);
     }
     .site-content {
       min-height: 100%;
@@ -149,7 +149,7 @@
       margin: 10px 0;
       font-size: 16px;
       line-height: 1.58;
-      opacity: .6;
+      opacity: .9;
     }
     .login-main {
       position: absolute;
@@ -161,7 +161,8 @@
       background-color: #fff;
     }
     .login-title {
-      font-size: 16px;
+      font-size: 18px;
+      font-weight: bolder;
     }
     .login-captcha {
       overflow: hidden;
@@ -171,8 +172,12 @@
       }
     }
     .login-btn-submit {
-      width: 100%;
+       width: 100%;
+      height: 44px;
       margin-top: 38px;
+      background-color:#e52e4c; 
+      border: none;
+      border-radius: 22px;
     }
   }
 </style>
