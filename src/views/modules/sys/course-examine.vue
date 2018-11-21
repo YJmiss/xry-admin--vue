@@ -30,29 +30,28 @@
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
-      <el-table-column type="selection" header-align="center" align="center" width="50">
-      </el-table-column>
+      <el-table-column type="selection" header-align="center" align="center" width="50" :disabled="dataForm.status ==3 || dataForm.status ==2"></el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
       <el-table-column prop="title" header-align="center" align="center" label="课程标题"></el-table-column>
       <el-table-column prop="tid" header-align="center" align="center" label="所属讲师ID"></el-table-column>
       <el-table-column prop="price" header-align="center" align="center" label="课程价格"></el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="审核状态">
         <template slot-scope="scope">
-          <el-button v-if="scope.row.status === 1" size="small" type="text">未审核</el-button>
-          <el-button v-else-if="scope.row.status === 2" size="small" type="text">审核中</el-button>
-          <el-button v-else-if="scope.row.status === 3" size="small" type="text">已通过</el-button>
-          <el-button v-else-if="scope.row.status === 4" size="small" type="text">未通过</el-button>
-          <el-button v-else-if="scope.row.status === 5" size="small" type="text">通过审核未上架</el-button>
-          <el-button v-else-if="scope.row.status === 6" size="small" type="text">通过审核已上架</el-button>
-          <el-button v-else size="small" type="text">未审核</el-button>
+          <el-tag v-if="scope.row.status === 1" size="small" type="info">未审核</el-tag>
+          <el-tag v-else-if="scope.row.status === 2" size="small" type="warning">审核中</el-tag>
+          <el-tag v-else-if="scope.row.status === 3" size="small" type="success">已通过</el-tag>
+          <el-tag v-else-if="scope.row.status === 4" size="small" type="danger">未通过</el-tag>
+          <el-tag v-else-if="scope.row.status === 5" size="small" type="warning">通过审核未上架</el-tag>
+          <el-tag v-else-if="scope.row.status === 6" size="small" type="success">通过审核已上架</el-tag>
+          <el-tag v-else size="small" type="info">未审核</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作">
         <template slot-scope="scope">
-        <el-button v-if="isAuth('xry:course:detail')"  size="small" @click="viewDetail(scope.row.id)">详情</el-button>
-        <el-button v-if="isAuth('xry:course:examine:pass')" type="primary" size="small" @click="examinePass(scope.row.id)" >审核通过</el-button> 
-        <el-button v-if="isAuth('xry:course:examine:reject')" type="danger" size="small" @click="examineReject(scope.row.id)">审核驳回</el-button> 
+          <el-button v-if="isAuth('xry:course:detail')"  size="small" @click="viewDetail(scope.row.id)">详情</el-button>
+          <el-button v-if="isAuth('xry:course:examine:pass')" :disabled="scope.row.status == 3 || scope.row.status == 2" type="primary" size="small" @click="examinePass(scope.row.id)" >审核通过</el-button> 
+          <el-button v-if="isAuth('xry:course:examine:reject')" type="danger" size="small" @click="examineReject(scope.row.id)">审核驳回</el-button> 
         </template>
       </el-table-column>
     </el-table>
@@ -205,7 +204,7 @@
         var ids = id ? [id] : this.dataListSelections.map(item => {
           return item.id
         })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '审核驳回' : ''}]操作?`, '提示', {
+        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '审核驳回' : '批量驳回'}]操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'

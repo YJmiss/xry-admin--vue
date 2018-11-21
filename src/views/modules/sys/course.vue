@@ -112,7 +112,6 @@
             if (data && data.code === 0) {
               this.dataList = data.page.list
               // 获取数据成功后，需要把id装换成name
-              this.idToName(this.dataList,this.courseCatList)
               this.totalPage = data.page.totalCount
             } else {
               this.dataList = []
@@ -245,16 +244,6 @@
             }
           })
         }).catch(() => {})
-      },
-      // 把表格中的id转换成name
-      idToName: function (idList,nameList) {
-        for (let i=0;i<idList.length;i++) {
-          for (let j=0;j<nameList.length;j++) {
-            if (idList[i].cid == nameList[j].id) {
-              this.courseCatName = nameList[j].name
-            }
-          }
-        }
       }
     }
   }
