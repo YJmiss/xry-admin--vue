@@ -26,11 +26,18 @@
         <el-input v-model="dataForm.price" type="text" placeholder="课程价格"></el-input>
       </el-form-item>
       <el-form-item label="课程图片" prop="image">
-        <el-upload class="upload-demo" action="http://localhost:80" :limit='5' :auto-upload="false" :on-exceed='uploadOverrun' ref="upload" :on-change='changeUpload'
-           :on-error="handlerError" :on-success="handlerSuccess">
-          <el-button size="small" type="primary">选择图片</el-button>
-          <div slot="tip" class="el-upload__tip">只能上传jpg/png文件，且不超过500kb</div>
-        </el-upload>
+    <el-upload class="load"
+      drag
+      :action="url"
+      :before-upload="beforeUploadHandle"
+      :on-success="successHandle"
+      multiple
+      :file-list="fileList"
+      >
+      <i class="el-icon-upload"></i>
+      <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+      <div class="el-upload__tip" slot="tip">只支持jpg、png、gif格式的图片！</div>
+    </el-upload>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -40,13 +47,10 @@
   </el-dialog>
 </template>
 <script>
-  import $ from 'jquery'
   import { treeDataTranslate} from '@/utils'
   export default {
     data () {
       return {
-        visible: false,
-        fileList: [],
         dataForm: {
           id: 0,
           title: '',
@@ -59,6 +63,13 @@
           price: 0,
           file: ''
         },
+        url: '',
+          num: 0,
+          successNum: 0,
+          fileList: [],
+        dataListLoading: false,
+        dataListSelections: [],
+        visible: false,
         dataRule: {
           title: [
             { required: true, message: '请填写课程标题', trigger: 'blur' }
@@ -88,6 +99,7 @@
     },
     methods: {
       init (id) {
+        this.url = this.$http.adornUrl(`/sys/oss/upload?token=${this.$cookie.get('token')}`)
         this.dataForm.id = id || 0
         // 查询所有课程类目，构造成一棵树
         this.$http({
@@ -172,56 +184,42 @@
           }
         })
       },
-      // 上传图片后预览图片
-      changeUpload: function(file, fileList) {
-        this.fileList = fileList;
-        this.$nextTick(() => {
-          let upload_list_li = document.getElementsByClassName('el-upload-list')[0].children;
-          for (let i = 0; i < upload_list_li.length; i++) {
-            let li_a = upload_list_li[i].children[0];
-            let imgElement = document.createElement("img");
-            imgElement.setAttribute('src', fileList[i].url);
-            imgElement.setAttribute('style', "max-width:50%;padding-left:25%");
-            if (li_a.lastElementChild.nodeName !== 'IMG') {
-                li_a.appendChild(imgElement);
-            }
+      // 上传之前
+      beforeUploadHandle (file) {
+        if (file.type !== 'image/jpg' && file.type !== 'image/jpeg' && file.type !== 'image/png' && file.type !== 'image/gif') {
+          this.$message.error('只支持jpg、png、gif格式的图片！')
+          return false
+        }
+        this.num++
+      },
+      // 上传成功
+      successHandle (response, file, fileList) {
+        this.fileList = fileList
+        this.successNum++
+        if (response && response.code === 0) {
+          if (this.num === this.successNum) {
+            this.$confirm('操作成功, 是否继续操作?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).catch(() => {
+              this.visible = false
+            })
           }
-        })
-        this.uploadImg(this.fileList)
-      },
-      // 提交、上传图片到服务器
-      uploadImg (event) {
-        //阻止元素发生默认的行为
-        //event.preventDefault();
-        let formData = new FormData();
-        formData.append("file", this.file);
-        let config = {'Content-Type': 'multipart/form-data'}
-        formData.append("config", this.config);
-        console.log(formData)
-        this.$http({
-          url: this.$http.adornUrl(`/xry/course/upload/img`),
-          method: 'post',
-          data: this.$http.adornData(formData)
-        }).then(({ data }) => {
-          console.log(data)
-				})
-      },
-      // 上传图片超出限制
-      uploadOverrun: function() {
-        this.$message({
-            type: 'error',
-            message: '上传文件个数超出限制!最多上传5张图片!'
-        });
-      },
-      // 上传出错信息
-      handlerError(err,file,fileList) {
-        console.log(err);
-      },
-      // 上传成功信息
-      handlerSuccess(response,file,fileList) {
-        console.log(err);
+        } else {
+          this.$message.error(response.msg)
+        }
       }
     }
   }
-  
 </script>
+<style scoped>
+.load{
+text-align: center;
+border: solid 1px #f0f0f0;
+margin-top: 20px;
+padding:10px;
+font-size: 16px;
+}
+</style>
+
