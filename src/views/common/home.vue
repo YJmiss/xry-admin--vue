@@ -1,9 +1,9 @@
 <template>
   <div class="mod-home">
-    <h3>系统首页</h3>
+    <h2>系统首页</h2>
     
-   <p style="color:#e52e4c;">学而用欢迎您！尊敬的用户：在这里开始您的系统管理吧~</p>
-  
+   <el-span id="span">学而用欢迎您！</el-span><br><br>
+  <el-p id="p">尊敬的用户：在这里开始您的系统管理吧~</el-p>
   </div>
 </template>
 
@@ -12,10 +12,15 @@
   }
 </script>
 
-<style>
-  .mod-home {
-    line-height: 1.5;
-     font-size: 16px;
-  }
+<style  lang="scss" scoped>
+  
+  #sapn{
+   color:#e52e4c;
+   font-size: 16px;
+   }
+   #p{
+   color:#333333;
+   font-size: 14px;
+   }
 </style>
 
