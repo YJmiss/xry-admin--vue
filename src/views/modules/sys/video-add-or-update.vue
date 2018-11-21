@@ -7,8 +7,7 @@
       <el-form-item label="所属课程" prop="courseName"> 
         <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
           <el-tree :data="courseList" :props="courseListTreeProps" node-key="courseId" ref="courseListTree"
-            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
-            :highlight-current="true" :expand-on-click-node="false">
+            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true" :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
         <el-input v-model="dataForm.courseName" v-popover:courseListPopover :readonly="true" placeholder="点击选择所属课程" class="cat-list__input"></el-input>
@@ -29,14 +28,6 @@
           <el-radio :label="3">免费</el-radio>
         </el-radio-group>
       </el-form-item>
-      <!-- <el-form-item label="审核状态" size="mini" prop="status">
-        <el-radio-group v-model="dataForm.status">
-          <el-radio :label="1">未审核</el-radio>
-          <el-radio :label="2">审核中</el-radio>
-          <el-radio :label="3">已审核</el-radio>
-          <el-radio :label="4">未通过</el-radio>
-        </el-radio-group>
-      </el-form-item> -->
       <el-form-item label="参数数据" prop="paramData">
         <el-input v-model="dataForm.paramData" type="text"placeholder="参数数据"></el-input>
       </el-form-item>
@@ -118,19 +109,7 @@
             this.$refs['dataForm'].resetFields()
           })
         }).then(() => {
-          // 查询目录树，需要根据选中课程的id查询出目录树
-          this.$http({
-            url: this.$http.adornUrl('/xry/course/catalog/treeCourseCatalog'),
-            method: 'get',
-            params: this.$http.adornParams()
-          }).then(({ data }) => {
-            this.courseCatalogList = treeDataTranslate(data.courseCatalogList, 'id')
-          }).then(() => {
-            this.visible = true
-            this.$nextTick(() => {
-              this.$refs['dataForm'].resetFields()
-            })
-          }).then(() => {
+          
             if (!this.dataForm.id) {
               // 新增
               this.courseListTreeSetCurrentNode()
@@ -156,11 +135,21 @@
                 }
               })
             } 
-          }) 
+          
         })
       },
       // 课程树选中
       courseListTreeCurrentChangeHandle (data, node) {
+        // 查询目录树，需要根据选中课程的id查询出目录树
+        this.$http({
+          url: this.$http.adornUrl('/xry/course/catalog/treeCourseCatalog'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'courseId':data.id
+          })
+        }).then(({ data }) => {
+          this.courseCatalogList = treeDataTranslate(data.courseCatalogList, 'id')
+        })
         this.dataForm.courseId = data.id
         this.dataForm.courseName = data.title
       },
