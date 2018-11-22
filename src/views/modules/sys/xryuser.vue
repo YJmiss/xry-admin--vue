@@ -20,7 +20,6 @@
       <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
-      <el-table-column prop="usercode" header-align="center" align="center" label="账号"></el-table-column>
       <el-table-column prop="nickname" header-align="center" align="center" label="昵称"></el-table-column>
       <el-table-column prop="phone" header-align="center" align="center" label="注册手机号"></el-table-column>
       <el-table-column prop="email" header-align="center" align="center" label="注册邮箱"></el-table-column>
@@ -34,7 +33,7 @@
           <el-tag v-else size="small" type="warning">手机号</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="openuserId" header-align="center" align="center" label="第三方登录用户主键"></el-table-column>
+      <el-table-column prop="openUserId" header-align="center" align="center" label="第三方登录用户主键"></el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="注册时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">

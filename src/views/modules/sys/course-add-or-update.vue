@@ -26,18 +26,11 @@
         <el-input v-model="dataForm.price" type="text" placeholder="课程价格"></el-input>
       </el-form-item>
       <el-form-item label="课程图片" prop="image">
-    <el-upload class="load"
-      drag
-      :action="url"
-      :before-upload="beforeUploadHandle"
-      :on-success="successHandle"
-      multiple
-      :file-list="fileList"
-      >
-      <i class="el-icon-upload"></i>
-      <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-      <div class="el-upload__tip" slot="tip">只支持jpg、png、gif格式的图片！</div>
-    </el-upload>
+        <el-upload class="load" drag :action="url" :before-upload="beforeUploadHandle" :on-success="successHandle" multiple :file-list="fileList">
+          <i class="el-icon-upload"></i>
+          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+          <div class="el-upload__tip" slot="tip">只支持jpg、png、gif格式的图片！</div>
+        </el-upload>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -64,9 +57,9 @@
           file: ''
         },
         url: '',
-          num: 0,
-          successNum: 0,
-          fileList: [],
+        num: 0,
+        successNum: 0,
+        fileList: [],
         dataListLoading: false,
         dataListSelections: [],
         visible: false,

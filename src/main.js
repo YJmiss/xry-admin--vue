@@ -14,18 +14,18 @@ import '@/element-ui' // api: https://github.com/ElemeFE/element
 import '@/element-ui-theme'
 import '@/assets/scss/index.scss'
 import '@/icons' // icon
-//富文本编辑器
-import '../static/UE/ueditor.config.js'
-import '../static/UE/ueditor.all.min.js'
-import '../static/UE/lang/zh-cn/zh-cn.js'
-import '../static/UE/ueditor.parse.min.js'
+// vue-quill-editor富文本编辑器
+import VueQuillEditor from 'vue-quill-editor'
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
+
 // 引入axios
 import axios from 'axios'
 Vue.prototype.$ajax = axios;
 // 引入jquery.js
 import $ from 'jquery'
 Vue.prototype.$jquery=$
-
  
 Vue.use(VueCookie)
 Vue.config.productionTip = false

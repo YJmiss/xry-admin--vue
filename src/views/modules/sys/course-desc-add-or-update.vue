@@ -11,7 +11,7 @@
         <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="课程描述">
-        <UE :defaultMsg=defaultMsg :config=config ref="ue"></UE>
+        <editor ref="myTextEditor" :uploadUrl="uploadUrl" :on-success="successHandle"></editor>  
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -22,18 +22,20 @@
 </template>
 
 <script>
-  import UE from '@/components/ue/ue.vue'
+  import { quillEditor } from 'vue-quill-editor'
+  import editor from '@/components/upload/Quilleditor.vue'
   import { treeDataTranslate } from '@/utils'
   export default {
-    components: {UE},
+    components: {quillEditor,editor},
     data () {
       return {
         visible: false,
         dataForm: {
           courseId: 0,
           parentName: '',
-          courseDesc: '',
+          courseDesc: ''
         },
+        uploadShow: false,
         dataRule: {
           courseId: [
             { required: true, message: '所属课程不能为空', trigger: 'blur' }
@@ -51,12 +53,17 @@
         config: {
           initialFrameWidth: null,
           initialFrameHeight: 350
-        }
+        },
+        url: '',
+        fileList: [],
+        /*测试上传图片的接口，返回结构为{url:''}*/
+        uploadUrl:this.$http.adornUrl(`/sys/oss/uploadImg?token=${this.$cookie.get('token')}`)
       }
     },
     methods: {
-      init (courseId) {
-        this.dataForm.courseId = courseId || 0
+      init (id) {
+        this.url = this.$http.adornUrl(`/sys/oss/upload?token=${this.$cookie.get('token')}`)
+        this.dataForm.courseId = id || 0
         this.$http({
           url: this.$http.adornUrl('/xry/course/treeCourse'),
           method: 'get',
@@ -99,8 +106,6 @@
       },
       // 表单提交
       dataFormSubmit () {
-        // 获取富文本编辑器的数据
-        this.dataForm.courseDesc = this.$refs.ue.getUEContent();
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
@@ -127,6 +132,44 @@
             })
           }
         })
+      },
+      // 上传之前
+      beforeUploadHandle (file) {
+        if (file.type !== 'image/jpg' && file.type !== 'image/jpeg' && file.type !== 'image/png' && file.type !== 'image/gif') {
+          this.$message.error('只支持jpg、png、gif格式的图片！')
+          return false
+        }
+        this.num++
+      },
+      // 上传成功
+      successHandle (response, file, fileList) {
+        console.log(fileList)
+        this.fileList = fileList
+        this.successNum++
+        if (response && response.code === 0) {
+          if (this.num === this.successNum) {
+            this.$confirm('操作成功, 是否继续操作?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).catch(() => {
+              this.visible = false
+            })
+          }
+        } else {
+          this.$message.error(response.msg)
+        }
+      },
+      //富文本编辑器失去焦点事件
+      onEditorBlur(editor){    
+ 	    },
+       //富文本编辑器获得焦点事件
+      onEditorFocus(editor){
+      },
+      //富文本编辑器文本发生变化
+      onEditorChange({editor,html,text}){
+          //this.content可以实时获取到当前编辑器内的文本内容
+          console.log(this.content);
       }
     }
   }
