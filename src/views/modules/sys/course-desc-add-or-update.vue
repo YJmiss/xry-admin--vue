@@ -1,13 +1,13 @@
 <template>
   <el-dialog :title="!dataForm.courseId ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
       <el-form-item label="所属课程" prop="parentName"> 
-        <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
+        <el-popover ref="courseListPopover" placement="bottom-start" trigger="click" :disabled="isShow">
           <el-tree :data="courseList" :props="courseListTreeProps" node-key="courseId" ref="courseListTree"
             @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true" :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
+        <el-input v-model="dataForm.parentName" v-popover:courseListPopover :disabled="isShow" :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="课程描述">
         <editor ref="myTextEditor" :uploadUrl="uploadUrl" v-model="dataForm.courseDesc"></editor>  
@@ -34,6 +34,7 @@
           parentName: '',
           courseDesc: ''
         },
+        isShow: false,
         uploadShow: false,
         dataRule: {
           courseId: [
@@ -54,7 +55,6 @@
           initialFrameHeight: 350
         },
         url: '',
-        fileList: [],
         /*测试上传图片的接口，返回结构为{url:''}*/
         uploadUrl:this.$http.adornUrl(`/sys/oss/uploadImg?token=${this.$cookie.get('token')}`)
       }
@@ -68,7 +68,7 @@
           method: 'get',
           params: this.$http.adornParams()
         }).then(({ data }) => {
-          this.courseList = treeDataTranslate(data.courseList, 'id')
+          this.courseList = treeDataTranslate(data.courseList, 'courseId')
         }).then(() => {
           this.visible = true
           this.$nextTick(() => {
@@ -76,6 +76,7 @@
           })
         }).then(() => {
           if (this.dataForm.courseId) {
+            this.isShow = true
             this.$http({
               url: this.$http.adornUrl(`/xry/course/desc/info/${this.dataForm.courseId}`),
               method: 'get',
@@ -100,6 +101,7 @@
       },
       // 课程树设置当前选中节点
       courseListTreeSetCurrentNode () {
+        console.log(this.$refs.courseListTree.getCheckedKeys())
         this.$refs.courseListTree.setCurrentKey(this.dataForm.courseId)
         this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
       },
@@ -108,7 +110,7 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/xry/course/desc/${!this.dataForm.courseId ? 'save' : 'save'}`),
+              url: this.$http.adornUrl(`/xry/course/desc/${!this.dataForm.courseId ? 'save' : 'update'}`),
               method: 'post',
               data: this.$http.adornData({
                 'courseId': this.dataForm.courseId || undefined,
