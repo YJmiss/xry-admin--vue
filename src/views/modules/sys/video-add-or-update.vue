@@ -29,28 +29,33 @@
           <el-radio :label="3">免费</el-radio>
         </el-radio-group>
       </el-form-item>
-      <!-- <el-form-item label="审核状态" size="mini" prop="status">
-        <el-radio-group v-model="dataForm.status">
-          <el-radio :label="1">未审核</el-radio>
-          <el-radio :label="2">审核中</el-radio>
-          <el-radio :label="3">已审核</el-radio>
-          <el-radio :label="4">未通过</el-radio>
-        </el-radio-group>
-      </el-form-item> -->
-      <el-form-item label="参数数据" prop="paramData">
-        <el-input v-model="dataForm.paramData" type="text"placeholder="参数数据"></el-input>
+      <el-form-item label="视频路径" prop="url">
+        <el-input v-model="dataForm.videoUrl" type="text" placeholder="视频路径" readonly="readonly"></el-input>
       </el-form-item>
-      <el-form-item label="视频路径" prop="videoUrl">
-        <el-input v-model="dataForm.videoUrl" type="text" placeholder="视频路径"></el-input>
-      </el-form-item>
-    </el-form>
+      <el-form-item label="上传视频" >
+      <el-upload class="load"
+      drag
+      :action="url"
+      :before-upload="beforeUploadHandle"
+      :on-success="successHandle"
+      :on-progress="progressHandle"
+      multiple
+      :file-list="fileList"
+      >
+      <div class="icon">
+      <i class="el-icon-caret-right"></i>
+      </div>
+      <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+      <div class="el-upload__tip" slot="tip">只支持mp4格式的视频,且一个文件不超过500kb！</div>
+    </el-upload>
+    </el-form-item>
+     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
 </template>
-
 <script>
   import { treeDataTranslate } from '@/utils'
   export default {
@@ -58,6 +63,9 @@
       return {
         visible: false,
         roleList: [],
+        fileList:[],
+        uplodProgress:0,
+        url: '',
         dataForm: {
           id: 0,
           title: '',
@@ -70,6 +78,7 @@
           courseName: '',
           catalogName: ''
         },
+        video:'',
         dataRule: {
           title: [
             { required: true, message: '请填写视频标题', trigger: 'blur' }
@@ -213,7 +222,43 @@
             })
           }
         })
-      }
+      },
+      // 上传之前
+      beforeUploadHandle (file) {
+        if (file.type !== 'video/mp4') {
+          this.$message.error('只支持mp4格式的视频！')
+          return false
+        }
+      },
+      // 上传进度
+progressHandle(file){
+  uplodProgress=file.fileList/file.size*100
+},
+ // 上传成功
+successHandle(file){
+  if(uplodProgress=file.size){
+   this.$confirm('操作成功, 是否继续操作?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).catch(() => {
+              this.visible = false
+            })
+  }
+}
     }
   }
 </script>
+<style scoped>
+.icon{
+  border:solid 1px #f8f8f8;
+  width:50px;
+  height:50px;
+  margin-left:43%;
+  margin-top:50px;
+  margin-bottom:10px;
+  padding-top:10px;
+  background: #ebebeb;
+  border-radius: 4px;
+}
+</style>
