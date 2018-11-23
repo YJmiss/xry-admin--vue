@@ -4,14 +4,13 @@
       <el-form-item label="所属课程" prop="parentName"> 
         <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
           <el-tree :data="courseList" :props="courseListTreeProps" node-key="courseId" ref="courseListTree"
-            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
-            :highlight-current="true" :expand-on-click-node="false">
+            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true" :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
         <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="课程描述">
-        <editor ref="myTextEditor" :uploadUrl="uploadUrl" :on-success="successHandle"></editor>  
+        <editor ref="myTextEditor" :uploadUrl="uploadUrl" v-model="dataForm.courseDesc"></editor>  
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -141,30 +140,13 @@
         }
         this.num++
       },
-      // 上传成功
-      successHandle (response, file, fileList) {
-        console.log(fileList)
-        this.fileList = fileList
-        this.successNum++
-        if (response && response.code === 0) {
-          if (this.num === this.successNum) {
-            this.$confirm('操作成功, 是否继续操作?', '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              type: 'warning'
-            }).catch(() => {
-              this.visible = false
-            })
-          }
-        } else {
-          this.$message.error(response.msg)
-        }
-      },
       //富文本编辑器失去焦点事件
-      onEditorBlur(editor){    
+      onEditorBlur(editor){   
+        console.log(editor); 
  	    },
        //富文本编辑器获得焦点事件
       onEditorFocus(editor){
+        console.log(editor);
       },
       //富文本编辑器文本发生变化
       onEditorChange({editor,html,text}){
@@ -208,5 +190,11 @@
       color: #e6a23c;
       cursor: pointer;
     }
+  }
+  .quill-editor{
+    height: 800px;
+  }
+  .el-dialog__footer{
+    padding-top: 50px;
   }
 </style>
