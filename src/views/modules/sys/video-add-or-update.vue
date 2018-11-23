@@ -33,21 +33,15 @@
         <el-input v-model="dataForm.videoUrl" type="text" placeholder="视频路径" readonly="readonly"></el-input>
       </el-form-item>
       <el-form-item label="上传视频" >
-      <el-upload class="load"
-      drag
-      :action="url"
-      :before-upload="beforeUploadHandle"
-      :on-success="successHandle"
-      :on-progress="progressHandle"
-      multiple
-      :file-list="fileList"
-      >
-      <div class="icon">
-      <i class="el-icon-caret-right"></i>
-      </div>
-      <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-      <div class="el-upload__tip" slot="tip">只支持mp4格式的视频,且一个文件不超过500kb！</div>
-    </el-upload>
+   <uploader :options="options" class="uploader-example">
+    <uploader-unsupport></uploader-unsupport>
+    <uploader-drop>
+      <p>将您要上传的视频文件拖拽到此处或者</p>
+      <uploader-btn>选择文件</uploader-btn>
+      <uploader-btn :directory="true">选择文件夹</uploader-btn>
+    </uploader-drop>
+    <uploader-list></uploader-list>
+   </uploader>
     </el-form-item>
      </el-form>
     <span slot="footer" class="dialog-footer">
@@ -58,14 +52,16 @@
 </template>
 <script>
   import { treeDataTranslate } from '@/utils'
+  const COMPONENT_NAME = 'uploader-file'
   export default {
     data () {
       return {
         visible: false,
         roleList: [],
         fileList:[],
-        uplodProgress:0,
+        index:0,
         url: '',
+        uplodProgress:0,
         dataForm: {
           id: 0,
           title: '',
@@ -78,10 +74,15 @@
           courseName: '',
           catalogName: ''
         },
-        video:'',
+        options: {
+          target: '//localhost:8080/example/test/upload'
+        },
+        attrs: {
+          accept: 'video/*'
+        },
         dataRule: {
           title: [
-            { required: true, message: '请填写视频标题', trigger: 'blur' }
+          { required: true, message: '请填写视频标题', trigger: 'blur' }
           ],
           courseName: [
             { required: true, message: '请选择视频所属课程', trigger: 'blur' }
@@ -113,6 +114,7 @@
     },
     methods: {
       init (id) {
+        this.url = this.$http.adornUrl(`/sys/oss/upload?token=${this.$cookie.get('token')}`)
         this.dataForm.id = id || 0
         // 查询课程树
         this.$http({
@@ -230,12 +232,17 @@
           return false
         }
       },
-      // 上传进度
-progressHandle(file){
-  uplodProgress=file.fileList/file.size*100
-},
+      //上传进度
+ progressHandle(file){
+   for(index==0;index<file.size;index++){
+  this.uplodProgress=fileList[index]/file.size
+  this.uplodProgress=this.uplodProgress*100+'%'
+   }
+   return  uplodProgress
+      },
  // 上传成功
 successHandle(file){
+  this.progressHandle
   if(uplodProgress=file.size){
    this.$confirm('操作成功, 是否继续操作?', '提示', {
               confirmButtonText: '确定',
@@ -250,15 +257,5 @@ successHandle(file){
   }
 </script>
 <style scoped>
-.icon{
-  border:solid 1px #f8f8f8;
-  width:50px;
-  height:50px;
-  margin-left:43%;
-  margin-top:50px;
-  margin-bottom:10px;
-  padding-top:10px;
-  background: #ebebeb;
-  border-radius: 4px;
-}
+
 </style>

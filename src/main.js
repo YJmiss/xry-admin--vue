@@ -25,10 +25,11 @@ Vue.prototype.$ajax = axios;
 // 引入jquery.js
 import $ from 'jquery'
 Vue.prototype.$jquery=$
-
- 
 Vue.use(VueCookie)
 Vue.config.productionTip = false
+// 引入上传组件
+import uploader from 'vue-simple-uploader'
+Vue.use(uploader)
 
 // 挂载全局
 Vue.prototype.$http = httpRequest// ajax请求方法
