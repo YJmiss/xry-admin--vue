@@ -10,8 +10,8 @@
         </el-popover>
         <el-input v-model="dataForm.parentName" v-popover:courseCatListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
       </el-form-item>
-      <el-form-item label="审核状态">
-        <el-select v-model="dataForm.status" placeholder="请选择审核状态" @change="currentSel">
+      <el-form-item label="状态">
+        <el-select v-model="dataForm.status" placeholder="请选择状态" @change="currentSel">
           <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
         </el-select>
       </el-form-item>
@@ -24,7 +24,7 @@
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
-      <el-table-column prop="parentId" header-align="center" align="center" label="父类目ID"></el-table-column>
+      <!-- <el-table-column prop="parentId" header-align="center" align="center" label="父类目ID"></el-table-column> -->
       <el-table-column prop="name" header-align="center" align="center" label="类目名称"></el-table-column>
       <el-table-column prop="sortOrder" header-align="center" align="center" label="排列序号"></el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="审核状态">

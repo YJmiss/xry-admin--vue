@@ -11,7 +11,7 @@
         <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="课程描述">
-        <UE :defaultMsg=defaultMsg :config=config ref="ue"></UE>
+        <editor :uploadUrl="uploadUrl" v-model="dataForm.courseDesc"></editor>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -22,17 +22,17 @@
 </template>
 
 <script>
-  import UE from '@/components/ue/ue.vue'
+  import editor from '@/components/Quilleditor.vue'
   import { treeDataTranslate } from '@/utils'
   export default {
-    components: {UE},
+    components: {editor},
     data () {
       return {
         visible: false,
         dataForm: {
           courseId: 0,
           parentName: '',
-          courseDesc: '',
+          courseDesc: ''
         },
         dataRule: {
           courseId: [
@@ -47,11 +47,8 @@
           label: 'title',
           children: 'children'
         },
-        defaultMsg: '',
-        config: {
-          initialFrameWidth: null,
-          initialFrameHeight: 350
-        }
+        //测试上传图片的接口，返回结构为{url:''}
+        uploadUrl: this.$http.adornUrl(`/sys/oss/upload?token=${this.$cookie.get('token')}`)
       }
     },
     methods: {
