@@ -96,8 +96,6 @@
       },
       // 表单提交
       dataFormSubmit () {
-        // 获取富文本编辑器的数据
-        this.dataForm.courseDesc = this.$refs.ue.getUEContent();
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
@@ -130,37 +128,5 @@
 </script>
 
 <style lang="scss">
-  .mod-course-cat {
-    .menu-list__input,
-    .icon-list__input {
-       > .el-input__inner {
-        cursor: pointer;
-      }
-    }
-    &__icon-popover {
-      /*max-width: 370px;*/
-    }
-    &__icon-list {
-      /*max-height: 180px;*/
-      padding: 0;
-      margin: -8px 0 0 -8px;
-      > .el-button {
-        padding: 8px;
-        margin: 8px 0 0 8px;
-        > span {
-          display: inline-block;
-          vertical-align: middle;
-          width: 18px;
-          height: 18px;
-          font-size: 18px;
-        }
-      }
-    }
-    .icon-list__tips {
-      font-size: 18px;
-      text-align: center;
-      color: #e6a23c;
-      cursor: pointer;
-    }
-  }
+  
 </style>
