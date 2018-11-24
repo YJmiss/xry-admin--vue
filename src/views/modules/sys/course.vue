@@ -26,7 +26,7 @@
       </el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
       <el-table-column prop="title" header-align="center" align="center" label="课程标题"></el-table-column>
-      <el-table-column prop="courseCatName" header-align="center" align="center" label="所属类目"></el-table-column>
+      <el-table-column prop="name" header-align="center" align="center" label="所属类目"></el-table-column>
       <el-table-column prop="tid" header-align="center" align="center" label="所属讲师"></el-table-column>
       <el-table-column prop="price" header-align="center" align="center" label="课程价格（￥：元）"></el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="审核状态">
@@ -65,7 +65,7 @@
         dataForm: {
           parentName: '',
           title: '',
-          courseCatName: ''
+          name: ''
         },
         dataList: [],
         pageIndex: 1,
@@ -111,7 +111,6 @@
           }).then(({ data }) => {
             if (data && data.code === 0) {
               this.dataList = data.page.list
-              // 获取数据成功后，需要把id装换成name
               this.totalPage = data.page.totalCount
             } else {
               this.dataList = []

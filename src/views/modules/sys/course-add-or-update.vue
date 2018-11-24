@@ -50,10 +50,10 @@
           image: '',
           cid: 1,
           parentName: '',
-          tid: 1,
+          tid:'',
           property: 1,
           status: 1,
-          price: 0,
+          price: '',
           file: ''
         },
         url: '',

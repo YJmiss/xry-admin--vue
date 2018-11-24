@@ -25,8 +25,8 @@
       <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
+      <el-table-column prop="courseTitle" header-align="center" align="center" label="所属课程"></el-table-column>
       <el-table-column prop="title" header-align="center" align="center" label="目录名称"></el-table-column>
-      <el-table-column prop="courseid" header-align="center" align="center" label="课程ID"></el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="审核状态">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === 1" size="small" type="warning">未审核</el-tag>
@@ -62,7 +62,8 @@
       return {
         dataForm: {
           title: '',
-          parentName: ''
+          parentName: '',
+          courseTitle:''
         },
         dataList: [],
         pageIndex: 1,
@@ -107,6 +108,7 @@
             })
           }).then(({ data }) => {
             if (data && data.code === 0) {
+              console.log(data.page.list)
               this.dataList = data.page.list
               this.totalPage = data.page.totalCount
             } else {
