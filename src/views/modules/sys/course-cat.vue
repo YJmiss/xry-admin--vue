@@ -1,4 +1,4 @@
-<template>
+<template>     
   <div class="mod-course-cat">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item label="类目名称" prop="parentName"> 
