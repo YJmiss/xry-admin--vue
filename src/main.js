@@ -26,6 +26,11 @@ Vue.config.productionTip = false
 import uploader from 'vue-simple-uploader'
 import UPLOAD from './components/el-upload.vue'
 Vue.use(uploader)
+// vue-quill-editor富文本编辑器
+import VueQuillEditor from 'vue-quill-editor'
+import 'quill/dist/quill.core.css'
+import 'quill/dist/quill.snow.css'
+import 'quill/dist/quill.bubble.css'
 
 // 挂载全局
 Vue.prototype.$http = httpRequest// ajax请求方法

@@ -48,7 +48,7 @@
           children: 'children'
         },
         //测试上传图片的接口，返回结构为{url:''}
-        uploadUrl: this.$http.adornUrl(`/sys/oss/upload?token=${this.$cookie.get('token')}`)
+        uploadUrl: this.$http.adornUrl(`/sys/oss/uploadImg?token=${this.$cookie.get('token')}`)
       }
     },
     methods: {
@@ -128,5 +128,6 @@
 </script>
 
 <style lang="scss">
-  
+  .quill-editor{height:1000px;}
+  .el-dialog__footer{padding-top:50px;}
 </style>
