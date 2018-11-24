@@ -29,6 +29,7 @@ Vue.use(VueCookie)
 Vue.config.productionTip = false
 // 引入上传组件
 import uploader from 'vue-simple-uploader'
+import UPLOAD from './components/el-upload.vue'
 Vue.use(uploader)
 
 // 挂载全局
