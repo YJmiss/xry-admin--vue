@@ -11,7 +11,7 @@
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择所属课程" class="cat-list__input"></el-input>
+        <el-input v-model="dataForm.courseName" v-popover:courseListPopover :readonly="true" placeholder="点击选择所属课程" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="所属目录" prop="catalogName"> 
         <el-popover ref="courseCatalogListPopover" placement="bottom-start" trigger="click">
@@ -32,8 +32,8 @@
       </el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
       <el-table-column prop="title" header-align="center" align="center" label="视频标题"></el-table-column>
-      <el-table-column prop="courseId" header-align="center" align="center" label="所属课程"></el-table-column>
-      <el-table-column prop="catalogId" header-align="center" align="center" label="所属目录"></el-table-column>
+      <el-table-column prop="courseTitle" header-align="center" align="center" label="所属课程"></el-table-column>
+      <el-table-column prop="catalogTitle" header-align="center" align="center" label="所属目录"></el-table-column>
       <el-table-column prop="property" header-align="center" align="center" label="是否收费">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.property === 1" size="small" type="warning">试学</el-tag>
@@ -78,7 +78,9 @@
         dataForm: {
           title: '',
           courseName: '',
-          catalogName: ''
+          catalogName: '',
+          courseTitle: '',
+          catalogTitle: ''
         },
         dataList: [],
         pageIndex: 1,

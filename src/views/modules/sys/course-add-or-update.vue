@@ -64,9 +64,9 @@
           file: ''
         },
         url: '',
-          num: 0,
-          successNum: 0,
-          fileList: [],
+        num: 0,
+        successNum: 0,
+        fileList: [],
         dataListLoading: false,
         dataListSelections: [],
         visible: false,

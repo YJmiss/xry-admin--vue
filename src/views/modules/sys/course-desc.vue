@@ -71,7 +71,6 @@
     methods: {
       // 获取数据列表
       getDataList () {
-        console.log(this.dataForm.course_id)
         this.dataListLoading = true
         this.$http({
           url: this.$http.adornUrl('/xry/course/treeCourse'),
