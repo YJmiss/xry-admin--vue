@@ -24,7 +24,7 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('xry:video:examine:pass')" type="success" @click="examinePass()" :disabled="dataListSelections.length <= 0">批量审核</el-button>
+        <el-button v-if="isAuth('xry:video:examine:pass')" type="success" @click="examine()" :disabled="dataListSelections.length <= 0">批量审核</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
@@ -51,13 +51,11 @@
           <el-tag v-else size="small" type="info">未审核</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="paramData" header-align="center" align="center" label="参数数据"></el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
-      <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作">
+      <el-table-column fixed="right" header-align="center" align="center" width="180" label="操作">
         <template slot-scope="scope">
           <el-button v-if="isAuth('xry:vedio:play')"  size="small" @click="videoPlay(scope.row.id)">详情</el-button>
-        <el-button v-if="isAuth('xry:video:examine:pass')" :disabled="scope.row.status == 3 || scope.row.status == 2" type="primary" size="small" @click="examinePass(scope.row.id)" >审核通过</el-button> 
-        <el-button v-if="isAuth('xry:video:examine:reject')" type="danger" size="small" @click="examineReject(scope.row.id)">审核驳回</el-button> 
+        <el-button v-if="isAuth('xry:video:examine:pass')" :disabled="scope.row.status == 3 || scope.row.status == 2" type="primary" size="small" @click="examine(scope.row.id)" >审核</el-button>  
         </template>
       </el-table-column>
     </el-table>
@@ -66,12 +64,15 @@
     </el-pagination>
     <!-- 弹窗, 播放视频内容 -->
     <video-play v-if="videoPlayVisible" ref="videoPlay" @refreshDataList="getDataList"></video-play>
+    <!-- 弹窗, 视频审核记录 -->
+    <examine-record-add v-if="examineRecordAddVisible" ref="examineRecordAdd" @refreshDataList="getDataList"></examine-record-add>
   </div>
 </template>
 
 <script>
   import { treeDataTranslate } from '@/utils'
   import videoPlay from './video-play'
+  import examineRecordAdd from './examine-record-add'
   export default {
     data () {
       return {
@@ -89,6 +90,7 @@
         dataListLoading: false,
         dataListSelections: [],
         videoPlayVisible: false,
+        examineRecordAddVisible:false,
         courseList: [],
         courseCatalogList: [],
         courseListTreeProps: {
@@ -102,7 +104,7 @@
       }
     },
     components: {
-      videoPlay
+      videoPlay,examineRecordAdd
     },
     activated () {
       this.getDataList()
@@ -185,72 +187,19 @@
       selectionChangeHandle (val) {
         this.dataListSelections = val
       },
-      // 查看课程详情 
+      // 查看视频详情 
       videoPlay (id) {
         this.videoPlayVisible = true
         this.$nextTick(() => {
           this.$refs.videoPlay.init(id)
         })
       },
-      // 审核通过/批量审核
-      examinePass(id) {
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
+      // 审核/记录审核
+      examine(id) {
+       this.examineRecordAddVisible = true
+        this.$nextTick(() => {
+          this.$refs.examineRecordAdd.init(id)
         })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '审核通过' : '批量审核'}]操作?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.$http({
-            url: this.$http.adornUrl('/xry/video/examinePass'),
-            method: 'post',
-            data: this.$http.adornData(ids, false)
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功！',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.getDataList()
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
-        }).catch(() => {})
-      },
-      // 审核驳回
-      examineReject(id) {
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '审核驳回' : '批量驳回'}]操作?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.$http({
-            url: this.$http.adornUrl('/xry/video/examineReject'),
-            method: 'post',
-            data: this.$http.adornData(ids, false)
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功！',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.getDataList()
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
-        }).catch(() => {})
       }
     }
   }
