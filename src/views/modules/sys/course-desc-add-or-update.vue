@@ -1,16 +1,17 @@
 <template>
   <el-dialog :title="!dataForm.courseId ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
       <el-form-item label="所属课程" prop="parentName"> 
-        <el-popover ref="courseListPopover" placement="bottom-start" trigger="click" :disabled="isShow">
+        <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
           <el-tree :data="courseList" :props="courseListTreeProps" node-key="courseId" ref="courseListTree"
-            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true" :highlight-current="true" :expand-on-click-node="false">
+            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
+            :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input v-model="dataForm.parentName" v-popover:courseListPopover :disabled="isShow" :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
+        <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="课程描述">
-        <editor ref="myTextEditor" :uploadUrl="uploadUrl" v-model="dataForm.courseDesc"></editor>  
+        <UE :defaultMsg=defaultMsg :config=config ref="ue"></UE>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -21,21 +22,18 @@
 </template>
 
 <script>
-  import { quillEditor } from 'vue-quill-editor'
-  import editor from '@/components/upload/Quilleditor.vue'
+  import UE from '@/components/ue/ue.vue'
   import { treeDataTranslate } from '@/utils'
   export default {
-    components: {quillEditor,editor},
+    components: {UE},
     data () {
       return {
         visible: false,
         dataForm: {
           courseId: 0,
           parentName: '',
-          courseDesc: ''
+          courseDesc: '',
         },
-        isShow: false,
-        uploadShow: false,
         dataRule: {
           courseId: [
             { required: true, message: '所属课程不能为空', trigger: 'blur' }
@@ -53,22 +51,18 @@
         config: {
           initialFrameWidth: null,
           initialFrameHeight: 350
-        },
-        url: '',
-        /*测试上传图片的接口，返回结构为{url:''}*/
-        uploadUrl:this.$http.adornUrl(`/sys/oss/uploadImg?token=${this.$cookie.get('token')}`)
+        }
       }
     },
     methods: {
-      init (id) {
-        this.url = this.$http.adornUrl(`/sys/oss/upload?token=${this.$cookie.get('token')}`)
-        this.dataForm.courseId = id || 0
+      init (courseId) {
+        this.dataForm.courseId = courseId || 0
         this.$http({
           url: this.$http.adornUrl('/xry/course/treeCourse'),
           method: 'get',
           params: this.$http.adornParams()
         }).then(({ data }) => {
-          this.courseList = treeDataTranslate(data.courseList, 'courseId')
+          this.courseList = treeDataTranslate(data.courseList, 'id')
         }).then(() => {
           this.visible = true
           this.$nextTick(() => {
@@ -76,7 +70,6 @@
           })
         }).then(() => {
           if (this.dataForm.courseId) {
-            this.isShow = true
             this.$http({
               url: this.$http.adornUrl(`/xry/course/desc/info/${this.dataForm.courseId}`),
               method: 'get',
@@ -101,16 +94,17 @@
       },
       // 课程树设置当前选中节点
       courseListTreeSetCurrentNode () {
-        console.log(this.$refs.courseListTree.getCheckedKeys())
         this.$refs.courseListTree.setCurrentKey(this.dataForm.courseId)
         this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
       },
       // 表单提交
       dataFormSubmit () {
+        // 获取富文本编辑器的数据
+        this.dataForm.courseDesc = this.$refs.ue.getUEContent();
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/xry/course/desc/${!this.dataForm.courseId ? 'save' : 'update'}`),
+              url: this.$http.adornUrl(`/xry/course/desc/${!this.dataForm.courseId ? 'save' : 'save'}`),
               method: 'post',
               data: this.$http.adornData({
                 'courseId': this.dataForm.courseId || undefined,
@@ -133,27 +127,6 @@
             })
           }
         })
-      },
-      // 上传之前
-      beforeUploadHandle (file) {
-        if (file.type !== 'image/jpg' && file.type !== 'image/jpeg' && file.type !== 'image/png' && file.type !== 'image/gif') {
-          this.$message.error('只支持jpg、png、gif格式的图片！')
-          return false
-        }
-        this.num++
-      },
-      //富文本编辑器失去焦点事件
-      onEditorBlur(editor){   
-        console.log(editor); 
- 	    },
-       //富文本编辑器获得焦点事件
-      onEditorFocus(editor){
-        console.log(editor);
-      },
-      //富文本编辑器文本发生变化
-      onEditorChange({editor,html,text}){
-          //this.content可以实时获取到当前编辑器内的文本内容
-          console.log(this.content);
       }
     }
   }
@@ -192,11 +165,5 @@
       color: #e6a23c;
       cursor: pointer;
     }
-  }
-  .quill-editor{
-    height: 800px;
-  }
-  .el-dialog__footer{
-    padding-top: 50px;
   }
 </style>

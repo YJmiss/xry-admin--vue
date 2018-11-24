@@ -122,7 +122,6 @@
       },
       // 课程类目树选中
       courseCatListTreeCurrentChangeHandle (data, node) {
-        console.log(data.id)
         this.dataForm.parentId = data.id
         this.dataForm.parentName = data.name
       },

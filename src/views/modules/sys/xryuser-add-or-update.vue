@@ -1,6 +1,9 @@
 <template>
   <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+      <el-form-item label="账号" prop="usercode">
+        <el-input v-model="dataForm.usercode" type="text"placeholder="账号"></el-input>
+      </el-form-item>
       <el-form-item label="昵称" prop="nickname">
         <el-input v-model="dataForm.nickname" type="text" placeholder="昵称"></el-input>
       </el-form-item>
@@ -28,8 +31,8 @@
       <el-form-item label="登录令牌" prop="loginToken">
         <el-input v-model="dataForm.loginToken" type="text"placeholder="登录令牌"></el-input>
       </el-form-item>
-      <el-form-item label="第三方登录用户主键" prop="openUserId">
-        <el-input v-model="dataForm.openUserId" type="text"placeholder="第三方登录用户主键"></el-input>
+      <el-form-item label="第三方登录用户主键" prop="openuserId">
+        <el-input v-model="dataForm.openuserId" type="text"placeholder="第三方登录用户主键"></el-input>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -48,6 +51,7 @@
         roleList: [],
         dataForm: {
           id: 0,
+          usercode: '',
           nickname: '',
           password: '',
           intro: '',
@@ -56,7 +60,7 @@
           email: '',
           socialSource: '',
           loginToken: '',
-          openUserId: ''
+          openuserId: ''
         },
         dataRule: {
           
@@ -77,7 +81,8 @@
           }).then(({ data }) => {
             this.visible = true
             if (data && data.code === 0) {
-              this.dataForm.nickname = data.user.nickname
+              this.dataForm.usercode = data.user.usercode
+              this.dataForm.nickname = data.user.usercode
               this.dataForm.password = data.user.password
               this.dataForm.intro = data.user.intro
               this.dataForm.avatar = data.user.avatar
@@ -85,7 +90,7 @@
               this.dataForm.email = data.user.email
               this.dataForm.socialSource = data.user.socialSource
               this.dataForm.loginToken = data.user.loginToken
-              this.dataForm.openUserId = data.user.openUserId
+              this.dataForm.openuserId = data.user.openuserId
             }
           })
         }
@@ -99,7 +104,8 @@
               method: 'post',
               data: this.$http.adornData({
                 'id': this.dataForm.id || undefined,
-                'nickname': this.dataForm.nickname,
+                'usercode': this.dataForm.usercode,
+                'usercode': this.dataForm.usercode,
                 'password': this.dataForm.password,
                 'intro': this.dataForm.intro,
                 'avatar': this.dataForm.avatar,
@@ -107,7 +113,7 @@
                 'email': this.dataForm.email,
                 'socialSource': this.dataForm.socialSource,
                 'loginToken': this.dataForm.loginToken,
-                'openUserId': this.dataForm.openUserId
+                'openuserId': this.dataForm.openuserId
               })
             }).then(({ data }) => {
               if (data && data.code === 0) {

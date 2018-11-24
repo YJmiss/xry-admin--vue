@@ -1,45 +1,32 @@
 <template>
-  <div class="mod-xryuser">
+  <div class="mod-xrypermission">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item>
-        <el-input v-model="dataForm.usercode" placeholder="账号" clearable></el-input>
-      </el-form-item>
-       <el-form-item>
-         <el-input v-model="dataForm.phone" placeholder="注册手机号" clearable></el-input>
-      </el-form-item>
-       <el-form-item>
-          <el-input v-model="dataForm.nickname" placeholder="昵称" clearable></el-input>
+        <el-input v-model="dataForm.name" placeholder="角色名字" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <!--<el-button v-if="isAuth('xry:user:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>-->
-        <el-button v-if="isAuth('xry:user:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('xry:permission:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('xry:permission:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
-      <el-table-column prop="usercode" header-align="center" align="center" label="账号"></el-table-column>
-      <el-table-column prop="nickname" header-align="center" align="center" label="昵称"></el-table-column>
-      <el-table-column prop="phone" header-align="center" align="center" label="注册手机号"></el-table-column>
-      <el-table-column prop="email" header-align="center" align="center" label="注册邮箱"></el-table-column>
-      <el-table-column prop="loginToken" header-align="center" align="center" label="登录令牌"></el-table-column>
-      <el-table-column prop="socialSource" header-align="center" align="center" label="第三方登录来源">
+      <el-table-column prop="name" header-align="center" align="center" label="权限名字"></el-table-column>
+      <el-table-column prop="url" header-align="center" align="center" label="访问url地址"></el-table-column>
+      <el-table-column prop="available" header-align="center" align="center" label="是否可用">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.socialSource === 0" size="small" type="warning">手机号</el-tag>
-          <el-tag v-else-if="scope.row.socialSource === 1" size="small" type="danger">微信</el-tag>
-          <el-tag v-else-if="scope.row.socialSource === 2" size="small" type="success">QQ</el-tag>
-          <el-tag v-else-if="scope.row.socialSource === 3" size="small" type="warning">支付宝</el-tag>
-          <el-tag v-else size="small" type="warning">手机号</el-tag>
+          <el-tag v-if="scope.row.available === 0" size="small" type="warning">不可用</el-tag>
+          <el-tag v-else-if="scope.row.available === 1" size="small" type="danger">可用</el-tag>
+          <el-tag v-else size="small" type="warning">可用</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="openuserId" header-align="center" align="center" label="第三方登录用户主键"></el-table-column>
-      <el-table-column prop="created" header-align="center" align="center" width="180" label="注册时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('xry:user:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
-          <el-button v-if="isAuth('xry:user:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button v-if="isAuth('xry:permission:update')" type="text" size="small" @click="addOrUpdateHandle(scope.row.id)">修改</el-button>
+          <el-button v-if="isAuth('xry:permission:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -52,12 +39,12 @@
 </template>
 
 <script>
-  import AddOrUpdate from './xryuser-add-or-update'
+  import AddOrUpdate from './xrypermission-add-or-update'
   export default {
     data () {
       return {
         dataForm: {
-          title: ''
+          name: ''
         },
         dataList: [],
         pageIndex: 1,
@@ -79,12 +66,12 @@
       getDataList () {
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/xry/user/list'),
+          url: this.$http.adornUrl('/xry/permission/list'),
           method: 'get',
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'title': this.dataForm.title
+            'name': this.dataForm.name
           })
         }).then(({ data }) => {
           if (data && data.code === 0) {
@@ -130,7 +117,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/xry/user/delete'),
+            url: this.$http.adornUrl('/xry/permission/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({ data }) => {

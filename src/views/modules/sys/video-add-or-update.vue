@@ -7,7 +7,8 @@
       <el-form-item label="所属课程" prop="courseName"> 
         <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
           <el-tree :data="courseList" :props="courseListTreeProps" node-key="courseId" ref="courseListTree"
-            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true" :highlight-current="true" :expand-on-click-node="false">
+            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
+            :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
         <el-input v-model="dataForm.courseName" v-popover:courseListPopover :readonly="true" placeholder="点击选择所属课程" class="cat-list__input"></el-input>
@@ -28,27 +29,39 @@
           <el-radio :label="3">免费</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="参数数据" prop="paramData">
-        <el-input v-model="dataForm.paramData" type="text"placeholder="参数数据"></el-input>
+      <el-form-item label="视频路径" prop="url">
+        <el-input v-model="dataForm.videoUrl" type="text" placeholder="视频路径" readonly="readonly"></el-input>
       </el-form-item>
-      <el-form-item label="视频路径" prop="videoUrl">
-        <el-input v-model="dataForm.videoUrl" type="text" placeholder="视频路径"></el-input>
-      </el-form-item>
-    </el-form>
+      <el-form-item label="上传视频" >
+   <uploader :options="options" class="uploader-example">
+    <uploader-unsupport></uploader-unsupport>
+    <uploader-drop>
+      <p>将您要上传的视频文件拖拽到此处或者</p>
+      <uploader-btn>选择文件</uploader-btn>
+      <uploader-btn :directory="true">选择文件夹</uploader-btn>
+    </uploader-drop>
+    <uploader-list></uploader-list>
+   </uploader>
+    </el-form-item>
+     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
       <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
     </span>
   </el-dialog>
 </template>
-
 <script>
   import { treeDataTranslate } from '@/utils'
+  const COMPONENT_NAME = 'uploader-file'
   export default {
     data () {
       return {
         visible: false,
         roleList: [],
+        fileList:[],
+        index:0,
+        url: '',
+        uplodProgress:0,
         dataForm: {
           id: 0,
           title: '',
@@ -61,9 +74,15 @@
           courseName: '',
           catalogName: ''
         },
+        options: {
+          target: '//localhost:8080/example/test/upload'
+        },
+        attrs: {
+          accept: 'video/*'
+        },
         dataRule: {
           title: [
-            { required: true, message: '请填写视频标题', trigger: 'blur' }
+          { required: true, message: '请填写视频标题', trigger: 'blur' }
           ],
           courseName: [
             { required: true, message: '请选择视频所属课程', trigger: 'blur' }
@@ -95,6 +114,7 @@
     },
     methods: {
       init (id) {
+        this.url = this.$http.adornUrl(`/sys/oss/upload?token=${this.$cookie.get('token')}`)
         this.dataForm.id = id || 0
         // 查询课程树
         this.$http({
@@ -109,7 +129,19 @@
             this.$refs['dataForm'].resetFields()
           })
         }).then(() => {
-          
+          // 查询目录树，需要根据选中课程的id查询出目录树
+          this.$http({
+            url: this.$http.adornUrl('/xry/course/catalog/treeCourseCatalog'),
+            method: 'get',
+            params: this.$http.adornParams()
+          }).then(({ data }) => {
+            this.courseCatalogList = treeDataTranslate(data.courseCatalogList, 'id')
+          }).then(() => {
+            this.visible = true
+            this.$nextTick(() => {
+              this.$refs['dataForm'].resetFields()
+            })
+          }).then(() => {
             if (!this.dataForm.id) {
               // 新增
               this.courseListTreeSetCurrentNode()
@@ -135,21 +167,11 @@
                 }
               })
             } 
-          
+          }) 
         })
       },
       // 课程树选中
       courseListTreeCurrentChangeHandle (data, node) {
-        // 查询目录树，需要根据选中课程的id查询出目录树
-        this.$http({
-          url: this.$http.adornUrl('/xry/course/catalog/treeCourseCatalog'),
-          method: 'get',
-          params: this.$http.adornParams({
-            'courseId':data.id
-          })
-        }).then(({ data }) => {
-          this.courseCatalogList = treeDataTranslate(data.courseCatalogList, 'id')
-        })
         this.dataForm.courseId = data.id
         this.dataForm.courseName = data.title
       },
@@ -202,7 +224,38 @@
             })
           }
         })
-      }
+      },
+      // 上传之前
+      beforeUploadHandle (file) {
+        if (file.type !== 'video/mp4') {
+          this.$message.error('只支持mp4格式的视频！')
+          return false
+        }
+      },
+      //上传进度
+ progressHandle(file){
+   for(index==0;index<file.size;index++){
+  this.uplodProgress=fileList[index]/file.size
+  this.uplodProgress=this.uplodProgress*100+'%'
+   }
+   return  uplodProgress
+      },
+ // 上传成功
+successHandle(file){
+  this.progressHandle
+  if(uplodProgress=file.size){
+   this.$confirm('操作成功, 是否继续操作?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).catch(() => {
+              this.visible = false
+            })
+  }
+}
     }
   }
 </script>
+<style scoped>
+
+</style>

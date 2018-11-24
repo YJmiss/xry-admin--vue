@@ -20,12 +20,20 @@
         <el-input type="textarea" :rows="6" placeholder="请输入内容描述" v-model="dataForm.titie_desc"></el-input>
       </el-form-item>
       <el-form-item label="广告图片" prop="pic">
-       <el-upload class="load" drag :action="url" :before-upload="beforeUploadHandle" :on-success="successHandle" multiple:file-list="fileList">
+       <el-upload class="load"
+      drag
+      :action="url"
+      :before-upload="beforeUploadHandle"
+      :on-success="successHandle"
+      multiple
+      :file-list="fileList"
+      >
       <i class="el-icon-upload"></i>
       <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
       <div class="el-upload__tip" slot="tip">只支持jpg、png、gif格式的图片！</div>
     </el-upload>
       </el-form-item>
+     
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -35,9 +43,10 @@
 </template>
 <script>
   import $ from 'jquery'
+  import UE from "@/components/ue/ue.vue";
   import { treeDataTranslate} from '@/utils'
   export default {
-    components: {  },
+    components: { UE },
     data () {
       return {
         visible: false,
