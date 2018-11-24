@@ -10,6 +10,14 @@
         </el-popover>
         <el-input v-model="dataForm.parentName" v-popover:courseCatListPopover :readonly="true" placeholder="点击选择课程类目" class="cat-list__input"></el-input>
       </el-form-item>
+      <el-form-item label="所属讲师" prop="teacherName">
+        <el-popover ref="teacherListPopover" placement="bottom-start" trigger="click">
+          <el-tree :data="teacherList" :props="teacherListTreeProps" node-key="id" ref="teacherListTree" @current-change="teacherListTreeCurrentChangeHandle" :default-expand-all="true"
+            :highlight-current="true" :expand-on-click-node="false">
+          </el-tree>
+        </el-popover>
+        <el-input v-model="dataForm.teacherName" v-popover:teacherListPopover :readonly="true" placeholder="点击选择所属讲师" class="cat-list__input"></el-input>
+      </el-form-item>
       <el-form-item label="课程标题">
         <el-input v-model="dataForm.title" placeholder="课程标题" clearable></el-input>
       </el-form-item>
@@ -26,8 +34,8 @@
       </el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
       <el-table-column prop="title" header-align="center" align="center" label="课程标题"></el-table-column>
-      <el-table-column prop="name" header-align="center" align="center" label="所属类目"></el-table-column>
-      <el-table-column prop="tid" header-align="center" align="center" label="所属讲师"></el-table-column>
+      <el-table-column prop="catName" header-align="center" align="center" label="所属类目"></el-table-column>
+      <el-table-column prop="nickname" header-align="center" align="center" label="所属讲师"></el-table-column>
       <el-table-column prop="price" header-align="center" align="center" label="课程价格（￥：元）"></el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="审核状态">
         <template slot-scope="scope">
@@ -65,7 +73,10 @@
         dataForm: {
           parentName: '',
           title: '',
-          name: ''
+          name: '',
+          teacherName:'',
+          catName:'',
+          nickname:''
         },
         dataList: [],
         pageIndex: 1,
@@ -77,6 +88,11 @@
         courseCatList: [],
         courseCatListTreeProps: {
           label: 'name',
+          children: 'children'
+        },
+        teacherList: [],
+        teacherListTreeProps: {
+          label: 'nickname',
           children: 'children'
         }
       }
@@ -99,24 +115,34 @@
         }).then(({ data }) => {
           this.courseCatList = treeDataTranslate(data.courseCatList, 'id')
         }).then(() => {
+          // 查询讲师列表，构造成一棵树
           this.$http({
-            url: this.$http.adornUrl('/xry/course/list'),
+            url: this.$http.adornUrl('/xry/user/treeUser'),
             method: 'get',
-            params: this.$http.adornParams({
-              'page': this.pageIndex,
-              'limit': this.pageSize,
-              'title': this.dataForm.title,
-              'cid': this.dataForm.parentId
-            })
+            params: this.$http.adornParams()
           }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.dataList = data.page.list
-              this.totalPage = data.page.totalCount
-            } else {
-              this.dataList = []
-              this.totalPage = 0
-            }
-            this.dataListLoading = false
+            this.teacherList = treeDataTranslate(data.userList, 'id')
+          }).then(() => {
+            this.$http({
+              url: this.$http.adornUrl('/xry/course/list'),
+              method: 'get',
+              params: this.$http.adornParams({
+                'page': this.pageIndex,
+                'limit': this.pageSize,
+                'title': this.dataForm.title,
+                'cid': this.dataForm.parentId,
+                'tid': this.dataForm.teacherId
+              })
+            }).then(({ data }) => {
+              if (data && data.code === 0) {
+                this.dataList = data.page.list
+                this.totalPage = data.page.totalCount
+              } else {
+                this.dataList = []
+                this.totalPage = 0
+              }
+              this.dataListLoading = false
+            })
           })
         })
       },
@@ -129,6 +155,16 @@
       courseCatListTreeSetCurrentNode () {
         this.$refs.courseCatListTree.setCurrentKey(this.dataForm.parentId)
         this.dataForm.parentName = (this.$refs.courseCatListTree.getCurrentNode() || {})['name']
+      },
+      // 讲师树选中
+      teacherListTreeCurrentChangeHandle (data, node) {
+        this.dataForm.teacherId = data.id
+        this.dataForm.teacherName = data.nickname
+      },
+      // 讲师树设置当前选中节点
+      teacherListTreeSetCurrentNode () {
+        this.$refs.teacherListTree.setCurrentKey(this.dataForm.teacherId)
+        this.dataForm.teacherName = (this.$refs.teacherListTree.getCurrentNode() || {})['nickname']
       },
       // 每页数
       sizeChangeHandle (val) {

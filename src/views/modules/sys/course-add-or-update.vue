@@ -11,10 +11,15 @@
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input v-model="dataForm.parentName" v-popover:courseCatListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
+        <el-input v-model="dataForm.parentName" v-popover:courseCatListPopover :readonly="true" placeholder="点击选择课程类目" class="cat-list__input"></el-input>
       </el-form-item>
-      <el-form-item label="所属讲师" prop="tid">
-        <el-input v-model="dataForm.tid" placeholder="所属讲师"></el-input>
+      <el-form-item label="所属讲师" prop="teacherName">
+        <el-popover ref="teacherListPopover" placement="bottom-start" trigger="click">
+          <el-tree :data="teacherList" :props="teacherListTreeProps" node-key="id" ref="teacherListTree" @current-change="teacherListTreeCurrentChangeHandle" :default-expand-all="true"
+            :highlight-current="true" :expand-on-click-node="false">
+          </el-tree>
+        </el-popover>
+        <el-input v-model="dataForm.teacherName" v-popover:teacherListPopover :readonly="true" placeholder="点击选择所属讲师" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="是否收费" size="mini" prop="property">
         <el-radio-group v-model="dataForm.property">
@@ -26,18 +31,11 @@
         <el-input v-model="dataForm.price" type="text" placeholder="课程价格"></el-input>
       </el-form-item>
       <el-form-item label="课程图片" prop="image">
-    <el-upload class="load"
-      drag
-      :action="url"
-      :before-upload="beforeUploadHandle"
-      :on-success="successHandle"
-      multiple
-      :file-list="fileList"
-      >
-      <i class="el-icon-upload"></i>
-      <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-      <div class="el-upload__tip" slot="tip">只支持jpg、png、gif格式的图片！</div>
-    </el-upload>
+        <el-upload class="load" drag :action="url" :before-upload="beforeUploadHandle" :on-success="successHandle" multiple :file-list="fileList">
+          <i class="el-icon-upload"></i>
+          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+          <div class="el-upload__tip" slot="tip">只支持jpg、png、gif格式的图片！</div>
+        </el-upload>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -46,6 +44,7 @@
     </span>
   </el-dialog>
 </template>
+
 <script>
   import { treeDataTranslate} from '@/utils'
   export default {
@@ -57,6 +56,7 @@
           image: '',
           cid: 1,
           parentName: '',
+          teacherName:'',
           tid:'',
           property: 1,
           status: 1,
@@ -94,6 +94,11 @@
         courseCatListTreeProps: {
           label: 'name',
           children: 'children'
+        },
+        teacherList: [],
+        teacherListTreeProps: {
+          label: 'nickname',
+          children: 'children'
         }
       }
     },
@@ -114,28 +119,39 @@
             this.$refs['dataForm'].resetFields()
           })
         }).then(() => {
-          if (this.dataForm.id) {
-            this.$http({
-              url: this.$http.adornUrl(`/xry/course/info/${this.dataForm.id}`),
-              method: 'get',
-              params: this.$http.adornParams()
-            }).then(({ data }) => {
-              if (data && data.code === 0) {
-                this.dataForm.id = data.course.id
-                this.dataForm.title = data.course.title
-                this.dataForm.cid = data.course.cid
-                this.dataForm.tid = data.course.tid
-                this.dataForm.property = data.course.property
-                this.dataForm.price = data.course.price
-                this.dataForm.status = data.course.status
-                this.dataForm.image = data.course.image
-                this.courseCatListTreeSetCurrentNode()
-              }
-            })
-          } else {
-            // 新增
-            this.courseCatListTreeSetCurrentNode()
-          }
+          // 查询讲师列表，构造成一棵树
+          this.$http({
+            url: this.$http.adornUrl('/xry/user/treeUser'),
+            method: 'get',
+            params: this.$http.adornParams()
+          }).then(({ data }) => {
+            this.teacherList = treeDataTranslate(data.userList, 'id')
+          }).then(() => {
+            if (this.dataForm.id) {
+              this.$http({
+                url: this.$http.adornUrl(`/xry/course/info/${this.dataForm.id}`),
+                method: 'get',
+                params: this.$http.adornParams()
+              }).then(({ data }) => {
+                if (data && data.code === 0) {
+                  this.dataForm.id = data.course.id
+                  this.dataForm.title = data.course.title
+                  this.dataForm.cid = data.course.cid
+                  this.dataForm.tid = data.course.tid
+                  this.dataForm.property = data.course.property
+                  this.dataForm.price = data.course.price
+                  this.dataForm.status = data.course.status
+                  this.dataForm.image = data.course.image
+                  this.courseCatListTreeSetCurrentNode()
+                  this.teacherListTreeSetCurrentNode()
+                }
+              })
+            } else {
+              // 新增
+              this.courseCatListTreeSetCurrentNode()
+              this.teacherListTreeSetCurrentNode()
+            }
+          })
         })
       },
       // 课程类目树选中
@@ -147,6 +163,16 @@
       courseCatListTreeSetCurrentNode () {
         this.$refs.courseCatListTree.setCurrentKey(this.dataForm.cid)
         this.dataForm.parentName = (this.$refs.courseCatListTree.getCurrentNode() || {})['name']
+      },
+      // 讲师树选中
+      teacherListTreeCurrentChangeHandle (data, node) {
+        this.dataForm.tid = data.id
+        this.dataForm.teacherName = data.nickname
+      },
+      // 讲师树设置当前选中节点
+      teacherListTreeSetCurrentNode () {
+        this.$refs.teacherListTree.setCurrentKey(this.dataForm.tid)
+        this.dataForm.teacherName = (this.$refs.teacherListTree.getCurrentNode() || {})['nickname']
       },
       // 表单提交
       dataFormSubmit () {
@@ -214,12 +240,12 @@
   }
 </script>
 <style scoped>
-.load{
-text-align: center;
-border: solid 1px #f0f0f0;
-margin-top: 20px;
-padding:10px;
-font-size: 16px;
-}
+  .load{
+    text-align: center;
+    border: solid 1px #f0f0f0;
+    margin-top: 20px;
+    padding:10px;
+    font-size: 16px;
+  }
 </style>
 

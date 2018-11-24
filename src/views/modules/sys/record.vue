@@ -18,15 +18,15 @@
       <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
-      <el-table-column prop="type" header-align="center" align="center" label="被审核对象类型">
+      <el-table-column prop="type" header-align="center" align="center" label="被审核对象类型" width="160">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.type === 1" size="small" type="success">课程审核</el-tag>
           <el-tag v-else size="small" type="warning">视频审核</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="recordId" header-align="center" align="center" label="被审核对象标题"></el-table-column>
-      <el-table-column prop="userId" header-align="center" align="center" label="审核人"></el-table-column>
-      <el-table-column prop="actionNumber" header-align="center" align="center" label="执行动作">
+      <el-table-column prop="userId" header-align="center" align="center" label="审核人" width="160"></el-table-column>
+      <el-table-column prop="actionNumber" header-align="center" align="center" label="执行动作" width="100">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.actionNumber === 3" size="small" type="success">通过</el-tag>
           <el-tag v-else size="small" type="warning">驳回</el-tag>
