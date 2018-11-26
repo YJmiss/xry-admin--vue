@@ -3,3 +3,4 @@ module.exports = {
   ENV_CONFIG: '"dev"',
   BASE_API: '"http://192.168.1.27:9001/xry"'
 }
+

@@ -22,10 +22,6 @@ import $ from 'jquery'
 Vue.prototype.$jquery=$
 Vue.use(VueCookie)
 Vue.config.productionTip = false
-// 引入上传组件
-import uploader from 'vue-simple-uploader'
-import UPLOAD from './components/el-upload.vue'
-Vue.use(uploader)
 // vue-quill-editor富文本编辑器
 import VueQuillEditor from 'vue-quill-editor'
 import 'quill/dist/quill.core.css'

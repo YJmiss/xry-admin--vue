@@ -34,7 +34,7 @@
         <el-upload class="load" drag :action="url" :before-upload="beforeUploadHandle" :on-success="successHandle" multiple :file-list="fileList">
           <i class="el-icon-upload"></i>
           <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-          <div class="el-upload__tip" slot="tip">只支持jpg、png、gif格式的图片！</div>
+          <div class="el-upload__tip" slot="tip">只支持jpg、png、gif/格式的图片！</div>
         </el-upload>
       </el-form-item>
     </el-form>
@@ -212,7 +212,7 @@
       },
       // 上传之前
       beforeUploadHandle (file) {
-        if (file.type !== 'image/jpg' && file.type !== 'image/jpeg' && file.type !== 'image/png' && file.type !== 'image/gif') {
+        if (file.type !== 'image/jpg' && file.type !== 'image/jpeg' && file.type !== 'image/png' && file.type !== 'image/gif'&& file.type !== 'video/mp4') {
           this.$message.error('只支持jpg、png、gif格式的图片！')
           return false
         }
@@ -242,10 +242,10 @@
 <style scoped>
   .load{
     text-align: center;
-    border: solid 1px #f0f0f0;
     margin-top: 20px;
     padding:10px;
     font-size: 16px;
+    border: none;
   }
 </style>
 

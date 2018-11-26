@@ -33,15 +33,13 @@
         <el-input v-model="dataForm.videoUrl" type="text" placeholder="视频路径" readonly="readonly"></el-input>
       </el-form-item>
       <el-form-item label="上传视频" >
-   <uploader :options="options" class="uploader-example">
-    <uploader-unsupport></uploader-unsupport>
-    <uploader-drop>
-      <p>将您要上传的视频文件拖拽到此处或者</p>
-      <uploader-btn>选择文件</uploader-btn>
-      <uploader-btn :directory="true">选择文件夹</uploader-btn>
-    </uploader-drop>
-    <uploader-list></uploader-list>
-   </uploader>
+    <el-upload class="load" drag :action="url" :before-upload="beforeUploadHandle" :on-success="successHandle" multiple :file-list="fileList">
+     <div class="iconCover">
+      <i class="el-icon-caret-right"></i>
+     </div>
+          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
+          <div class="el-upload__tip" slot="tip">只支持mp4格式的视频！</div>
+   </el-upload>
     </el-form-item>
      </el-form>
     <span slot="footer" class="dialog-footer">
@@ -52,7 +50,6 @@
 </template>
 <script>
   import { treeDataTranslate } from '@/utils'
-  const COMPONENT_NAME = 'uploader-file'
   export default {
     data () {
       return {
@@ -73,12 +70,6 @@
           paramData: '',
           courseName: '',
           catalogName: ''
-        },
-        options: {
-          target: '//localhost:8080/example/test/upload'
-        },
-        attrs: {
-          accept: 'video/*'
         },
         dataRule: {
           title: [
@@ -228,27 +219,44 @@
           return false
         }
       },
-      //上传进度
-      progressHandle(file){
-        for(index==0;index<file.size;index++){
-        this.uplodProgress=fileList[index]/file.size
-        this.uplodProgress=this.uplodProgress*100+'%'
+     // 上传成功
+      successHandle (response, file, fileList) {
+        this.fileList = fileList
+        this.successNum++
+        if (response && response.code === 0) {
+          if (this.num === this.successNum) {
+            this.$confirm('操作成功, 是否继续操作?', '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).catch(() => {
+              this.visible = false
+            })
+          }
+        } else {
+          this.$message.error(response.msg)
         }
-        return  uplodProgress
-      },
-      // 上传成功
-      successHandle(file){
-        this.progressHandle
-        if(uplodProgress=file.size){
-        this.$confirm('操作成功, 是否继续操作?', '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-      }).catch(() => {
-        this.visible = false
-      })
-  }
-}
+      }
     }
   }
 </script>
+<style scoped>
+  .load{
+    text-align: center;
+    margin-top: 20px;
+    padding:10px;
+    font-size: 16px;
+    border: none;
+  }
+  .iconCover{
+    width:48px;
+    height:48px;
+    margin-left:44%;
+    margin-bottom: 20px;
+    margin-top: 40px;
+   padding: 8px;
+   border-radius: 6px;
+   border: solid 1px #bbbbbc;
+  background-color: #bbfbfb;
+  }
+</style>
