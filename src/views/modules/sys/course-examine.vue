@@ -3,7 +3,7 @@
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item label="所属类目" prop="courseCatName"> 
         <el-popover ref="courseCatListPopover" placement="bottom-start" trigger="click">
-          <el-tree :data="courseCatList" :props="courseCatListTreeProps" node-key="courseCatId" ref="courseCatListTree"
+          <el-tree :data="courseCatList" :props="courseCatListTreeProps" node-key="id" ref="courseCatListTree"
             @current-change="courseCatListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
@@ -19,8 +19,8 @@
         </el-popover>
         <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择课程标题" class="cat-list__input"></el-input>
       </el-form-item>
-      <el-form-item label="审核状态" prop="parentName">
-        <el-select v-model="value" placeholder="请选择审核状态">
+      <el-form-item label="审核状态">
+        <el-select v-model="dataForm.status" placeholder="请选择审核状态" @change="currentSel">
           <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
         </el-select> 
       </el-form-item>
@@ -33,7 +33,7 @@
       <el-table-column type="selection" header-align="center" align="center" width="50" :disabled="dataForm.status ==3 || dataForm.status ==2"></el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
       <el-table-column prop="title" header-align="center" align="center" label="课程标题"></el-table-column>
-      <el-table-column prop="tid" header-align="center" align="center" label="所属讲师ID"></el-table-column>
+      <el-table-column prop="nickname" header-align="center" align="center" label="所属讲师"></el-table-column>
       <el-table-column prop="price" header-align="center" align="center" label="课程价格"></el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="审核状态">
         <template slot-scope="scope">
@@ -70,12 +70,11 @@
     data () {
       return {
         dataForm: {
-          id:'',
+          id: 0,
           title: '',
           parentName: '',
           courseCatName: '',
-          courseCatId: '',
-          courseId: '',
+          nickname: '',
           examinePassBtnStatus: false,
           examineRejectBtnStatus: false
         },
@@ -133,14 +132,14 @@
             this.courseList = treeDataTranslate(data.courseList, 'id')
           }).then(() => {
             this.$http({
-                url: this.$http.adornUrl('/xry/course/list'),
+                url: this.$http.adornUrl('/xry/course/examineList'),
                 method: 'get',
                 params: this.$http.adornParams({
                 'page': this.pageIndex,
                 'limit': this.pageSize,
-                'cid': this.dataForm.courseCatId,
-                'courseId': this.dataForm.id,
-                'examineStatus': this.value
+                'catalogId': this.dataForm.courseCatId,
+                'courseId': this.dataForm.courseId,
+                'examineStatus': this.dataForm.status
                 })
             }).then(({ data }) => {
                 if (data && data.code === 0) {
@@ -155,17 +154,6 @@
           })
         })
       },
-      // 课程树选中
-      courseListTreeCurrentChangeHandle (data, node) {
-        console.log(data.title)
-        this.dataForm.id = data.id
-        this.dataForm.parentName = data.title
-      },
-      // 课程树设置当前选中节点
-      courseListTreeSetCurrentNode () {
-        this.$refs.courseListTree.setCurrentKey(this.dataForm.id)
-        this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
-      },
       // 课程类目树选中
       courseCatListTreeCurrentChangeHandle (data, node) {
         this.dataForm.courseCatId = data.id
@@ -175,6 +163,16 @@
       courseCatListTreeSetCurrentNode () {
         this.$refs.courseCatListTree.setCurrentKey(this.dataForm.courseCatId)
         this.dataForm.courseCatName = (this.$refs.courseCatListTree.getCurrentNode() || {})['name']
+      },
+      // 课程树选中
+      courseListTreeCurrentChangeHandle (data, node) {
+        this.dataForm.courseId = data.id
+        this.dataForm.parentName = data.title
+      },
+      // 课程树设置当前选中节点
+      courseListTreeSetCurrentNode () {
+        this.$refs.courseListTree.setCurrentKey(this.dataForm.courseId)
+        this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
       },
       // 每页数
       sizeChangeHandle (val) {
@@ -231,34 +229,38 @@
       },
       // 审核通过/批量审核
       examinePass(id) {
-      var ids = id ? [id] : this.dataListSelections.map(item => {
-        return item.id
-      })
-      this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '审核通过' : '批量审核'}]操作?`, '提示', {
-        confirmButtonText: '确定',
-        cancelButtonText: '取消',
-        type: 'warning'
-      }).then(() => {
-        this.$http({
-          url: this.$http.adornUrl('/xry/course/examinePass'),
-          method: 'post',
-          data: this.$http.adornData(ids, false)
-        }).then(({ data }) => {
-          if (data && data.code === 0) {
-            this.$message({
-              message: '操作成功！',
-              type: 'success',
-              duration: 1500,
-              onClose: () => {
-                this.getDataList()
-              }
-            })
-          } else {
-            this.$message.error(data.msg)
-          }
+        var ids = id ? [id] : this.dataListSelections.map(item => {
+          return item.id
         })
-      }).catch(() => {})
-    }
+        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '审核通过' : '批量审核'}]操作?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl('/xry/course/examinePass'),
+            method: 'post',
+            data: this.$http.adornData(ids, false)
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功！',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }).catch(() => {})
+      },
+      // 审核状态选择改变
+      currentSel(selVal){
+        this.dataForm.status = selVal;
+      }
     }
   }
 </script>

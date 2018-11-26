@@ -183,7 +183,7 @@
       },
       // 审核状态下拉选中事件
       currentSel(selVal){
-        this.status = selVal;
+        this.dataForm.status = selVal;
       }
     }
   }
