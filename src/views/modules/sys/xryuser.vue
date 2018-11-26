@@ -40,8 +40,7 @@
       <el-table-column prop="role" header-align="center" align="center" label="角色">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.role === 0" size="small" type="success">普通用户</el-tag>
-          <el-tag v-else-if="scope.row.role === 1" size="small" type="info">讲师</el-tag>
-          <el-tag v-else size="small" type="success">普通用户</el-tag>
+          <el-tag v-else size="small" type="info">讲师</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="socialSource" header-align="center" align="center" label="第三方登录来源">
@@ -58,9 +57,8 @@
       <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作">
         <template slot-scope="scope">
           <el-button v-if="isAuth('xry:user:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-          <el-button v-if="isAuth('xry:user:delete')" type="text" v-show="dataForm.role == 0" size="small" @click="deleteHandle(scope.row.id)">讲师</el-button>
-          <el-button v-if="isAuth('xry:user:delete')" type="text" v-show="dataForm.role == 1" size="small" @click="deleteHandle(scope.row.id)">普通用户</el-button>
-          <el-button v-if="isAuth('xry:user:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">重置登录密码</el-button>
+          <el-button v-if="isAuth('xry:user:delete')" type="text" v-show="dataForm.role == 0" size="small" @click="updateUserRoleTeacher(scope.row.id)">置为讲师</el-button>
+          <el-button v-if="isAuth('xry:user:delete')" type="text" v-show="dataForm.role == 1" size="small" @click="updateUserRole(scope.row.id)">置为普通用户</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -92,21 +90,21 @@
         addOrUpdateVisible: false,
         statusValue: '',
         statusValues: [
-          { value: '0', label: '正常' }, 
-          { value: '1', label: '异常' }, 
-          { value: '2', label: '删除' }
+          { statusValue: '0', label: '正常' }, 
+          { statusValue: '1', label: '异常' }, 
+          { statusValue: '2', label: '删除' }
         ],
         socialSourceValue: '',
         socialSourceValues: [
-          { value: '0', label: '手机号' }, 
-          { value: '1', label: '微信' }, 
-          { value: '2', label: 'QQ' },
-          { value: '2', label: '支付宝' }
+          { socialSourceValue: '0', label: '手机号' }, 
+          { socialSourceValue: '1', label: '微信' }, 
+          { socialSourceValue: '2', label: 'QQ' },
+          { socialSourceValue: '3', label: '支付宝' }
         ],
         roleValue: '',
         roleValues: [
-          { value: '0', label: '普通用户' }, 
-          { value: '1', label: '讲师' } 
+          { roleValue: '0', label: '普通用户' }, 
+          { roleValue: '1', label: '讲师' } 
         ]
       }
     },
@@ -126,10 +124,10 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'phone': this.phone,
-            'status': this.status,
-            'role': this.role,
-            'socialSource': this.socialSource
+            'phone': this.dataForm.phone,
+            'role': this.dataForm.role,
+            'status': this.dataForm.status,
+            'socialSource': this.dataForm.socialSource
           })
         }).then(({ data }) => {
           if (data && data.code === 0) {
@@ -162,13 +160,74 @@
         var ids = id ? [id] : this.dataListSelections.map(item => {
           return item.id
         })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+        this.$confirm(`确定对该用户进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.$http({
             url: this.$http.adornUrl('/xry/user/delete'),
+            method: 'post',
+            data: this.$http.adornData(ids, false)
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }).catch(() => {})
+      },
+      // 修改用户角色（普通用户<->讲师切换）
+      updateUserRole (id) {
+        var ids = id ? [id] : this.dataListSelections.map(item => {
+          return item.id
+        })
+        this.$confirm(`确定要把该用户[${id ? '置为普通用户' : '批量置为普通用户'}]吗?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl('/xry/user/updateUserRole'),
+            method: 'post',
+            data: this.$http.adornData(ids, false)
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }).catch(() => {})
+      },
+      // 修改用户角色（讲师<->普通用户切换）
+      updateUserRoleTeacher (id) {
+        console.log(id)
+        var ids = id ? [id] : this.dataListSelections.map(item => {
+          return item.id
+        })
+        this.$confirm(`确定要把该用户[${id ? '置为讲师' : '批量置为讲师'}]吗?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl('/xry/user/updateUserRoleTeacher'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({ data }) => {

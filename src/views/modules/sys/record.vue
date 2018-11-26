@@ -24,8 +24,13 @@
           <el-tag v-else size="small" type="warning">视频审核</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="recordId" header-align="center" align="center" label="被审核对象标题"></el-table-column>
-      <el-table-column prop="userId" header-align="center" align="center" label="审核人" width="160"></el-table-column>
+      <el-table-column prop="type" header-align="center" align="center" label="被审核对象标题">
+        <template slot-scope="scope">                   
+          <p v-if="scope.row.type==1">{{scope.row.courseTitle}}</p>
+          <p v-else="scope.row.type==2">{{scope.row.videoTitle}}</p>                    
+        </template>
+      </el-table-column>
+      <el-table-column prop="username" header-align="center" align="center" label="审核人" width="160"></el-table-column>
       <el-table-column prop="actionNumber" header-align="center" align="center" label="执行动作" width="100">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.actionNumber === 3" size="small" type="success">通过</el-tag>
@@ -58,7 +63,12 @@
           actionNumber: 3,
           created:'',
           examineType:'',
-          examineTitle:''
+          examineTitle:'',
+          courseTitle: '',
+          username: '',
+          videoTitle:'',
+          courseId:'',
+          videoId:''
         },
         dataList: [],
         pageIndex: 1,
@@ -93,6 +103,7 @@
           })
         }).then(({ data }) => {
           if (data && data.code === 0) {
+            console.log(data)
             this.dataList = data.page.list
             this.totalPage = data.page.totalCount
           } else {
