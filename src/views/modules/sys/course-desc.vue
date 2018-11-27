@@ -3,8 +3,7 @@
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item label="所属课程" prop="parentName"> 
         <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
-          <el-tree :data="courseList" :props="courseListTreeProps" node-key="course_id" ref="courseListTree"
-            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
+          <el-tree :data="courseList" :props="courseListTreeProps" node-key="course_id" ref="courseListTree" @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>

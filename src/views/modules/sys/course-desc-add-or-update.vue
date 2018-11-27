@@ -1,10 +1,9 @@
 <template>
   <el-dialog :title="!dataForm.courseId ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-      <el-form-item label="所属课程" prop="parentName"> 
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
+      <el-form-item label="所属课程" prop="parentName" v-show="dataForm.isShow"> 
         <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
-          <el-tree :data="courseList" :props="courseListTreeProps" node-key="courseId" ref="courseListTree"
-            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
+          <el-tree :data="courseList" :props="courseListTreeProps" node-key="courseId" ref="courseListTree" @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
@@ -23,15 +22,17 @@
 
 <script>
   import { treeDataTranslate } from '@/utils'
+  import Editor from '@/components/Quilleditor.vue'
   export default {
-    components: {editor},
+    components: {Editor},
     data () {
       return {
         visible: false,
         dataForm: {
           courseId: 0,
           parentName: '',
-          courseDesc: ''
+          courseDesc: '',
+          isShow: true
         },
         dataRule: {
           courseId: [
@@ -66,6 +67,7 @@
           })
         }).then(() => {
           if (this.dataForm.courseId) {
+            this.dataForm.isShow = false
             this.$http({
               url: this.$http.adornUrl(`/xry/course/desc/info/${this.dataForm.courseId}`),
               method: 'get',
@@ -98,7 +100,7 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/xry/course/desc/${!this.dataForm.courseId ? 'save' : 'save'}`),
+              url: this.$http.adornUrl(`/xry/course/desc/${!this.dataForm.courseId ? 'save' : 'update'}`),
               method: 'post',
               data: this.$http.adornData({
                 'courseId': this.dataForm.courseId || undefined,
