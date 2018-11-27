@@ -56,9 +56,9 @@
       <el-table-column prop="created" header-align="center" align="center" width="180" label="注册时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作" prop="role">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('xry:user:delete')" type="text" size="small" @click="deleteHandle(scope.row.id)">删除</el-button>
-          <el-button v-if="isAuth('xry:user:updateUserRoleTeacher')" type="text" size="small" @click="updateUserRoleTeacher(scope.row.id)" v-show="scope.row.role == 0">置为讲师</el-button>
-          <el-button v-if="isAuth('xry:user:updateUserRole')" type="text" size="small" @click="updateUserRole(scope.row.id)" v-show="scope.row.role == 1">置为普通用户</el-button>
+          <el-button v-if="isAuth('xry:user:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
+          <el-button v-if="isAuth('xry:user:updateUserRoleTeacher')" type="primary" round size="small" @click="updateUserRoleTeacher(scope.row.id)" v-show="scope.row.role == 0">置为讲师</el-button>
+          <el-button v-if="isAuth('xry:user:updateUserRole')" type="success" round size="small" @click="updateUserRole(scope.row.id)" v-show="scope.row.role == 1">置为普通用户</el-button>
         </template>
       </el-table-column>
     </el-table>

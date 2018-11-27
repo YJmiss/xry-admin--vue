@@ -54,8 +54,8 @@
       <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="180" label="操作">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('xry:vedio:play')"  size="small" @click="videoPlay(scope.row.id)">详情</el-button>
-        <el-button v-if="isAuth('xry:record:examine')" :disabled="scope.row.status == 2 || scope.row.status == 3 || scope.row.status == 5 || scope.row.status == 6" type="primary" size="small" @click="examine(scope.row.id)" >审核</el-button>  
+          <el-button v-if="isAuth('xry:vedio:play')" round size="small" @click="videoPlay(scope.row.id)">详情</el-button>
+        <el-button v-if="isAuth('xry:record:examine')" round :disabled="scope.row.status == 2 || scope.row.status == 3 || scope.row.status == 5 || scope.row.status == 6" type="primary" size="small" @click="examine(scope.row.id)" >审核</el-button>  
         </template>
       </el-table-column>
     </el-table>
