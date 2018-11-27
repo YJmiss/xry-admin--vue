@@ -26,7 +26,6 @@
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
       <!-- <el-table-column prop="parentId" header-align="center" align="center" label="父类目ID"></el-table-column> -->
       <el-table-column prop="name" header-align="center" align="center" label="类目名称"></el-table-column>
-      <el-table-column prop="sortOrder" header-align="center" align="center" label="排列序号"></el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="审核状态">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === 1" size="small" type="success">正常</el-tag>
@@ -34,6 +33,7 @@
           <el-tag v-else size="small" type="warning">正常</el-tag>
         </template>
       </el-table-column>
+      <el-table-column prop="sortOrder" header-align="center" align="center" label="排列序号"></el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">

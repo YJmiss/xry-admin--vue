@@ -15,7 +15,7 @@
           </el-select>
       </el-form-item>
       <el-form-item label="第三方登录来源">
-          <el-select v-model="dataForm.socialSource" placeholder="请选择第三方登录来源" @change="socialSourceCurrentSel">
+          <el-select v-model="dataForm.social_source" placeholder="请选择第三方登录来源" @change="socialSourceCurrentSel">
             <el-option v-for="item in socialSourceValues" :key="item.socialSourceValue" :label="item.label" :value="item.socialSourceValue"></el-option>
           </el-select>
       </el-form-item>
@@ -37,21 +37,27 @@
           <el-tag v-else size="small" type="success">正常</el-tag>
         </template>
       </el-table-column>
+
+
       <el-table-column prop="role" header-align="center" align="center" label="角色">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.role === 0" size="small" type="success">普通用户</el-tag>
           <el-tag v-else size="small" type="info">讲师</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="socialSource" header-align="center" align="center" label="第三方登录来源">
+
+
+      <el-table-column prop="social_source" header-align="center" align="center" label="第三方登录来源">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.socialSource === 0" size="small" type="warning">手机号</el-tag>
-          <el-tag v-else-if="scope.row.socialSource === 1" size="small" type="danger">微信</el-tag>
-          <el-tag v-else-if="scope.row.socialSource === 2" size="small" type="success">QQ</el-tag>
-          <el-tag v-else-if="scope.row.socialSource === 3" size="small" type="warning">支付宝</el-tag>
+          <el-tag v-if="scope.row.social_source === 0" size="small" type="warning">手机号</el-tag>
+          <el-tag v-else-if="scope.row.social_source === 1" size="small" type="danger">微信</el-tag>
+          <el-tag v-else-if="scope.row.social_source === 2" size="small" type="success">QQ</el-tag>
+          <el-tag v-else-if="scope.row.social_source === 3" size="small" type="warning">支付宝</el-tag>
           <el-tag v-else size="small" type="warning">手机号</el-tag>
         </template>
       </el-table-column>
+
+
       <el-table-column prop="openuserId" header-align="center" align="center" label="第三方登录用户主键"></el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="注册时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作" prop="role">
@@ -77,7 +83,7 @@
           email: '',
           status: '',
           role: '',
-          socialSource: '',
+          social_source: '',
           openuserId: '',
           created: ''
         },
@@ -108,15 +114,14 @@
         ]
       }
     },
-    components: {
-      
-    },
+    components: {},
     activated () {
       this.getDataList()
     },
     methods: {
       // 获取数据列表
       getDataList () {
+        console.log(this.dataForm.social_source)
         this.dataListLoading = true
         this.$http({
           url: this.$http.adornUrl('/xry/user/list'),
@@ -127,7 +132,7 @@
             'phone': this.dataForm.phone,
             'role': this.dataForm.role,
             'status': this.dataForm.status,
-            'socialSource': this.dataForm.socialSource
+            'socialSource': this.dataForm.social_source
           })
         }).then(({ data }) => {
           if (data && data.code === 0) {
@@ -217,7 +222,6 @@
       },
       // 修改用户角色（讲师<->普通用户切换）
       updateUserRoleTeacher (id) {
-        console.log(id)
         var ids = id ? [id] : this.dataListSelections.map(item => {
           return item.id
         })
@@ -256,7 +260,7 @@
       },
       // 第三方登录来源下拉选中事件
       socialSourceCurrentSel(selVal){
-        this.socialSource = selVal;
+        this.social_source = selVal;
       }
     }
   }
