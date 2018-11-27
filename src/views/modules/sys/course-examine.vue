@@ -50,8 +50,8 @@
       <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作">
         <template slot-scope="scope">
           <el-button v-if="isAuth('xry:course:detail')"  size="small" @click="viewDetail(scope.row.id)">详情</el-button>
-          <el-button v-if="isAuth('xry:course:examine:pass')" :disabled="scope.row.status == 3 || scope.row.status == 2" type="primary" size="small" @click="examinePass(scope.row.id)" >审核通过</el-button> 
-          <el-button v-if="isAuth('xry:course:examine:reject')" type="danger" size="small" @click="examineReject(scope.row.id)">审核驳回</el-button> 
+          <el-button v-if="isAuth('xry:course:examine:pass')" :disabled="scope.row.status == 3 || scope.row.status == 2" type="primary" size="small" @click="examinePass(scope.row.id)" >审核</el-button> 
+          <!-- <el-button v-if="isAuth('xry:course:examine:reject')" type="danger" size="small" @click="examineReject(scope.row.id)">审核驳回</el-button> -->
         </template>
       </el-table-column>
     </el-table>

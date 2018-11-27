@@ -1,13 +1,14 @@
 <template>
   <el-dialog :title="!dataForm.id ? '' : '审核/记录'" :close-on-click-modal="false" :visible.sync="visible">
-  <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-  <el-radio-group v-model="radio">
-   <el-radio  :label="1">申请通过</el-radio>
-   <el-radio  :label="2">申请驳回</el-radio>
-   </el-radio-group>
-   <el-form-item label="记录详情" prop="record">
-    <textarea rows="15" cols="110"></textarea>
-  </el-form-item>
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
+      <el-radio-group v-model="dataForm.actionNumber">
+        <el-radio  :label="3">申请通过</el-radio>
+        <el-radio  :label="4">申请驳回</el-radio>
+      </el-radio-group>
+      <el-form-item label="记录详情" prop="detail">
+        <textarea rows="15" cols="110" v-model="dataForm.detail"></textarea>
+      </el-form-item>
+      <el-form-item v-model="dataForm.type" :visible="false"></el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -24,10 +25,11 @@
         visible: false,
         dataForm: {
           id: 0,
-          videoUrl: '',
+          actionNumber:3,
+          detail:'',
+          type: 1
         },
-         radio:1,
-         record:'',
+        
         dataRule: {
         record:[
           { required: true, message: '请填写审核记录详情！', trigger: 'blur' }
@@ -36,8 +38,9 @@
       }
     },
     methods: {
-      init (id) {
+      init (id,examineType) {
         this.dataForm.id = id || 0
+        this.dataForm.type = examineType
         if (!this.dataForm.id) {
           // 新增
         } else {
@@ -49,8 +52,6 @@
             this.visible = true
             if (data && data.code === 0) {
               this.dataForm.id = data.video.id
-              this.dataForm.videoUrl = data.video.videoUrl
-           
             }
           })
         } 
@@ -58,18 +59,16 @@
       // 审核记录弹框
       dataFormSubmit () {
         this.visible = false
-      },
-      dataFormSubmit(){
-    this.$refs['dataForm'].validate((valid) => {
+        this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/xry/record/${!this.dataForm.id ? 'save' : ''}`),
+              url: this.$http.adornUrl(`/xry/record/videoExamine`),
               method: 'post',
               data: this.$http.adornData({
-                'id': this.dataForm.id || undefined,
-                'record': this.record,
-                'videoUrl': this.dataForm.videoUrl,
-                'radio':this.radio
+                'recordId': this.dataForm.id || undefined,
+                'actionNumber': this.dataForm.actionNumber,
+                'type':this.dataForm.type,
+                'detail': this.dataForm.detail
               })
             }).then(({ data }) => {
               if (data && data.code === 0) {

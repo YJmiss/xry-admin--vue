@@ -24,7 +24,7 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('xry:video:examine:pass')" type="success" @click="examine()" :disabled="dataListSelections.length <= 0">批量审核</el-button>
+        <!-- <el-button v-if="isAuth('xry:video:examine:pass')" type="success" @click="examine()" :disabled="dataListSelections.length <= 0">批量审核</el-button> -->
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
@@ -83,6 +83,7 @@
           courseTitle: '',
           catalogTitle: ''
         },
+        examineType: 2, // 用于区别视频审核和课程审核
         dataList: [],
         pageIndex: 1,
         pageSize: 10,
@@ -198,7 +199,7 @@
       examine(id) {
        this.examineRecordAddVisible = true
         this.$nextTick(() => {
-          this.$refs.examineRecordAdd.init(id)
+          this.$refs.examineRecordAdd.init(id,this.examineType)
         })
       }
     }
