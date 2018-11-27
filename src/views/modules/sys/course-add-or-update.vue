@@ -104,7 +104,7 @@
     },
     methods: {
       init (id) {
-        this.url = this.$http.adornUrl(`/sys/oss/upload?token=${this.$cookie.get('token')}`)
+        this.url = this.$http.adornUrl(`/sys/oss/uploadImg?token=${this.$cookie.get('token')}`)
         this.dataForm.id = id || 0
         // 查询所有课程类目，构造成一棵树
         this.$http({

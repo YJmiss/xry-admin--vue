@@ -21,17 +21,16 @@
       <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
-      <el-table-column prop="category" header-align="center" align="center" label="广告类别">
+      <el-table-column prop="category" header-align="center" align="center" width="190" label="广告类别">
          <template slot-scope="scope">
           <el-tag v-if="scope.row.category === 1" size="small" type="text">首页轮播</el-tag>
-          <el-tag v-else-if="scope.row.category === 2" size="small" type="text">首页中部广告</el-tag>
-          <el-tag v-else size="small" type="text">分类页广告</el-tag>
+          <el-tag v-else-if="scope.row.category === 2" size="small" type="info">首页中部广告</el-tag>
+          <el-tag v-else size="small" type="success">分类页广告</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="title" header-align="center" align="center" label="内容标题"></el-table-column>
+      <el-table-column prop="title" header-align="center" align="center" label="广告标题"></el-table-column>
       <el-table-column prop="url" header-align="center" align="center" label="跳转链接"></el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
-      <el-table-column prop="pic" header-align="center" align="center" label="图片"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
           <el-button v-if="isAuth('xry:content:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>

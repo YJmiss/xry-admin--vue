@@ -1,7 +1,7 @@
 <template>
   <el-dialog :title="!dataForm.id ? '新增' : '视频内容审核'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-      <video width="100%" id="vedio1" controls=" controls"  src="http://www.ynyuanli.com/img/oceans.mp4" type="video/mp4" ></video>
+      <video width="100%" id="video-play" controls=" controls" src="" type="video/mp4" ></video>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -11,6 +11,7 @@
 </template>
 
 <script>
+  import $ from 'jquery'
   import { treeDataTranslate } from '@/utils'
   export default {
     data () {
@@ -40,6 +41,8 @@
               this.dataForm.id = data.video.id
               this.dataForm.videoUrl = data.video.videoUrl
             }
+            // 把this.dataForm.videoUrl赋值给视频标签的src属性
+            $("#video-play").attr("src",this.dataForm.videoUrl);
           })
         } 
       },

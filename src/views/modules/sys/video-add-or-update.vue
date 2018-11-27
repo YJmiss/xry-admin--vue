@@ -33,7 +33,7 @@
         <el-input v-model="dataForm.videoUrl" type="text" placeholder="视频路径" readonly="readonly"></el-input>
       </el-form-item>
       <el-form-item label="上传视频" >
-        <UE :defaultMsg=defaultMsg :config=config ref="ue"></UE>
+        <UE id="video-upload" :defaultMsg="defaultMsg" :config="config" ref="ue"></UE>
     </el-form-item>
      </el-form>
     <span slot="footer" class="dialog-footer">
@@ -43,6 +43,7 @@
   </el-dialog>
 </template>
 <script>
+  import $ from 'jquery'
   import UE from '@/components/ue/ue.vue'
   import { treeDataTranslate } from '@/utils'
   const COMPONENT_NAME = 'uploader-file'
@@ -69,7 +70,6 @@
           courseName: '',
           catalogName: ''
         },
-        
         dataRule: {
           title: [
           { required: true, message: '请填写视频标题', trigger: 'blur' }
@@ -100,7 +100,7 @@
           label: 'title',
           children: 'children'
         },
-         defaultMsg: '',
+        defaultMsg: '',
         config: {
           initialFrameWidth: null,
           initialFrameHeight: 350
@@ -124,51 +124,47 @@
             this.$refs['dataForm'].resetFields()
           })
         }).then(() => {
-          // 查询目录树，需要根据选中课程的id查询出目录树
-          this.$http({
-            url: this.$http.adornUrl('/xry/course/catalog/treeCourseCatalog'),
-            method: 'get',
-            params: this.$http.adornParams()
-          }).then(({ data }) => {
-            this.courseCatalogList = treeDataTranslate(data.courseCatalogList, 'id')
-          }).then(() => {
-            this.visible = true
-            this.$nextTick(() => {
-              this.$refs['dataForm'].resetFields()
+          if (!this.dataForm.id) {
+            // 新增
+            this.courseListTreeSetCurrentNode()
+            this.courseCatalogListTreeSetCurrentNode()
+          } else {
+            this.$http({
+              url: this.$http.adornUrl(`/xry/video/info/${this.dataForm.id}`),
+              method: 'get',
+              params: this.$http.adornParams()
+            }).then(({ data }) => {
+              this.visible = true
+              if (data && data.code === 0) {
+                this.dataForm.id = data.video.id
+                this.dataForm.title = data.video.title
+                this.dataForm.videoUrl = data.video.videoUrl
+                this.dataForm.courseId = data.video.courseId
+                this.dataForm.catalogId = data.video.catalogId
+                this.dataForm.property = data.video.property
+                this.dataForm.status = data.video.status
+                this.dataForm.paramData = data.video.paramData
+                this.courseListTreeSetCurrentNode()
+                this.courseCatalogListTreeSetCurrentNode()
+              }
             })
-          }).then(() => {
-            if (!this.dataForm.id) {
-              // 新增
-              this.courseListTreeSetCurrentNode()
-              this.courseCatalogListTreeSetCurrentNode()
-            } else {
-              this.$http({
-                url: this.$http.adornUrl(`/xry/video/info/${this.dataForm.id}`),
-                method: 'get',
-                params: this.$http.adornParams()
-              }).then(({ data }) => {
-                this.visible = true
-                if (data && data.code === 0) {
-                  this.dataForm.id = data.video.id
-                  this.dataForm.title = data.video.title
-                  this.dataForm.videoUrl = data.video.videoUrl
-                  this.dataForm.courseId = data.video.courseId
-                  this.dataForm.catalogId = data.video.catalogId
-                  this.dataForm.property = data.video.property
-                  this.dataForm.status = data.video.status
-                  this.dataForm.paramData = data.video.paramData
-                  this.courseListTreeSetCurrentNode()
-                  this.courseCatalogListTreeSetCurrentNode()
-                }
-              })
-            } 
-          }) 
+          }  
         })
       },
       // 课程树选中
       courseListTreeCurrentChangeHandle (data, node) {
         this.dataForm.courseId = data.id
         this.dataForm.courseName = data.title
+        // 查询目录树，需要根据选中课程的id查询出目录树
+          this.$http({
+            url: this.$http.adornUrl('/xry/course/catalog/treeCourseCatalog'),
+            method: 'get',
+            params: this.$http.adornParams({
+              'courseId':data.id
+            })
+          }).then(({ data }) => {
+            this.courseCatalogList = treeDataTranslate(data.courseCatalogList, 'id')
+          }).then(() => {})
       },
       // 课程树设置当前选中节点
       courseListTreeSetCurrentNode () {
@@ -187,6 +183,7 @@
       },
       // 表单提交
       dataFormSubmit () {
+        this.dataForm.videoUrl = this.getVideoURL();
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
@@ -228,26 +225,31 @@
         }
       },
       //上传进度
- progressHandle(file){
-   for(index==0;index<file.size;index++){
-  this.uplodProgress=fileList[index]/file.size
-  this.uplodProgress=this.uplodProgress*100+'%'
-   }
-   return  uplodProgress
+      progressHandle(file){
+        for(index==0;index<file.size;index++){
+        this.uplodProgress=fileList[index]/file.size
+        this.uplodProgress=this.uplodProgress*100+'%'
+        }
+        return uplodProgress
       },
- // 上传成功
-successHandle(file){
-  this.progressHandle
-  if(uplodProgress=file.size){
-   this.$confirm('操作成功, 是否继续操作?', '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              type: 'warning'
-            }).catch(() => {
-              this.visible = false
-            })
-  }
-}
+      // 上传成功
+      successHandle(file){
+        this.progressHandle
+        if(uplodProgress=file.size){
+          this.$confirm('操作成功, 是否继续操作?', '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).catch(() => {
+            this.visible = false
+          })
+        }
+      },
+      // 获取富文本编辑器的内容
+      getVideoURL() {
+        let content = this.$refs.ue.getUEContent();
+        return $(content).find("video").attr("src");
+      }
     }
   }
 </script>

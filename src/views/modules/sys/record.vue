@@ -26,14 +26,14 @@
       </el-table-column>
       <el-table-column prop="type" header-align="center" align="center" label="被审核对象标题">
         <template slot-scope="scope">                   
-          <p v-if="scope.row.type==1">{{scope.row.courseTitle}}</p>
-          <p v-else="scope.row.type==2">{{scope.row.videoTitle}}</p>                    
+          <el-p v-if="scope.row.type==1">{{scope.row.courseTitle}}</el-p>
+          <el-p v-else="scope.row.type==2">{{scope.row.videoTitle}}</el-p>                    
         </template>
       </el-table-column>
       <el-table-column prop="username" header-align="center" align="center" label="审核人" width="160"></el-table-column>
-      <el-table-column prop="actionNumber" header-align="center" align="center" label="执行动作" width="100">
+      <el-table-column prop="action_number" header-align="center" align="center" label="执行动作" width="100">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.actionNumber === 3" size="small" type="success">通过</el-tag>
+          <el-tag v-if="scope.row.action_number === 3" size="small" type="success">通过</el-tag>
           <el-tag v-else size="small" type="warning">驳回</el-tag>
         </template>
       </el-table-column>
@@ -103,7 +103,6 @@
           })
         }).then(({ data }) => {
           if (data && data.code === 0) {
-            console.log(data)
             this.dataList = data.page.list
             this.totalPage = data.page.totalCount
           } else {
