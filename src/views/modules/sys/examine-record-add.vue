@@ -41,17 +41,23 @@
       init (id,examineType) {
         this.dataForm.id = id || 0
         this.dataForm.type = examineType
+        let urlType = '';
+        if (1 == examineType) {urlType = 'course'} else {urlType = 'video'}
         if (!this.dataForm.id) {
           // 新增
         } else {
           this.$http({
-            url: this.$http.adornUrl(`/xry/video/info/${this.dataForm.id}`),
+            url: this.$http.adornUrl(`/xry/${urlType}/info/${this.dataForm.id}`),
             method: 'get',
             params: this.$http.adornParams()
           }).then(({ data }) => {
             this.visible = true
             if (data && data.code === 0) {
-              this.dataForm.id = data.video.id
+              if (data.course) {
+                this.dataForm.id = data.course.id
+              } else {
+                this.dataForm.id = data.video.id
+              }
             }
           })
         } 
@@ -62,7 +68,7 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/xry/record/videoExamine`),
+              url: this.$http.adornUrl(`/xry/record/examine`),
               method: 'post',
               data: this.$http.adornData({
                 'recordId': this.dataForm.id || undefined,

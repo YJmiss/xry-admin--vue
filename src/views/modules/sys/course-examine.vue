@@ -26,7 +26,7 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('xry:course:examine:pass')" type="success" @click="examinePass()" :disabled="dataListSelections.length <= 0">批量审核</el-button>
+        <!-- <el-button v-if="isAuth('xry:course:examine:pass')" type="success" @click="examinePass()" :disabled="dataListSelections.length <= 0">批量审核</el-button> -->
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
@@ -50,7 +50,7 @@
       <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作">
         <template slot-scope="scope">
           <el-button v-if="isAuth('xry:course:detail')"  size="small" @click="viewDetail(scope.row.id)">详情</el-button>
-          <el-button v-if="isAuth('xry:course:examine:pass')" :disabled="scope.row.status == 3 || scope.row.status == 2" type="primary" size="small" @click="examinePass(scope.row.id)" >审核</el-button> 
+          <el-button v-if="isAuth('xry:record:examine')" :disabled="scope.row.status == 2 || scope.row.status == 3 || scope.row.status == 5 || scope.row.status == 6" type="primary" size="small" @click="examine(scope.row.id)" >审核</el-button> 
           <!-- <el-button v-if="isAuth('xry:course:examine:reject')" type="danger" size="small" @click="examineReject(scope.row.id)">审核驳回</el-button> -->
         </template>
       </el-table-column>
@@ -60,12 +60,15 @@
     </el-pagination>
     <!-- 弹窗, 查看详情（审核内容） -->
     <course-detail v-if="courseDetailVisible" ref="courseDetail" @refreshDataList="getDataList"></course-detail>
+    <!-- 弹窗, 视频审核记录 -->
+    <examine-record-add v-if="examineRecordAddVisible" ref="examineRecordAdd" @refreshDataList="getDataList"></examine-record-add>
   </div>
 </template>
 
 <script>
   import { treeDataTranslate } from '@/utils'
   import courseDetail from './course-examine-detail'
+  import examineRecordAdd from './examine-record-add'
   export default {
     data () {
       return {
@@ -78,6 +81,7 @@
           examinePassBtnStatus: false,
           examineRejectBtnStatus: false
         },
+        examineType: 1, // 用于区别视频审核和课程审核
         dataList: [],
         pageIndex: 1,
         pageSize: 10,
@@ -85,6 +89,7 @@
         dataListLoading: false,
         dataListSelections: [],
         courseDetailVisible: false,
+        examineRecordAddVisible:false,
         courseList: [],
         courseListTreeProps: {
           label: 'title',
@@ -107,9 +112,7 @@
         value: ''
       }
     },
-    components: {
-      courseDetail
-    },
+    components: { courseDetail,examineRecordAdd },
     activated () {
       this.getDataList()
     },
@@ -196,70 +199,16 @@
           this.$refs.courseDetail.init(id)
         })
       },
-      // 审核驳回
-      examineReject (id) {
-        console.log(this.dataForm.status)
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '审核驳回' : '批量驳回'}]操作?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.$http({
-            url: this.$http.adornUrl('/xry/course/examineReject'),
-            method: 'post',
-            data: this.$http.adornData(ids, false)
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功！',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.getDataList()
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
-        }).catch(() => {})
-      },
-      // 审核通过/批量审核
-      examinePass(id) {
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '审核通过' : '批量审核'}]操作?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.$http({
-            url: this.$http.adornUrl('/xry/course/examinePass'),
-            method: 'post',
-            data: this.$http.adornData(ids, false)
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功！',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.getDataList()
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
-        }).catch(() => {})
-      },
       // 审核状态选择改变
       currentSel(selVal){
         this.dataForm.status = selVal;
+      },
+      // 审核/记录审核
+      examine(id) {
+       this.examineRecordAddVisible = true
+        this.$nextTick(() => {
+          this.$refs.examineRecordAdd.init(id,this.examineType)
+        })
       }
     }
   }
