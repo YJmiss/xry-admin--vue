@@ -126,8 +126,7 @@
         }).then(() => {
           if (!this.dataForm.id) {
             // 新增
-            this.courseListTreeSetCurrentNode()
-            this.courseCatalogListTreeSetCurrentNode()
+            
           } else {
             this.$http({
               url: this.$http.adornUrl(`/xry/video/info/${this.dataForm.id}`),

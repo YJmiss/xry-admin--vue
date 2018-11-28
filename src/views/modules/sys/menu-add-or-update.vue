@@ -140,7 +140,7 @@
         }).then(() => {
           if (!this.dataForm.id) {
             // 新增
-            this.menuListTreeSetCurrentNode()
+            
           } else {
             // 修改
             this.$http({

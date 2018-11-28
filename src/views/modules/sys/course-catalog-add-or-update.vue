@@ -80,7 +80,7 @@
         }).then(() => {
           if (!this.dataForm.id) {
             // 新增
-            this.courseListTreeSetCurrentNode()
+            
           } else {
             // 修改
             this.$http({

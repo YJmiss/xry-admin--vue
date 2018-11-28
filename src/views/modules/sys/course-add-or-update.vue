@@ -114,11 +114,6 @@
         }).then(({ data }) => {
           this.courseCatList = treeDataTranslate(data.courseCatList, 'id')
         }).then(() => {
-          this.visible = true
-          this.$nextTick(() => {
-            this.$refs['dataForm'].resetFields()
-          })
-        }).then(() => {
           // 查询讲师列表，构造成一棵树
           this.$http({
             url: this.$http.adornUrl('/xry/user/treeUser'),
@@ -126,6 +121,11 @@
             params: this.$http.adornParams()
           }).then(({ data }) => {
             this.teacherList = treeDataTranslate(data.userList, 'id')
+          }).then(() => { 
+            this.visible = true
+            this.$nextTick(() => {
+              this.$refs['dataForm'].resetFields()
+            })
           }).then(() => {
             if (this.dataForm.id) {
               this.$http({
@@ -148,8 +148,7 @@
               })
             } else {
               // 新增
-              this.courseCatListTreeSetCurrentNode()
-              this.teacherListTreeSetCurrentNode()
+              
             }
           })
         })

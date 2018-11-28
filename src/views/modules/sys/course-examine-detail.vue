@@ -103,7 +103,7 @@
             })
           } else {
             // 新增
-            this.courseCatListTreeSetCurrentNode()
+            
           }
         })
       },
