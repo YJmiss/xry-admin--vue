@@ -30,12 +30,13 @@
         visible: false,
         dataForm: {
           courseId: 0,
+          courseDescId: 0,
           parentName: '',
           courseDesc: '',
           isShow: true
         },
         dataRule: {
-          courseId: [
+          parentName: [
             { required: true, message: '所属课程不能为空', trigger: 'blur' }
           ],
           courseDesc: [
@@ -74,6 +75,7 @@
               params: this.$http.adornParams()
             }).then(({ data }) => {
               if (data && data.code === 0) {
+                this.dataForm.courseDescId = data.courseDesc.courseId
                 this.dataForm.courseId = data.courseDesc.courseId
                 this.dataForm.courseDesc = data.courseDesc.courseDesc
                 this.courseListTreeSetCurrentNode()
@@ -97,10 +99,11 @@
       },
       // 表单提交
       dataFormSubmit () {
+        console.log(this.dataForm.courseDescId)
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/xry/course/desc/${!this.dataForm.courseId ? 'update' : 'save'}`),
+              url: this.$http.adornUrl(`/xry/course/desc/${!this.dataForm.courseId ? 'save' : 'update'}`),
               method: 'post',
               data: this.$http.adornData({
                 'courseId': this.dataForm.courseId || undefined,

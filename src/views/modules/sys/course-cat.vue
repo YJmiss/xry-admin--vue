@@ -19,6 +19,8 @@
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('xry:course:cat:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('xry:course:cat:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('xry:course:cat:toUse')" type="success" @click="courseCatToUse()" :disabled="dataListSelections.length <= 0">批量启用</el-button>
+        <el-button v-if="isAuth('xry:course:cat:toDisable')" type="warning" @click="courseCatToDisable()" :disabled="dataListSelections.length <= 0">批量禁用</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
@@ -26,19 +28,20 @@
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
       <!-- <el-table-column prop="parentId" header-align="center" align="center" label="父类目ID"></el-table-column> -->
       <el-table-column prop="name" header-align="center" align="center" label="类目名称"></el-table-column>
-      <el-table-column prop="status" header-align="center" align="center" label="审核状态">
+      <el-table-column prop="status" header-align="center" align="center" label="状态" width="120">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.status === 1" size="small" type="success">正常</el-tag>
-          <el-tag v-else-if="scope.row.status === 2" size="small" type="danger">删除</el-tag>
-          <el-tag v-else size="small" type="warning">正常</el-tag>
+          <el-tag v-if="scope.row.status === 1" size="small" type="success">已启用</el-tag>
+          <el-tag v-else size="small"  type="danger">已禁用</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="sortOrder" header-align="center" align="center" label="排列序号"></el-table-column>
+      <el-table-column prop="sortOrder" header-align="center" align="center" label="排列序号" width="120"></el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
-      <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+      <el-table-column fixed="right" header-align="center" align="center" width="400" label="操作">
         <template slot-scope="scope">
           <el-button v-if="isAuth('xry:course:cat:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
           <el-button v-if="isAuth('xry:course:cat:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
+          <el-button v-if="isAuth('xry:course:cat:toUse')" type="success" round size="small" v-show="scope.row.status === 2" @click="courseCatToUse(scope.row.id)">启用类目</el-button>
+          <el-button v-if="isAuth('xry:course:cat:toDisable')" type="warning" round size="small" v-show="scope.row.status === 1" @click="courseCatToDisable(scope.row.id)">禁用类目</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -164,7 +167,67 @@
           this.$http({
             url: this.$http.adornUrl(`/xry/course/cat/delete`),
             method: 'post',
-             data: this.$http.adornData(ids, false)
+            data: this.$http.adornData(ids, false)
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }).catch(() => {})
+      },
+      // 课程类目的启用
+      courseCatToUse (id) {
+         var ids = id ? [id] : this.dataListSelections.map(item => {
+          return item.id
+        })
+        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '启用' : '批量启用'}]操作?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl(`/xry/course/cat/toUse`),
+            method: 'post',
+            data: this.$http.adornData(ids, false)
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }).catch(() => {})
+      },
+      // 课程类目的禁用
+      courseCatToDisable (id) {
+         var ids = id ? [id] : this.dataListSelections.map(item => {
+          return item.id
+        })
+        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '禁用' : '批量禁用'}]操作?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl(`/xry/course/cat/toDisable`),
+            method: 'post',
+            data: this.$http.adornData(ids, false)
           }).then(({ data }) => {
             if (data && data.code === 0) {
               this.$message({

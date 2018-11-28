@@ -3,7 +3,7 @@
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
       <el-form-item label="广告类别">
         <template>
-          <el-radio-group v-model="dataForm.category" @change="currentSel">
+          <el-radio-group v-model="dataForm.category">
             <el-radio :label="1">首页轮播</el-radio>
             <el-radio :label="2">首页中部广告</el-radio>
             <el-radio :label="3">分类页广告</el-radio>

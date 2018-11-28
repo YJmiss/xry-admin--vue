@@ -25,8 +25,8 @@
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('xry:course:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('xry:course:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-        <el-button v-if="isAuth('xry:course:add:to:course')" type="primary" @click="addToCourse()" :disabled="dataListSelections.length <= 0">课程上架</el-button>
-        <el-button v-if="isAuth('xry:course:del:from:course')" type="warning" @click="delFromCourse()" :disabled="dataListSelections.length <= 0">课程下架</el-button>
+        <el-button v-if="isAuth('xry:course:add:to:course')" type="primary" @click="addToCourse()" :disabled="dataListSelections.length <= 0">批量上架</el-button>
+        <el-button v-if="isAuth('xry:course:del:from:course')" type="warning" @click="delFromCourse()" :disabled="dataListSelections.length <= 0">批量下架</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
@@ -49,10 +49,12 @@
         </template>
       </el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
-      <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
-        <template slot-scope="scope">
+      <el-table-column fixed="right" header-align="center" align="center" width="400" label="操作">
+        <template slot-scope="scope" porp="status">
           <el-button v-if="isAuth('xry:course:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
           <el-button v-if="isAuth('xry:course:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
+          <el-button v-if="isAuth('xry:course:add:to:course')" type="primary" round size="small" @click="addToCourse(scope.row.id)" v-show="scope.row.status ===3 || scope.row.status ===5">课程上架</el-button>
+          <el-button v-if="isAuth('xry:course:del:from:course')" type="warning" round size="small" @click="delFromCourse(scope.row.id)" v-show="scope.row.status ===6 ">课程下架</el-button>
         </template>
       </el-table-column>
     </el-table>

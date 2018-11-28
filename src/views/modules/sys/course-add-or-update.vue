@@ -31,7 +31,7 @@
         <el-input v-model="dataForm.price" type="text" placeholder="课程价格"></el-input>
       </el-form-item>
       <el-form-item label="课程图片" prop="image">
-        <el-upload class="load" drag :action="url" :before-upload="beforeUploadHandle" :on-success="successHandle" multiple :file-list="fileList">
+        <el-upload class="load" drag :action="url" ref="upload" :before-upload="beforeUploadHandle" :on-success="successHandle" multiple :file-list="fileList">
           <i class="el-icon-upload"></i>
           <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
           <div class="el-upload__tip" slot="tip">只支持jpg、png、gif/格式的图片！</div>
@@ -71,24 +71,13 @@
         dataListSelections: [],
         visible: false,
         dataRule: {
-          title: [
-            { required: true, message: '请填写课程标题', trigger: 'blur' }
-          ],
-          parentName: [
-            { required: true, message: '上级类目不能为空', trigger: 'change' }
-          ],
-          tid: [
-            { required: true, message: '请选择所属讲师', trigger: 'blur' }
-          ],
-          property: [
-            { required: true, message: '请设置课程属性', trigger: 'blur' }
-          ],
-          status: [
-            { required: true, message: '请设置课程审核状态', trigger: 'blur' }
-          ],
-          price: [
-            { required: true, message: '请填写课程价格', trigger: 'blur' }
-          ]
+          title: [{ required: true, message: '请填写课程标题', trigger: 'blur' }],
+          parentName: [{ required: true, message: '上级类目不能为空', trigger: 'change' }],
+          tid: [{ required: true, message: '请选择所属讲师', trigger: 'blur' }],
+          property: [{ required: true, message: '请设置课程属性', trigger: 'blur' }],
+          status: [{ required: true, message: '请设置课程审核状态', trigger: 'blur' }],
+          price: [ { required: true, message: '请填写课程价格', trigger: 'blur' }],
+          image: [{required: true, message: '请上传课程封面图', trigger: 'blur'}]
         },
         courseCatList: [],
         courseCatListTreeProps: {
@@ -124,7 +113,10 @@
           }).then(() => { 
             this.visible = true
             this.$nextTick(() => {
+              // 重置form表单（清空form表单的内容）
               this.$refs['dataForm'].resetFields()
+              // 清除el-upload上次操作数据
+              this.$refs.upload.clearFiles()
             })
           }).then(() => {
             if (this.dataForm.id) {
@@ -216,7 +208,7 @@
         }
         this.num++
       },
-      // 上传成功
+      // 课程封面图上传成功
       successHandle (response, file, fileList) {
         this.fileList = fileList
         this.successNum++
