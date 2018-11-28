@@ -221,19 +221,7 @@
       successHandle (response, file, fileList) {
         this.fileList = fileList
         this.successNum++
-        if (response && response.code === 0) {
-          if (this.num === this.successNum) {
-            this.$confirm('操作成功, 是否继续操作?', '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              type: 'warning'
-            }).catch(() => {
-              this.visible = false
-            })
-          }
-        } else {
-          this.$message.error(response.msg)
-        }
+        this.dataForm.image = response.url
       }
     }
   }
