@@ -13,10 +13,19 @@
       <el-form-item label="内容标题" prop="title">
         <el-input v-model="dataForm.title" type="text"placeholder="内容标题"></el-input>
       </el-form-item>
-      <el-form-item label="跳转链接" prop="url">
-        <el-input v-model="dataForm.url" type="text" placeholder="跳转链接"></el-input>
+      <el-form-item label="跳转链接" prop="url" v-show="dataForm.category === 2">
+        <el-input v-model="dataForm.url" type="text" placeholder="请填写跳转链接"></el-input>
       </el-form-item>
-       <el-form-item label="内容描述" prop="titie_desc">
+      <el-form-item label="所属课程" prop="parentName" v-show="dataForm.category === 1 || dataForm.category === 3"> 
+        <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
+          <el-tree :data="courseList" :props="courseListTreeProps" node-key="id" ref="courseListTree"
+            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
+            :highlight-current="true" :expand-on-click-node="false">
+          </el-tree>
+        </el-popover>
+        <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择所属课程" class="cat-list__input"></el-input>
+      </el-form-item>
+      <el-form-item label="内容描述" prop="titie_desc">
         <el-input type="textarea" :rows="6" placeholder="请输入内容描述" v-model="dataForm.titie_desc"></el-input>
       </el-form-item>
       <el-form-item label="广告图片" prop="pic">
@@ -50,6 +59,8 @@
           title_desc: '',
           url: '',
           pic: '',
+          parentName:'',
+          status: 1
         },
         visible: false,
         url: '',
@@ -63,9 +74,6 @@
           title: [
             { required: true, message: '请填写广告标题', trigger: 'blur' }
           ],
-          url: [
-            { required: true, message: '请填写跳转链接', trigger: 'blur' }
-          ],
           pic: [
             { required: true, message: '请上传广告封面图片', trigger: 'blur' }
           ]
@@ -74,39 +82,66 @@
         config: {
           initialFrameWidth: null,
           initialFrameHeight: 350
+        },
+        courseList: [],
+        courseListTreeProps: {
+          label: 'title',
+          children: 'children'
         }
       }
     },
     methods: {
       init (id) {
         this.dataForm.id = id || 0
-        this.visible = true
-        this.$nextTick(() => {
-          // 重置form表单（清空form表单的内容）
-          this.$refs['dataForm'].resetFields()
-          // 清除el-upload上次操作数据
-          this.$refs.upload.clearFiles()
-        })
-        this.url = this.$http.adornUrl(`/sys/oss/upload?token=${this.$cookie.get('token')}`)
-        if (this.dataForm.id) {
-          this.$http({
-            url: this.$http.adornUrl(`/xry/content/info/${this.dataForm.id}`),
-            method: 'get',
-            params: this.$http.adornParams()
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.dataForm.id = data.content.id
-              this.dataForm.category = data.content.category
-              this.dataForm.title = data.content.title
-              this.dataForm.title_desc = data.content.title_desc
-              this.dataForm.url = data.content.url
-              this.dataForm.pic = data.content.pic
-              this.dataForm.pic2 = data.content.pic2
-            }
+        // 查询目录所属课程
+        this.$http({
+          url: this.$http.adornUrl('/xry/course/treeCourse'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({ data }) => {
+          this.courseList = treeDataTranslate(data.courseList, 'id')
+        }).then(() => {
+          this.visible = true
+            this.$nextTick(() => {
+            // 重置form表单（清空form表单的内容）
+            this.$refs['dataForm'].resetFields()
+            // 清除el-upload上次操作数据
+            this.$refs.upload.clearFiles()
           })
-        } else {
-          // 新增
-        }
+        }).then(() => {
+          this.url = this.$http.adornUrl(`/sys/oss/upload?token=${this.$cookie.get('token')}`)
+          if (this.dataForm.id) {
+            this.$http({
+              url: this.$http.adornUrl(`/xry/content/info/${this.dataForm.id}`),
+              method: 'get',
+              params: this.$http.adornParams()
+            }).then(({ data }) => {
+              if (data && data.code === 0) {
+                this.dataForm.id = data.content.id
+                this.dataForm.category = data.content.category
+                this.dataForm.title = data.content.title
+                this.dataForm.title_desc = data.content.title_desc
+                this.dataForm.url = data.content.url
+                this.dataForm.pic = data.content.pic
+                this.dataForm.course_id = data.content.course_id
+                this.dataForm.status = data.content.status
+                this.courseListTreeSetCurrentNode()
+              }
+            })
+          } else {
+            // 新增
+          }
+        })
+      },
+      // 课程类目树选中
+      courseListTreeCurrentChangeHandle (data, node) {
+        this.dataForm.courseid = data.id
+        this.dataForm.parentName = data.title
+      },
+      // 课程类目树设置当前选中节点
+      courseListTreeSetCurrentNode () {
+        this.$refs.courseListTree.setCurrentKey(this.dataForm.courseid)
+        this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
       },
        // 上传之前
       beforeUploadHandle (file) {
@@ -124,6 +159,30 @@
       },
       // 表单提交
       dataFormSubmit () {
+        // 单独校验"所属课程"、"跳转链接"
+        if (1 == this.dataForm.category || 3 == this.dataForm.category) {
+            // 校验"所属课程"
+            if (!this.dataForm.parentName) {
+              this.$confirm(`请选择所属课程`, '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+              }).then(() => {
+                return;
+              })
+            }
+        } else {
+          // 校验"跳转链接"
+          if (!this.dataForm.parentName) {
+            this.$confirm(`请选择跳转链接`, '提示', {
+              confirmButtonText: '确定',
+              cancelButtonText: '取消',
+              type: 'warning'
+            }).then(() => {
+              return;
+            })
+          }
+        }
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
@@ -136,7 +195,7 @@
                 'title_desc': this.dataForm.title_desc,
                 'url': this.dataForm.url,
                 'pic': this.dataForm.pic,
-                'pic2': this.dataForm.pic2
+                'course_id': this.dataForm.course_id
               })
             }).then(({ data }) => {
               if (data && data.code === 0) {

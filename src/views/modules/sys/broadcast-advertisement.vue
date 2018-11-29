@@ -21,7 +21,7 @@
       <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
-      <el-table-column prop="category" header-align="center" align="center" width="190" label="广告类别">
+      <el-table-column prop="category" header-align="center" align="center" width="150" label="广告类别">
          <template slot-scope="scope">
           <el-tag v-if="scope.row.category === 1" size="small" type="text">首页轮播</el-tag>
           <el-tag v-else-if="scope.row.category === 2" size="small" type="info">首页中部广告</el-tag>
@@ -29,8 +29,9 @@
         </template>
       </el-table-column>
       <el-table-column prop="title" header-align="center" align="left" label="广告标题"></el-table-column>
-      <el-table-column prop="url" header-align="center" align="left" label="跳转链接"></el-table-column>
-      <el-table-column prop="pic" header-align="center" align="left" label="广告缩略图">
+      <el-table-column prop="url" header-align="center" align="left" label="跳转链接" width="300"></el-table-column>
+      <el-table-column prop="courseTitle" header-align="center" align="left" label="所属课程" width="300"></el-table-column>
+      <el-table-column prop="pic" header-align="center" align="left" label="广告缩略图" width="100">
         <template slot-scope="scope">
           <el-popover ref="imgPopover" placement="left" trigger="hover">
             <img class="big-img" :src="scope.row.pic"/>
@@ -38,11 +39,18 @@
           <img class="broadcst-img" v-popover:imgPopover :src="scope.row.pic" alt="广告缩略图">
         </template>
       </el-table-column>
-      <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
-      <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+      <el-table-column prop="status" header-align="center" align="center" width="120" label="状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.status === 0" size="small" type="warning">已禁用</el-tag>
+          <el-tag v-else-if="scope.row.status === 1" size="small" type="success">已启用</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column fixed="right" header-align="center" align="center" width="250" label="操作">
         <template slot-scope="scope">
           <el-button v-if="isAuth('xry:content:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
           <el-button v-if="isAuth('xry:content:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
+          <el-button v-if="isAuth('xry:content:toDisable')" type="primary" round size="small" @click="contentToDisable(scope.row.id)" v-show="scope.row.status ===1">禁用</el-button>
+          <el-button v-if="isAuth('xry:content:toUse')" type="warning" round size="small" @click="contentToUse(scope.row.id)" v-show="scope.row.status ===0 ">启用</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -65,7 +73,8 @@
           category: 0,
           url: '',
           pic: '',
-          type: ''
+          type: '',
+          courseTitle: ''
         },
         dataList: [],
         pageIndex: 1,
@@ -100,8 +109,10 @@
             params: this.$http.adornParams({
               'page': this.pageIndex,
               'limit': this.pageSize,
+              'title': this.dataForm.title,
               'category': this.dataForm.type,
-              'title': this.dataForm.title
+              'courseId': this.dataForm.courseId,
+              'status': this.dataForm.status
             })
           }).then(({ data }) => {
             if (data && data.code === 0) {
@@ -148,6 +159,66 @@
         }).then(() => {
           this.$http({
             url: this.$http.adornUrl('/xry/content/delete'),
+            method: 'post',
+            data: this.$http.adornData(ids, false)
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }).catch(() => {})
+      },
+      // 广告禁用：1->0
+      contentToDisable (id) {
+        var ids = id ? [id] : this.dataListSelections.map(item => {
+          return item.id
+        })
+        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '禁用' : '批量禁用'}]操作?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl('/xry/content/toDisable'),
+            method: 'post',
+            data: this.$http.adornData(ids, false)
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }).catch(() => {})
+      },
+      // 广告启用：0->1
+      contentToUse (id) {
+        var ids = id ? [id] : this.dataListSelections.map(item => {
+          return item.id
+        })
+        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '禁用' : '批量禁用'}]操作?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl('/xry/content/toUse'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({ data }) => {

@@ -16,16 +16,6 @@
         </el-popover>
         <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
       </el-form-item>
-      <!-- <el-form-item label="审核状态" size="mini" prop="status">
-        <el-radio-group v-model="dataForm.status">
-          <el-radio :label="1">未审核</el-radio>
-          <el-radio :label="2">审核中</el-radio>
-          <el-radio :label="3">已审核</el-radio>
-          <el-radio :label="4">未通过</el-radio>
-          <el-radio :label="5">通过不上架</el-radio>
-          <el-radio :label="6">未通并上架</el-radio>
-        </el-radio-group>
-      </el-form-item> -->
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
