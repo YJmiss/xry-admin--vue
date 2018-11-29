@@ -51,7 +51,7 @@
           url: '',
           pic: '',
         },
-          visible: false,
+        visible: false,
         url: '',
         num: 0,
         successNum: 0,
@@ -120,7 +120,6 @@
       successHandle (response, file, fileList) {
         this.fileList = fileList
         this.successNum++
-        this.visible = false
         this.dataForm.pic = response.url
       },
       // 表单提交

@@ -31,19 +31,14 @@
         </template>
       </el-table-column>
       <el-table-column prop="username" header-align="center" align="center" label="审核人" width="160"></el-table-column>
-
-
       <el-table-column prop="action_number" header-align="center" align="left" label="审核详情" width="400">
         <template slot-scope="scope">
-          <el-popover ref="detailPopover" placement="bottom-start" trigger="hover">
-           <p prop="detail">{{scope.row.detail}}</p>
+          <el-popover ref="detailPopover" placement="top-start" trigger="hover">
+            <span>点击查看详情</span>
           </el-popover>
-          <el-tag class="examin-detail" v-if="scope.row.action_number === 3" size="small" type="success" v-popover:detailPopover>{{scope.row.detail}}</el-tag>
-          <el-tag class="examin-detail" v-else size="small" type="danger" v-popover:detailPopover>{{scope.row.detail}}</el-tag>
+          <el-button class="examin-detail" show-overflow-tooltip size="small" type="text" v-popover:detailPopover @click="showDetail(scope.row.detail)">{{scope.row.detail}}</el-button>
         </template>
       </el-table-column>
-
-      
       <el-table-column prop="action_number" header-align="center" align="center" label="执行动作" width="100">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.action_number === 3" size="small" type="success">通过</el-tag>
@@ -174,16 +169,10 @@
       },
       // 点击->审核详情弹出框
       showDetail (detail) {
-        console.log(detail)
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+        this.$alert(detail, '审核详情', {
           confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          onClose: () => {
-            this.getDataList()
-          }
-        }).catch(() => {})
+          callback: action => {}
+        });
       },
       // 审核类型下拉选中事件
       currentSel(selVal){
@@ -194,4 +183,5 @@
 </script>
 <style>
   .examin-detail:hover{cursor:pointer }
+  .examin-detail{float:left}
 </style>
