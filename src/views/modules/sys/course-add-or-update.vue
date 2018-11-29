@@ -19,7 +19,7 @@
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input v-model="dataForm.nickname" v-popover:teacherListPopover :readonly="true" placeholder="点击选择所属讲师" class="cat-list__input"></el-input>
+        <el-input v-model="dataForm.teacherName" v-popover:teacherListPopover :readonly="true" placeholder="点击选择所属讲师" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="是否收费" size="mini" prop="property">
         <el-radio-group v-model="dataForm.property">
@@ -212,6 +212,7 @@
       },
       // 课程封面图上传成功
       successHandle (response, file, fileList) {
+        console.log(response)
         this.fileList = fileList
         this.successNum++
         this.dataForm.image = response.url

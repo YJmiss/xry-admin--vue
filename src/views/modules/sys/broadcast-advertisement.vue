@@ -11,6 +11,11 @@
       <el-form-item label="广告标题">
         <el-input v-model="dataForm.title" placeholder="广告标题" clearable></el-input>
       </el-form-item>
+      <el-form-item label="状态">
+        <el-select v-model="dataForm.status" placeholder="请选择状态" @change="statusSel">
+          <el-option v-for="item in contentStatus" :key="item.contentStatusValue" :label="item.label" :value="item.contentStatusValue"></el-option>
+        </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('xry:content:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
@@ -90,7 +95,12 @@
         }, {
           value: '3',label: '分类页广告'
         }],
-        value: ''
+        value: '',
+        contentStatus: [
+          { contentStatusValue: '1', label: '启用' }, 
+          { contentStatusValue: '0', label: '禁用' }
+        ],
+        contentStatusValue: ''
       }
     },
     components: {
@@ -240,6 +250,10 @@
       // 广告类别下拉选中事件
       currentSel(selVal){
         this.type = selVal;
+      },
+      // 状态下拉选中事件
+      statusSel(selVal){
+        this.dataForm.status = selVal;
       }
     }
   }

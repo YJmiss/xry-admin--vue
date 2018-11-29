@@ -76,8 +76,8 @@
         dataListSelections: [],
         addOrUpdateVisible: false,
         options: [
-          { value: '1', label: '正常' }, 
-          { value: '2', label: '删除' }
+          { value: '1', label: '启用' }, 
+          { value: '2', label: '禁用' }
         ],
         value: ''
       }
