@@ -32,7 +32,10 @@
       <el-table-column prop="url" header-align="center" align="left" label="跳转链接"></el-table-column>
       <el-table-column prop="pic" header-align="center" align="left" label="广告缩略图">
         <template slot-scope="scope">
-          <img :src="scope.row.pic" alt="广告缩略图">
+          <el-popover ref="imgPopover" placement="left" trigger="hover">
+            <img class="big-img" :src="scope.row.pic"/>
+          </el-popover>
+          <img class="broadcst-img" v-popover:imgPopover :src="scope.row.pic" alt="广告缩略图">
         </template>
       </el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
@@ -170,3 +173,8 @@
     }
   }
 </script>
+<style>
+  .broadcst-img{width: 50px;height: 50px;}
+  .broadcst-img:hover{cursor:pointer}
+  .big-img{height:500px;width:500px;}
+</style>
