@@ -24,13 +24,26 @@
           <el-tag v-else size="small" type="warning">视频审核</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="type" header-align="center" align="center" label="被审核对象标题">
+      <el-table-column prop="type" header-align="center" align="left" label="被审核对象标题" width="300">
         <template slot-scope="scope">                   
           <p v-if="scope.row.type==1">{{scope.row.courseTitle}}</p>
           <p v-else="scope.row.type==2">{{scope.row.videoTitle}}</p>                    
         </template>
       </el-table-column>
       <el-table-column prop="username" header-align="center" align="center" label="审核人" width="160"></el-table-column>
+
+
+      <el-table-column prop="action_number" header-align="center" align="left" label="审核详情" width="400">
+        <template slot-scope="scope">
+          <el-popover ref="detailPopover" placement="bottom-start" trigger="hover">
+           <p prop="detail">{{scope.row.detail}}</p>
+          </el-popover>
+          <el-tag class="examin-detail" v-if="scope.row.action_number === 3" size="small" type="success" v-popover:detailPopover>{{scope.row.detail}}</el-tag>
+          <el-tag class="examin-detail" v-else size="small" type="danger" v-popover:detailPopover>{{scope.row.detail}}</el-tag>
+        </template>
+      </el-table-column>
+
+      
       <el-table-column prop="action_number" header-align="center" align="center" label="执行动作" width="100">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.action_number === 3" size="small" type="success">通过</el-tag>
@@ -68,8 +81,10 @@
           username: '',
           videoTitle:'',
           courseId:'',
-          videoId:''
+          videoId:'',
+          detail:''
         },
+        visible: false,
         dataList: [],
         pageIndex: 1,
         pageSize: 10,
@@ -157,6 +172,19 @@
           })
         }).catch(() => {})
       },
+      // 点击->审核详情弹出框
+      showDetail (detail) {
+        console.log(detail)
+        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          onClose: () => {
+            this.getDataList()
+          }
+        }).catch(() => {})
+      },
       // 审核类型下拉选中事件
       currentSel(selVal){
         this.examineType = selVal;
@@ -164,3 +192,6 @@
     }
   }
 </script>
+<style>
+  .examin-detail:hover{cursor:pointer }
+</style>

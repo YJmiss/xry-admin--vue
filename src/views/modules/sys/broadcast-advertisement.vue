@@ -28,8 +28,13 @@
           <el-tag v-else size="small" type="success">分类页广告</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="title" header-align="center" align="center" label="广告标题"></el-table-column>
-      <el-table-column prop="url" header-align="center" align="center" label="跳转链接"></el-table-column>
+      <el-table-column prop="title" header-align="center" align="left" label="广告标题"></el-table-column>
+      <el-table-column prop="url" header-align="center" align="left" label="跳转链接"></el-table-column>
+      <el-table-column prop="pic" header-align="center" align="left" label="广告缩略图">
+        <template slot-scope="scope">
+          <img :src="scope.row.pic" alt="广告缩略图">
+        </template>
+      </el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">

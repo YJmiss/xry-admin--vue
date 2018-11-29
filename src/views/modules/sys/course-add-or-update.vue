@@ -19,7 +19,7 @@
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input v-model="dataForm.teacherName" v-popover:teacherListPopover :readonly="true" placeholder="点击选择所属讲师" class="cat-list__input"></el-input>
+        <el-input v-model="dataForm.nickname" v-popover:teacherListPopover :readonly="true" placeholder="点击选择所属讲师" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="是否收费" size="mini" prop="property">
         <el-radio-group v-model="dataForm.property">
@@ -28,7 +28,8 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="课程价格" prop="price">
-        <el-input v-model="dataForm.price" type="text" placeholder="课程价格"></el-input>
+        <el-input class="course-price" v-model="dataForm.price" type="text" placeholder="课程价格"></el-input>
+        <p class="price-tip">单位：（元）</p>
       </el-form-item>
       <el-form-item label="课程图片" prop="image">
         <el-upload class="load" drag :action="url" ref="upload" :before-upload="beforeUploadHandle" :on-success="successHandle" multiple :file-list="fileList">
@@ -57,6 +58,7 @@
           cid: 1,
           parentName: '',
           teacherName:'',
+          nickname:'',
           tid:'',
           property: 1,
           status: 1,
@@ -218,12 +220,8 @@
   }
 </script>
 <style scoped>
-  .load{
-    text-align: center;
-    margin-top: 20px;
-    padding:10px;
-    font-size: 16px;
-    border: none;
-  }
+  .load{ text-align: center;margin-top: 20px;padding:10px;font-size: 16px;border: none;}
+  .course-price{width:700px}
+  .price-tip{display:inline;color:red;padding-left:20px;}
 </style>
 

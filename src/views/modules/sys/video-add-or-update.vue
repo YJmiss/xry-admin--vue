@@ -82,12 +82,6 @@
           ],
           property: [
             { required: true, message: '请设置课程属性', trigger: 'blur' }
-          ],
-          status: [
-            { required: true, message: '请设置课程审核状态', trigger: 'blur' }
-          ],
-          paramData: [
-            { required: true, message: '请填写视频格式', trigger: 'blur' }
           ]
         },
         courseList: [],
@@ -183,38 +177,48 @@
       // 表单提交
       dataFormSubmit () {
         this.dataForm.videoUrl = this.getVideoURL();
-        this.$refs['dataForm'].validate((valid) => {
-          if (valid) {
-            this.$http({
-              url: this.$http.adornUrl(`/xry/video/${!this.dataForm.id ? 'save' : 'update'}`),
-              method: 'post',
-              data: this.$http.adornData({
-                'id': this.dataForm.id || undefined,
-                'title': this.dataForm.title,
-                'videoUrl': this.dataForm.videoUrl,
-                'courseId': this.dataForm.courseId,
-                'catalogId': this.dataForm.catalogId,
-                'property': this.dataForm.property,
-                'status': this.dataForm.status,
-                'paramData': this.dataForm.paramData
-              })
-            }).then(({ data }) => {
-              if (data && data.code === 0) {
-                this.$message({
-                  message: '操作成功',
-                  type: 'success',
-                  duration: 1500,
-                  onClose: () => {
-                    this.visible = false
-                    this.$emit('refreshDataList')
-                  }
+        if (!this.dataForm.videoUrl) {
+          this.$confirm(`请上传视频再次提交`, '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            return;
+          })
+        } else {
+          this.$refs['dataForm'].validate((valid) => {
+            if (valid) {
+              this.$http({
+                url: this.$http.adornUrl(`/xry/video/${!this.dataForm.id ? 'save' : 'update'}`),
+                method: 'post',
+                data: this.$http.adornData({
+                  'id': this.dataForm.id || undefined,
+                  'title': this.dataForm.title,
+                  'videoUrl': this.dataForm.videoUrl,
+                  'courseId': this.dataForm.courseId,
+                  'catalogId': this.dataForm.catalogId,
+                  'property': this.dataForm.property,
+                  'status': this.dataForm.status,
+                  'paramData': this.dataForm.paramData
                 })
-              } else {
-                this.$message.error(data.msg)
-              }
-            })
-          }
-        })
+              }).then(({ data }) => {
+                if (data && data.code === 0) {
+                  this.$message({
+                    message: '操作成功',
+                    type: 'success',
+                    duration: 1500,
+                    onClose: () => {
+                      this.visible = false
+                      this.$emit('refreshDataList')
+                    }
+                  })
+                } else {
+                  this.$message.error(data.msg)
+                }
+              })
+            }
+          })
+        }
       },
       // 上传之前
       beforeUploadHandle (file) {

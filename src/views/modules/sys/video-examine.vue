@@ -136,7 +136,9 @@
               params: this.$http.adornParams({
                 'page': this.pageIndex,
                 'limit': this.pageSize,
-                'title': this.dataForm.title
+                'title': this.dataForm.title,
+                'courseId': this.dataForm.courseId,
+                'catalogId': this.dataForm.catalogId
               })
             }).then(({ data }) => {
               if (data && data.code === 0) {

@@ -32,10 +32,10 @@
       <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
-      <el-table-column prop="title" header-align="center" align="center" label="视频标题"></el-table-column>
-      <el-table-column prop="courseTitle" header-align="center" align="center" label="所属课程"></el-table-column>
-      <el-table-column prop="catalogTitle" header-align="center" align="center" label="所属目录"></el-table-column>
-      <el-table-column prop="property" header-align="center" align="center" label="是否收费">
+      <el-table-column prop="title" header-align="center" align="left" label="视频标题" width="300"></el-table-column>
+      <el-table-column prop="courseTitle" header-align="center" align="left" label="所属课程" width="300"></el-table-column>
+      <el-table-column prop="catalogTitle" header-align="center" align="left" label="所属目录" width="300"></el-table-column>
+      <el-table-column prop="property" header-align="center" align="center" label="是否收费" width="100">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.property === 1" size="small" type="warning">试学</el-tag>
           <el-tag v-else-if="scope.row.property === 2" size="small" type="danger">收费</el-tag>
@@ -43,7 +43,7 @@
           <el-tag v-else size="small" type="warning">试学</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="status" header-align="center" align="center" label="审核状态">
+      <el-table-column prop="status" header-align="center" align="center" label="审核状态" width="100">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === 1" size="small" type="warning">未审核</el-tag>
           <el-tag v-else-if="scope.row.status === 2" size="small" type="danger">审核中</el-tag>
@@ -54,7 +54,6 @@
           <el-tag v-else size="small" type="warning">未审核</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="paramData" header-align="center" align="center" label="参数数据"></el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
