@@ -99,7 +99,7 @@
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({
-              url: this.$http.adornUrl(`/xry/course/desc/${!this.dataForm.courseId ? 'save' : 'update'}`),
+              url: this.$http.adornUrl(`/xry/course/desc/save`),
               method: 'post',
               data: this.$http.adornData({
                 'courseId': this.dataForm.courseId || undefined,
