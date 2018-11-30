@@ -11,7 +11,7 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('xry:course:desc:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button v-if="isAuth('xry:course:desc:save')" type="primary" @click="addHandle()">新增</el-button>
         <el-button v-if="isAuth('xry:course:desc:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
@@ -26,7 +26,7 @@
       <el-table-column prop="created" header-align="center" align="center" width="280" label="创建时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('xry:course:desc:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
+          <el-button v-if="isAuth('xry:course:desc:update')" type="primary" size="small" icon="el-icon-edit" circle @click="updateHandle(scope.row.id)"></el-button>
           <el-button v-if="isAuth('xry:course:desc:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
         </template>
       </el-table-column>
@@ -34,14 +34,17 @@
     <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex" :page-sizes="[10, 20, 50, 100]" 
           :page-size="pageSize" :total="totalPage" layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
-    <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <!-- 弹窗, 新增 -->
+    <add-page v-if="addVisible" ref="addPage" @refreshDataList="getDataList"></add-page>
+    <!-- 弹窗, 修改 -->
+    <update-page v-if="updateVisible" ref="updatePage" @refreshDataList="getDataList"></update-page>
   </div>
 </template>
 
 <script>
   import { treeDataTranslate } from '@/utils'
-  import AddOrUpdate from './course-desc-add-or-update'
+  import AddPage from './course-desc-add'
+  import UpdatePage from './course-desc-update'
   export default {
     data () {
       return {
@@ -57,7 +60,8 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false,
+        addVisible: false,
+        updateVisible: false,
         courseList: [],
         courseListTreeProps: {
           label: 'title',
@@ -66,7 +70,7 @@
       }
     },
     components: {
-      AddOrUpdate
+      AddPage,UpdatePage
     },
     activated () {
       this.getDataList()
@@ -128,11 +132,18 @@
       selectionChangeHandle (val) {
         this.dataListSelections = val
       },
-      // 新增 / 修改
-      addOrUpdateHandle (id) {
-        this.addOrUpdateVisible = true
+      // 新增
+      addHandle (id) {
+        this.addVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
+          this.$refs.addPage.init(id)
+        })
+      },
+      // 修改
+      updateHandle (id) {
+        this.updateVisible = true
+        this.$nextTick(() => {
+          this.$refs.updatePage.init(id)
         })
       },
       // 删除

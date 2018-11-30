@@ -1,13 +1,13 @@
 <template>
   <el-dialog :title="!dataForm.courseId ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
-      <el-form-item label="所属课程" prop="parentName" v-show="dataForm.isShow"> 
+      <el-form-item label="所属课程" prop="parentName" v-show="false"> 
         <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
           <el-tree :data="courseList" :props="courseListTreeProps" node-key="courseId" ref="courseListTree" @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
+        <el-input v-model="dataForm.parentName" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="课程描述">
         <editor :uploadUrl="uploadUrl" v-model="dataForm.courseDesc"></editor>
@@ -33,12 +33,8 @@
           courseDescId: 0,
           parentName: '',
           courseDesc: '',
-          isShow: true
         },
         dataRule: {
-          parentName: [
-            { required: true, message: '所属课程不能为空', trigger: 'blur' }
-          ],
           courseDesc: [
             { required: true, message: '课程描述不能为空', trigger: 'blur' }
           ]
@@ -68,7 +64,6 @@
           })
         }).then(() => {
           if (this.dataForm.courseId) {
-            this.dataForm.isShow = false
             this.$http({
               url: this.$http.adornUrl(`/xry/course/desc/info/${this.dataForm.courseId}`),
               method: 'get',
@@ -83,7 +78,6 @@
             })
           } else {
             // 新增
-            
           }
         })
       },
