@@ -26,7 +26,7 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <!-- <el-button v-if="isAuth('xry:course:examine:pass')" type="success" @click="examinePass()" :disabled="dataListSelections.length <= 0">批量审核</el-button> -->
+        <!-- <el-button v-if="isAuth('xry:course:examine')" type="success" @click="examinePass()" :disabled="dataListSelections.length <= 0">批量审核</el-button> -->
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">

@@ -212,7 +212,6 @@
       },
       // 课程封面图上传成功
       successHandle (response, file, fileList) {
-        console.log(response)
         this.fileList = fileList
         this.successNum++
         this.dataForm.image = response.url

@@ -20,8 +20,11 @@
       </el-table-column>
       <el-table-column prop="course_id" header-align="center" align="center" width="80" label="ID"></el-table-column>
       <el-table-column prop="title" header-align="center" align="center" label="所属课程"></el-table-column>
-      <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
-      <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+      <el-table-column prop="" header-align="center" align="center" label="描述详情">
+        
+      </el-table-column>
+      <el-table-column prop="created" header-align="center" align="center" width="280" label="创建时间"></el-table-column>
+      <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作">
         <template slot-scope="scope">
           <el-button v-if="isAuth('xry:course:desc:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
           <el-button v-if="isAuth('xry:course:desc:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
@@ -45,7 +48,8 @@
         dataForm: {
           parentName: '',
           course_id: '',
-          title: ''
+          title: '',
+          course_desc:''
         },
         dataList: [],
         pageIndex: 1,

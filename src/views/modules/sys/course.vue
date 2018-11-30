@@ -52,8 +52,8 @@
         <template slot-scope="scope" porp="status">
           <el-button v-if="isAuth('xry:course:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)" :disabled="scope.row.status ===6 || scope.row.status === 3 || scope.row.status === 5"></el-button>
           <el-button v-if="isAuth('xry:course:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
-          <el-button v-if="isAuth('xry:course:add:to:course')" type="primary" round size="small" @click="addToCourse(scope.row.id)" v-show="scope.row.status ===3 || scope.row.status ===5">上架</el-button>
-          <el-button v-if="isAuth('xry:course:del:from:course')" type="warning" round size="small" @click="delFromCourse(scope.row.id)" v-show="scope.row.status ===6 ">下架</el-button>
+          <el-button v-if="isAuth('xry:course:addToCourse')" type="primary" round size="small" @click="addToCourse(scope.row.id)" v-show="scope.row.status ===3 || scope.row.status ===5">上架</el-button>
+          <el-button v-if="isAuth('xry:course:delFromCourse')" type="warning" round size="small" @click="delFromCourse(scope.row.id)" v-show="scope.row.status ===6 ">下架</el-button>
         </template>
       </el-table-column>
     </el-table>

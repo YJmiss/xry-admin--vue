@@ -31,7 +31,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="username" header-align="center" align="center" label="审核人" width="160"></el-table-column>
-      <el-table-column prop="action_number" header-align="center" align="left" label="审核详情" width="400">
+      <el-table-column prop="detail" header-align="center" align="left" label="审核详情" width="400">
         <template slot-scope="scope">
           <el-popover ref="detailPopover" placement="top-start" trigger="hover">
             <span>点击查看详情</span>

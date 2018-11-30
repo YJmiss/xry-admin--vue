@@ -34,7 +34,6 @@
           id: 0,
           title: '',
           courseid: 0,
-          status: 1,
           parentName: ''
         },
         dataRule: {
@@ -82,7 +81,6 @@
               this.dataForm.id = data.courseCatalog.id
               this.dataForm.title = data.courseCatalog.title
               this.dataForm.courseid = data.courseCatalog.courseid
-              this.dataForm.status = data.courseCatalog.status
               this.courseListTreeSetCurrentNode()
             })
           }
@@ -110,7 +108,6 @@
                 'id': this.dataForm.id || undefined,
                 'title': this.dataForm.title,
                 'courseid': this.dataForm.courseid,
-                'status': this.dataForm.status
               })
             }).then(({ data }) => {
               if (data && data.code === 0) {
