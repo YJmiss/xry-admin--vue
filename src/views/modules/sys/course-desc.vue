@@ -19,7 +19,7 @@
       <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column>
       <el-table-column prop="course_id" header-align="center" align="center" width="80" label="ID"></el-table-column>
-      <el-table-column prop="title" header-align="center" align="center" label="所属课程"></el-table-column>
+      <el-table-column prop="title" header-align="center" align="left" label="所属课程"></el-table-column>
       <el-table-column prop="" header-align="center" align="center" label="描述详情">
         
       </el-table-column>

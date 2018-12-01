@@ -27,7 +27,7 @@
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
       <!-- <el-table-column prop="parentId" header-align="center" align="center" label="父类目ID"></el-table-column> -->
-      <el-table-column prop="name" header-align="center" align="center" label="类目名称"></el-table-column>
+      <el-table-column prop="name" header-align="center" align="left" label="类目名称"></el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="状态" width="120">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === 1" size="small" type="success">已启用</el-tag>
