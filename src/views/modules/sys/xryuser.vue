@@ -37,16 +37,12 @@
           <el-tag v-else size="small" type="success">正常</el-tag>
         </template>
       </el-table-column>
-
-
       <el-table-column prop="role" header-align="center" align="center" label="角色">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.role === 0" size="small" type="success">普通用户</el-tag>
           <el-tag v-else size="small" type="info">讲师</el-tag>
         </template>
       </el-table-column>
-
-
       <el-table-column prop="social_source" header-align="center" align="center" label="第三方登录来源">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.social_source === 0" size="small" type="warning">手机号</el-tag>
@@ -56,8 +52,6 @@
           <el-tag v-else size="small" type="warning">手机号</el-tag>
         </template>
       </el-table-column>
-
-
       <el-table-column prop="openuserId" header-align="center" align="center" label="第三方登录用户主键"></el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="注册时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作" prop="role">

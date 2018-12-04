@@ -26,8 +26,8 @@
       </el-table-column>
       <el-table-column prop="type" header-align="center" align="left" label="被审核对象标题" width="300">
         <template slot-scope="scope">                   
-          <p v-if="scope.row.type==1">{{scope.row.courseTitle}}</p>
-          <p v-else="scope.row.type==2">{{scope.row.videoTitle}}</p>                    
+          <p v-if="scope.row.type===1">{{scope.row.courseTitle}}</p>
+          <p v-else="scope.row.type===2">{{scope.row.videoTitle}}</p>                    
         </template>
       </el-table-column>
       <el-table-column prop="username" header-align="center" align="center" label="审核人" width="160"></el-table-column>

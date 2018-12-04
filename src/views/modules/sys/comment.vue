@@ -1,7 +1,7 @@
 <template>
-  <div class="mod-course">
+  <div>
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item label="选择课程" prop="parentName"> 
+     <el-form-item label="课程" prop="parentName"> 
         <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
           <el-tree :data="courseList" :props="courseListTreeProps" node-key="id" ref="courseListTree"
             @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
@@ -10,7 +10,7 @@
         </el-popover>
         <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择课程" class="cat-list__input"></el-input>
       </el-form-item>
-      <el-form-item label="所属讲师" prop="teacherName">
+      <el-form-item label="讲师" prop="teacherName">
         <el-popover ref="teacherListPopover" placement="bottom-start" trigger="click">
           <el-tree :data="teacherList" :props="teacherListTreeProps" node-key="id" ref="teacherListTree" @current-change="teacherListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">
@@ -18,83 +18,81 @@
         </el-popover>
         <el-input v-model="dataForm.teacherName" v-popover:teacherListPopover :readonly="true" placeholder="点击选择讲师" class="cat-list__input"></el-input>
       </el-form-item>
-      <el-form-item label="消息类型">
-        <el-select v-model="dataForm.type" placeholder="请选择消息类型" @change="currentSel">
-          <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
-        </el-select>
+       <el-form-item label="类型">
+         <el-select v-model="dataForm.type" placeholder="请选择类型" @change="typeCurrentSel">
+            <el-option v-for="item in typeValues" :key="item.typeValue" :label="item.label" :value="item.typeValue"></el-option>
+          </el-select>
+      </el-form-item>
+      <el-form-item label="评论状态">
+          <el-select v-model="dataForm.status" placeholder="请选择评论状态" @change="statusCurrentSel">
+            <el-option v-for="item in statusValues" :key="item.statusValue" :label="item.label" :value="item.statusValue"></el-option>
+          </el-select>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('xry:message:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('xry:message:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('xry:comment:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-      <!-- <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column> -->
-      <el-table-column prop="type" header-align="center" align="center" width="150" label="消息类型">
-        <template slot-scope="scope">
-          <el-tag v-if="scope.row.type === 1" size="small" type="success">课程消息</el-tag>
-          <el-tag v-else-if="scope.row.type === 2" size="small" type="danger">我关注的</el-tag>
-          <el-tag v-else size="small" type="warning">平台通知</el-tag>
+      <el-table-column header-align="center" align="left" label="被评论对象" width="260">
+        <template slot-scope="scope">                   
+          <p v-if="scope.row.type===0">{{scope.row.courseTitle}}</p>
+          <p v-else="scope.row.type===1">{{scope.row.nickname}}</p>                    
         </template>
       </el-table-column>
-      <el-table-column prop="course_type" header-align="center" align="center" width="150" label="课程消息类型">
+      <el-table-column prop="nickname" header-align="center" align="center" label="评价用户" width="150"></el-table-column>
+      <el-table-column prop="star_level" header-align="center" align="center" label="星级评分" width="100"></el-table-column>
+      <el-table-column prop="status" header-align="center" align="center" label="评论状态" width="120">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.course_type === 1" size="small" type="info">开课通知</el-tag>
-          <el-tag v-else size="small" type="success">课程章节更新</el-tag>
+          <el-tag v-if="scope.row.status === 1" size="small" type="success">正常显示</el-tag>
+          <el-tag v-else size="small" type="warning">已被删除</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="courseTitle" header-align="center" align="left" width="300" label="消息->课程"></el-table-column>
-      <el-table-column prop="nickname" header-align="center" align="center" width="130" label="消息->讲师"></el-table-column>
-      <el-table-column prop="status" header-align="center" align="center" width="150" label="发布状态">
+      <el-table-column prop="type" header-align="center" align="center" label="类型" width="150">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.status === 0" size="small" type="info">未发布</el-tag>
-          <el-tag v-else size="small" type="success">已发布</el-tag>
+          <el-tag v-if="scope.row.type === 0" size="small" type="success">课程评价</el-tag>
+          <el-tag v-else size="small" type="info">讲师评价</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="publish_date" header-align="center" align="center" width="200" label="发布日期"></el-table-column>
-      <el-table-column prop="info" header-align="center" align="left" label="具体信息" width="350">
+      <el-table-column prop="detail" header-align="center" align="left" label="详情" width="360">
         <template slot-scope="scope">
           <el-popover ref="detailPopover" placement="top-start" trigger="hover">
             <span>点击查看详情</span>
           </el-popover>
-          <el-button show-overflow-tooltip size="small" type="text" v-popover:detailPopover @click="showDetail(scope.row.info)">{{scope.row.info}}</el-button>
+          <el-button show-overflow-tooltip size="small" type="text" v-popover:detailPopover @click="showDetail(scope.row.detail)">{{scope.row.detail}}</el-button>
         </template>
       </el-table-column>
-      <el-table-column fixed="right" header-align="center" align="left" width="230" label="操作">
-        <template slot-scope="scope" porp="status">
-          <el-button v-if="isAuth('xry:message:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
-          <el-button v-if="isAuth('xry:message:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
-          <el-button v-if="isAuth('xry:message:publishMessage')" type="primary" round size="small" @click="publishMessage(scope.row.id)" v-show="scope.row.status ===0">立即发布</el-button>
-          <el-button v-if="isAuth('xry:message:cancelPublish')" type="warning" round size="small" @click="cancelPublish(scope.row.id)" v-show="scope.row.status ===1 ">取消发布</el-button>
+      <el-table-column prop="created" header-align="center" align="center" width="180" label="时间"></el-table-column>
+      <el-table-column fixed="right" header-align="center" align="center" width="230" label="操作" prop="status">
+        <template slot-scope="scope">
+          <el-button v-if="isAuth('xry:comment:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
+          <el-button v-if="isAuth('xry:comment:hideComment')" type="warning" round size="small" @click="hideComment(scope.row.id)" v-show="scope.row.status == 1">删除评论</el-button>
+          <el-button v-if="isAuth('xry:comment:recoverComment')" type="primary" round size="small" @click="recoverComment(scope.row.id)" v-show="scope.row.status == 0">恢复显示</el-button>
         </template>
       </el-table-column>
     </el-table>
     <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex" :page-sizes="[10, 20, 50, 100]" 
           :page-size="pageSize" :total="totalPage" layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
-    <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
   </div>
 </template>
 
 <script>
   import { treeDataTranslate } from '@/utils'
-  import AddOrUpdate from './message-add-or-update'
   export default {
     data () {
       return {
         dataForm: {
-          type: '',
-          course_type: '',
-          status: 0,
-          publish_date:'',
-          info:'',
+          objId: '',
+          userId: '',
+          star_level: '',
           courseTitle:'',
+          status: '',
+          teacherName:'',
           nickname:'',
           parentName:'',
-          teacherName:''
+          type: ''
         },
         dataList: [],
         pageIndex: 1,
@@ -103,6 +101,16 @@
         dataListLoading: false,
         dataListSelections: [],
         addOrUpdateVisible: false,
+        statusValue: '',
+        statusValues: [
+          { statusValue: '1', label: '正常显示' }, 
+          { statusValue: '0', label: '已被删除' }
+        ],
+        typeValue: '',
+        typeValues: [
+          { typeValue: '0', label: '课程评价' }, 
+          { typeValue: '1', label: '讲师评价' } 
+        ],
         courseList: [],
         courseListTreeProps: {
           label: 'title',
@@ -112,18 +120,10 @@
         teacherListTreeProps: {
           label: 'nickname',
           children: 'children'
-        },
-        options: [
-          { value: '1', label: '课程消息' }, 
-          { value: '2', label: '我关注的' },
-          { value: '3', label: '平台通知' }
-        ],
-        value: ''
+        }
       }
     },
-    components: {
-      AddOrUpdate
-    },
+    components: {},
     activated () {
       this.getDataList()
     },
@@ -131,7 +131,7 @@
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
-        // 查询所有课程类目，构造成一棵树
+        // 查询所有课程，构造成一棵树
         this.$http({
           url: this.$http.adornUrl('/xry/course/treeCourse'),
           method: 'get',
@@ -148,14 +148,15 @@
             this.teacherList = treeDataTranslate(data.userList, 'id')
           }).then(() => {
             this.$http({
-              url: this.$http.adornUrl('/xry/message/list'),
+              url: this.$http.adornUrl('/xry/comment/list'),
               method: 'get',
               params: this.$http.adornParams({
                 'page': this.pageIndex,
                 'limit': this.pageSize,
-                'objId': this.dataForm.objId,
+                'courseId':this.dataForm.courseId,
                 'userId':this.dataForm.userId,
-                'type':this.dataForm.type
+                'type':this.dataForm.type,
+                'status':this.dataForm.status
               })
             }).then(({ data }) => {
               if (data && data.code === 0) {
@@ -170,14 +171,14 @@
           })
         })
       },
-      // 课程树选中
+      // 课程类目树选中
       courseListTreeCurrentChangeHandle (data, node) {
-        this.dataForm.objId = data.id
+        this.dataForm.courseId = data.id
         this.dataForm.parentName = data.title
       },
-      // 课程树设置当前选中节点
+      // 课程类目树设置当前选中节点
       courseListTreeSetCurrentNode () {
-        this.$refs.courseListTree.setCurrentKey(this.dataForm.objId)
+        this.$refs.courseListTree.setCurrentKey(this.dataForm.courseId)
         this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
       },
       // 讲师树选中
@@ -205,19 +206,12 @@
       selectionChangeHandle (val) {
         this.dataListSelections = val
       },
-      // 新增 / 修改
-      addOrUpdateHandle (id) {
-        this.addOrUpdateVisible = true
-        this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
-        })
-      },
       // 删除
       deleteHandle (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
           return item.id
         })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+        this.$confirm(`确定对该用户进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -242,18 +236,18 @@
           })
         }).catch(() => {})
       },
-      // 发布消息
-      publishMessage (id) {
+      // 不显示评论
+      hideComment (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
           return item.id
         })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '发布' : '批量发布'}]操作?`, '提示', {
+        this.$confirm(`确定要进行[${id ? '删除' : '批量删除'}]评论操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/xry/message/publishMessage'),
+            url: this.$http.adornUrl('/xry/comment/hideComment'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({ data }) => {
@@ -272,18 +266,18 @@
           })
         }).catch(() => {})
       },
-      // 取消发布消息
-      cancelPublish (id) {
+      // 恢复评论显示
+      recoverComment (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
           return item.id
         })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '取消发布' : '批量取消发布'}]操作?`, '提示', {
+        this.$confirm(`确定要进行[${id ? '恢复显示' : '批量恢复显示'}]评论操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/xry/message/cancelPublish'),
+            url: this.$http.adornUrl('/xry/comment/recoverComment'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({ data }) => {
@@ -302,9 +296,13 @@
           })
         }).catch(() => {})
       },
-      // 消息类型下拉选中事件
-      currentSel(selVal){
-        this.dataForm.type = selVal;
+      // 用户状态下拉选中事件
+      statusCurrentSel(selVal){
+        this.status = selVal;
+      },
+      // 用户角色下拉选中事件
+      typeCurrentSel(selVal){
+        this.type = selVal;
       },
       // 点击->详情弹出框
       showDetail (detail) {
