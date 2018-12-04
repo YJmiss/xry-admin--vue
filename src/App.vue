@@ -14,7 +14,7 @@ export default{
  methods: {
    //初始化weosocket
    initWebSocket(){ 
-    const wsuri = `http://127.0.0.1:9001/messageSocket/${localStorage.getItem('userId')}`
+    const wsuri = `http://127.0.0.1:9001/xry/messageSocket/`
     this.websock = new WebSocket(wsuri);
     this.websock.onmessage = this.websocketonmessage;
     this.websock.onopen = this.websocketonopen;
