@@ -22,7 +22,7 @@
 
 <script>
   import { treeDataTranslate } from '@/utils'
-  import Editor from '@/components/Quilleditor.vue'
+  import Editor from '@/components/quill-editor.vue'
   export default {
     components: {Editor},
     data () {
