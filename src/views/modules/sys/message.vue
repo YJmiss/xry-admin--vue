@@ -80,6 +80,8 @@
 </template>
 
 <script>
+  import SockJS from  'sockjs-client';
+  import  Stomp from 'stompjs';
   import { treeDataTranslate } from '@/utils'
   import AddOrUpdate from './message-add-or-update'
   export default {
@@ -118,7 +120,10 @@
           { value: '2', label: '我关注的' },
           { value: '3', label: '平台通知' }
         ],
-        value: ''
+        value: '',
+        // sockjs的变量
+        stompClient:'',
+        timer:''
       }
     },
     components: {
@@ -126,6 +131,7 @@
     },
     activated () {
       this.getDataList()
+      this.initWebSocket()
     },
     methods: {
       // 获取数据列表
@@ -312,6 +318,64 @@
           confirmButtonText: '确定',
           callback: action => {}
         });
+      },
+      // WebSocket连接初始化
+      initWebSocket() {
+        this.connection();
+        let that= this;
+        // 断开重连机制,尝试发送消息,捕获异常发生时重连
+        this.timer = setInterval(() => {
+          try {
+            that.stompClient.send("发送消息给服务器！");
+          } catch (err) {
+            console.log("断线了: " + err);
+            that.connection();
+          }
+        }, 5000);
+      }, 
+      // WebSocket连接后台 
+      connection() {
+        // 建立连接对象（messageWebSocket对应WebSocketConfig下的addEndpoint()的第一个参数）
+        let url = this.$http.adornUrl('/messageWebSocket');
+        let topicURL = this.$http.adornUrl("/topic/ip");
+        console.log(url)
+        console.log(topicURL)
+        let socket = new SockJS(url);
+        // 获取STOMP子协议的客户端对象
+        this.stompClient = Stomp.over(socket);
+        // 定义客户端的认证信息,按需求配置
+        // 可以传参数到后台
+        let headers = { Authorization:'' }
+        // 向服务器发起websocket连接
+        this.stompClient.connect(headers,(frame) => {
+          // 订阅服务端提供的某个topic（对应后台WebSocketComponent下的convertAndSend方法第一个参数）
+          this.stompClient.subscribe(topicURL, (msg) => { 
+            console.log('广播成功')
+            // msg.body存放的是服务端发送给我们的信息
+            console.log(msg);  
+          });
+          //用户加入接口
+          //this.stompClient.send("/app/chat.addUser", headers, JSON.stringify({sender: '',chatType: 'JOIN'}))  
+        }, (err) => {
+          // 连接发生错误时的处理函数
+          console.log('失败')
+          console.log(err);
+        });
+      },    
+      // WebSocket断开连接
+      disconnect() {
+        if (this.stompClient) {
+          this.stompClient.disconnect();
+        }
+        console.log("WebSocket断开连接")
+      },  
+      mounted(){
+        this.initWebSocket();
+      },
+      // 页面离开时断开连接,清除定时器
+      beforeDestroy: function () {
+        this.disconnect();
+        clearInterval(this.timer);
       }
     }
   }

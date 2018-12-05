@@ -14,14 +14,17 @@ import '@/element-ui' // api: https://github.com/ElemeFE/element
 import '@/element-ui-theme'
 import '@/assets/scss/index.scss'
 import '@/icons' // icon
+Vue.use(VueCookie)
+Vue.config.productionTip = false
+
 // 引入axios
 import axios from 'axios'
 Vue.prototype.$ajax = axios;
+
 // 引入jquery.js
 import $ from 'jquery'
 Vue.prototype.$jquery=$
-Vue.use(VueCookie)
-Vue.config.productionTip = false
+
 // vue-quill-editor富文本编辑器
 import VueQuillEditor from 'vue-quill-editor'
 import 'quill/dist/quill.core.css'
@@ -31,6 +34,11 @@ import 'quill/dist/quill.bubble.css'
 // 挂载全局
 Vue.prototype.$http = httpRequest// ajax请求方法
 Vue.prototype.isAuth = isAuth // 权限方法
+
+// 引入socket
+// import VueSocketio from 'vue-socket.io';
+// import socketio from 'socket.io-client';
+// Vue.use(VueSocketio, socketio('http://127.0.0.1:9001'), store);
 
 // 保存整站vuex本地储存初始状态
 window.SITE_CONFIG['storeState'] = cloneDeep(store.state)
