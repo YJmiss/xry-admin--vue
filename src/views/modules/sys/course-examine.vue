@@ -30,7 +30,7 @@
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
-      <el-table-column type="selection" header-align="center" align="center" width="50" :disabled="dataForm.status ==3 || dataForm.status ==2"></el-table-column>
+      <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
       <el-table-column prop="title" header-align="center" align="left" label="课程标题" width="380"></el-table-column>
       <el-table-column prop="nickname" header-align="center" align="center" label="所属讲师" width="160"></el-table-column>
@@ -38,19 +38,17 @@
       <el-table-column prop="status" header-align="center" align="center" label="审核状态">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === 1" size="small" type="info">未审核</el-tag>
-          <el-tag v-else-if="scope.row.status === 2" size="small" type="warning">审核中</el-tag>
-          <el-tag v-else-if="scope.row.status === 3" size="small" type="success">已通过</el-tag>
-          <el-tag v-else-if="scope.row.status === 4" size="small" type="danger">未通过</el-tag>
-          <el-tag v-else-if="scope.row.status === 5" size="small" type="warning">通过审核未上架</el-tag>
-          <el-tag v-else-if="scope.row.status === 6" size="small" type="success">通过审核已上架</el-tag>
-          <el-tag v-else size="small" type="info">未审核</el-tag>
+          <el-tag v-else-if="scope.row.status === 2" size="small" type="danger">未通过</el-tag>
+          <el-tag v-else-if="scope.row.status === 3" size="small" type="warning">通过审核</el-tag>
+          <el-tag v-else-if="scope.row.status === 4" size="small" type="success">通过审核已上架</el-tag>
+          <el-tag v-else size="small" type="info">已下架</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作">
         <template slot-scope="scope">
           <el-button v-if="isAuth('xry:course:detail')" round size="small" @click="viewDetail(scope.row.id)">详情</el-button>
-          <el-button v-if="isAuth('xry:record:examine')" round :disabled="scope.row.status == 2 || scope.row.status == 3 || scope.row.status == 5 || scope.row.status == 6" type="primary" size="small" @click="examine(scope.row.id)" >审核</el-button> 
+          <el-button v-if="isAuth('xry:record:examine')" round :disabled="scope.row.status == 3 || scope.row.status == 4 || scope.row.status == 5" type="primary" size="small" @click="examine(scope.row.id)" >审核</el-button> 
           <!-- <el-button v-if="isAuth('xry:course:examine:reject')" type="danger" size="small" @click="examineReject(scope.row.id)">审核驳回</el-button> -->
         </template>
       </el-table-column>
@@ -103,12 +101,15 @@
         options: [{
           value: '1', label: '未审核'
         }, {
-          value: '2', label: '审核中'
+          value: '2', label: '未通过'
         }, {
-          value: '3', label: '已通过'
+          value: '3', label: '通过未上架'
         }, {
-          value: '4', label: '未通过'
-        }],
+          value: '4', label: '通过已上架'
+        }, {
+          value: '5', label: '已下架'
+        }
+        ],
         value: ''
       }
     },

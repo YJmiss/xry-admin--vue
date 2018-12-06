@@ -3,7 +3,7 @@
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
       <el-radio-group v-model="dataForm.actionNumber">
         <el-radio  :label="3">申请通过</el-radio>
-        <el-radio  :label="4">申请驳回</el-radio>
+        <el-radio  :label="2">申请驳回</el-radio>
       </el-radio-group>
       <el-form-item label="记录详情" prop="detail">
         <textarea rows="15" cols="110" v-model="dataForm.detail"></textarea>

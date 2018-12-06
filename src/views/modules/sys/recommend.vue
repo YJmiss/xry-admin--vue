@@ -23,6 +23,8 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
+        <el-button v-if="isAuth('xry:course:recommendCourse')" type="primary" @click="recommendCourse()" :disabled="dataListSelections.length <= 0">批量推荐</el-button>
+        <el-button v-if="isAuth('xry:course:cancelRecommend')" type="warning" @click="cancelRecommend()" :disabled="dataListSelections.length <= 0">取消批量推荐</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
@@ -32,10 +34,25 @@
       <el-table-column prop="catName" header-align="center" align="left" label="所属类目"></el-table-column>
       <el-table-column prop="nickname" header-align="center" align="center" width="150" label="所属讲师"></el-table-column>
       <el-table-column prop="price" header-align="center" align="center" label="课程价格（元）" width="250"></el-table-column>
+      <el-table-column prop="status" header-align="center" align="center" width="150" label="审核状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.status === 1" size="small" type="info">未审核</el-tag>
+          <el-tag v-else-if="scope.row.status === 2" size="small" type="danger">未通过</el-tag>
+          <el-tag v-else-if="scope.row.status === 3" size="small" type="warning">通过审核未上架</el-tag>
+          <el-tag v-else-if="scope.row.status === 4" size="small" type="success">通过审核已上架</el-tag>
+          <el-tag v-else size="small" type="info">已下架</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="recommend" header-align="center" align="center" label="是否推荐" width="250">
+         <template slot-scope="scope">
+          <el-tag v-if="scope.row.recommend === 0" size="small" type="warning">未推荐</el-tag>
+          <el-tag v-else size="small" type="success">已推荐</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="250" label="操作">
-        <template slot-scope="scope" porp="status">
-          <el-button v-if="isAuth('xry:course:update')" type="primary" size="small" round @click="addOrUpdateHandle(scope.row.id)" v-show="scope.row.status ===3 && scope.row.recommend ===0">推荐课程</el-button>
-          <el-button v-if="isAuth('xry:course:delete')" type="danger" size="small" round @click="deleteHandle(scope.row.id)" v-show="scope.row.recommend ===1">取消推荐</el-button>
+        <template slot-scope="scope">
+          <el-button v-if="isAuth('xry:course:recommendCourse')" type="primary" size="small" round @click="recommendCourse(scope.row.id)" v-show="scope.row.recommend ===0" :disabled="scope.row.status === 1 || scope.row.status ===2">推荐课程</el-button>
+          <el-button  v-if="isAuth('xry:course:cancelRecommend')" type="danger" size="small" round @click="cancelRecommend(scope.row.id)" v-show="scope.row.recommend ===1">取消推荐</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -89,6 +106,7 @@
       this.getDataList()
     },
     methods: {
+      // 设置只查询审核通过的课程
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
@@ -119,7 +137,6 @@
                 'tid': this.dataForm.teacherId
               })
             }).then(({ data }) => {
-              console.log(data)
               if (data && data.code === 0) {
                 this.dataList = data.page.list
                 this.totalPage = data.page.totalCount
@@ -174,80 +191,49 @@
           this.$refs.addOrUpdate.init(id)
         })
       },
-      // 删除
-      deleteHandle (id) {
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.$http({
-            url: this.$http.adornUrl('/xry/course/delete'),
-            method: 'post',
-            data: this.$http.adornData(ids, false)
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.getDataList()
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
-        }).catch(() => {})
-      },
-      // 课程上架操作
-      addToCourse(id) {
-        let flag = 0;
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '上架' : '批量上架'}]操作?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.$http({
-            url: this.$http.adornUrl('/xry/course/addToCourse'),
-            method: 'post',
-            data: this.$http.adornData(ids, false)
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.getDataList()
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
-        }).catch(() => {})
-      },
-      // 课程下架操作
-      delFromCourse(id) {
+      // 推荐课程、批量推荐操作
+      recommendCourse(id) {
         let flag = 1;
         var ids = id ? [id] : this.dataListSelections.map(item => {
           return item.id
         })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '下架' : '批量下架'}]操作?`, '提示', {
+        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '课程推荐' : '批量推荐'}]操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/xry/course/delFromCourse'),
+            url: this.$http.adornUrl('/xry/course/recommendCourse'),
+            method: 'post',
+            data: this.$http.adornData(ids, false)
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }).catch(() => {})
+      },
+      // 取消推荐课程、批量取消推荐操作
+      cancelRecommend(id) {
+        var ids = id ? [id] : this.dataListSelections.map(item => {
+          return item.id
+        })
+        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '取消推荐' : '批量取消推荐'}]操作?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl('/xry/course/cancelRecommend'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({ data }) => {

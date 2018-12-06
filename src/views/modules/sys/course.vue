@@ -38,22 +38,20 @@
       <el-table-column prop="price" header-align="center" align="center" label="课程价格（元）"></el-table-column>
       <el-table-column prop="status" header-align="center" align="center" width="150" label="审核状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.status === 1" size="small" type="warning">未审核</el-tag>
-          <el-tag v-else-if="scope.row.status === 2" size="small" type="danger">审核中</el-tag>
-          <el-tag v-else-if="scope.row.status === 3" size="small" type="success">已通过</el-tag>
-          <el-tag v-else-if="scope.row.status === 4" size="small" type="warning">未通过</el-tag>
-          <el-tag v-else-if="scope.row.status === 5" size="small" type="warning">通过审核未上架</el-tag>
-          <el-tag v-else-if="scope.row.status === 6" size="small" type="success">通过审核已上架</el-tag>
-          <el-tag v-else size="small" type="warning">未审核</el-tag>
+          <el-tag v-if="scope.row.status === 1" size="small" type="info">未审核</el-tag>
+          <el-tag v-else-if="scope.row.status === 2" size="small" type="danger">未通过</el-tag>
+          <el-tag v-else-if="scope.row.status === 3" size="small" type="warning">通过审核未上架</el-tag>
+          <el-tag v-else-if="scope.row.status === 4" size="small" type="success">通过审核已上架</el-tag>
+          <el-tag v-else size="small" type="info">已下架</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="220" label="创建时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="left" width="250" label="操作">
         <template slot-scope="scope" porp="status">
-          <el-button v-if="isAuth('xry:course:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)" :disabled="scope.row.status ===6 || scope.row.status === 3 || scope.row.status === 5"></el-button>
-          <el-button v-if="isAuth('xry:course:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)" :disabled="scope.row.status ===6"></el-button>
+          <el-button v-if="isAuth('xry:course:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)" :disabled="scope.row.status ===4 || scope.row.status === 3"></el-button>
+          <el-button v-if="isAuth('xry:course:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)" :disabled="scope.row.status ===4 || scope.row.status === 3"></el-button>
           <el-button v-if="isAuth('xry:course:addToCourse')" type="primary" round size="small" @click="addToCourse(scope.row.id)" v-show="scope.row.status ===3 || scope.row.status ===5">上架</el-button>
-          <el-button v-if="isAuth('xry:course:delFromCourse')" type="warning" round size="small" @click="delFromCourse(scope.row.id)" v-show="scope.row.status ===6 ">下架</el-button>
+          <el-button v-if="isAuth('xry:course:delFromCourse')" type="warning" round size="small" @click="delFromCourse(scope.row.id)" v-show="scope.row.status ===4 ">下架</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -221,7 +219,6 @@
       },
       // 课程上架操作
       addToCourse(id) {
-        let flag = 0;
         var ids = id ? [id] : this.dataListSelections.map(item => {
           return item.id
         })
@@ -252,7 +249,6 @@
       },
       // 课程下架操作
       delFromCourse(id) {
-        let flag = 1;
         var ids = id ? [id] : this.dataListSelections.map(item => {
           return item.id
         })
