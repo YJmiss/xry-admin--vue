@@ -25,8 +25,8 @@
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('xry:course:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('xry:course:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-        <el-button v-if="isAuth('xry:course:add:to:course')" type="primary" @click="addToCourse()" :disabled="dataListSelections.length <= 0">批量上架</el-button>
-        <el-button v-if="isAuth('xry:course:del:from:course')" type="warning" @click="delFromCourse()" :disabled="dataListSelections.length <= 0">批量下架</el-button>
+        <el-button v-if="isAuth('xry:course:addToCourse')" type="primary" @click="addToCourse()" :disabled="dataListSelections.length <= 0">批量上架</el-button>
+        <el-button v-if="isAuth('xry:course:delFromCourse')" type="warning" @click="delFromCourse()" :disabled="dataListSelections.length <= 0">批量下架</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
