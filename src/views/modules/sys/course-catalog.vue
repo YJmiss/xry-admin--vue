@@ -105,7 +105,7 @@
           })
         })
       },
-       // 课程类目树选中
+      // 课程类目树选中
       courseListTreeCurrentChangeHandle (data, node) {
         this.dataForm.courseid = data.id
         this.dataForm.parentName = data.title
