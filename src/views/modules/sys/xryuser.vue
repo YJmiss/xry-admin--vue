@@ -28,7 +28,7 @@
       <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column>
       <el-table-column prop="phone" header-align="center" align="center" label="注册手机号"></el-table-column>
-      <el-table-column prop="email" header-align="center" align="center" label="注册邮箱"></el-table-column>
+      <el-table-column prop="email" header-align="center" align="center" label="用户邮箱"></el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="用户状态" width="100">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === 0" size="small" type="success">正常</el-tag>
