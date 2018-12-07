@@ -4,16 +4,6 @@
       <el-form-item label="手机号">
         <el-input v-model="dataForm.phone" placeholder="请填写手机号" clearable></el-input>
       </el-form-item>
-       <el-form-item label="用户角色">
-         <el-select v-model="dataForm.role" placeholder="请选择用户角色" @change="roleCurrentSel">
-            <el-option v-for="item in roleValues" :key="item.roleValue" :label="item.label" :value="item.roleValue"></el-option>
-          </el-select>
-      </el-form-item>
-      <el-form-item label="用户状态">
-          <el-select v-model="dataForm.status" placeholder="请选择用户状态" @change="statusCurrentSel">
-            <el-option v-for="item in statusValues" :key="item.statusValue" :label="item.label" :value="item.statusValue"></el-option>
-          </el-select>
-      </el-form-item>
       <el-form-item label="第三方登录来源">
           <el-select v-model="dataForm.social_source" placeholder="请选择第三方登录来源" @change="socialSourceCurrentSel">
             <el-option v-for="item in socialSourceValues" :key="item.socialSourceValue" :label="item.label" :value="item.socialSourceValue"></el-option>
@@ -21,28 +11,13 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('xry:user:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column>
       <el-table-column prop="phone" header-align="center" align="center" label="注册手机号"></el-table-column>
-      <el-table-column prop="email" header-align="center" align="center" label="注册邮箱"></el-table-column>
-      <el-table-column prop="status" header-align="center" align="center" label="用户状态" width="100">
-        <template slot-scope="scope">
-          <el-tag v-if="scope.row.status === 0" size="small" type="success">正常</el-tag>
-          <el-tag v-else-if="scope.row.status === 1" size="small" type="danger">异常</el-tag>
-          <el-tag v-else-if="scope.row.status === 2" size="small" type="warning">删除</el-tag>
-          <el-tag v-else size="small" type="success">正常</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column prop="role" header-align="center" align="center" label="角色">
-        <template slot-scope="scope">
-          <el-tag v-if="scope.row.role === 0" size="small" type="success">普通用户</el-tag>
-          <el-tag v-else size="small" type="info">讲师</el-tag>
-        </template>
-      </el-table-column>
+      <el-table-column prop="email" header-align="center" align="center" label="邮箱"></el-table-column>
       <el-table-column prop="social_source" header-align="center" align="center" label="第三方登录来源">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.social_source === 0" size="small" type="warning">手机号</el-tag>
@@ -52,13 +27,16 @@
           <el-tag v-else size="small" type="warning">手机号</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="openuserId" header-align="center" align="center" label="第三方登录用户主键"></el-table-column>
-      <el-table-column prop="created" header-align="center" align="center" width="180" label="注册时间"></el-table-column>
+      <el-table-column prop="recommend" header-align="center" align="center" label="是否推荐">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.recommend === 0" size="small" type="warning">未推荐</el-tag>
+          <el-tag v-else size="small" type="danger">已推荐</el-tag>
+        </template>
+      </el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作" prop="role">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('xry:user:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
-          <el-button v-if="isAuth('xry:user:updateUserRoleTeacher')" type="primary" round size="small" @click="updateUserRoleTeacher(scope.row.id)" v-show="scope.row.role == 0">置为讲师</el-button>
-          <el-button v-if="isAuth('xry:user:updateUserRole')" type="success" round size="small" @click="updateUserRole(scope.row.id)" v-show="scope.row.role == 1">置为普通用户</el-button>
+          <el-button v-if="isAuth('xry:user:recommendUser')" type="primary" round size="small" @click="recommendUser(scope.row.id)" v-show="scope.row.recommend == 0">推荐讲师</el-button>
+          <el-button v-if="isAuth('xry:user:cancelRecommend')" type="success" round size="small" @click="cancelRecommend(scope.row.id)" v-show="scope.row.recommend == 1">取消推荐</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -75,7 +53,6 @@
         dataForm: {
           phone: '',
           email: '',
-          status: '',
           role: '',
           social_source: '',
           openuserId: '',
@@ -88,23 +65,12 @@
         dataListLoading: false,
         dataListSelections: [],
         addOrUpdateVisible: false,
-        statusValue: '',
-        statusValues: [
-          { statusValue: '0', label: '正常' }, 
-          { statusValue: '1', label: '异常' }, 
-          { statusValue: '2', label: '删除' }
-        ],
         socialSourceValue: '',
         socialSourceValues: [
           { socialSourceValue: '0', label: '手机号' }, 
           { socialSourceValue: '1', label: '微信' }, 
           { socialSourceValue: '2', label: 'QQ' },
           { socialSourceValue: '3', label: '支付宝' }
-        ],
-        roleValue: '',
-        roleValues: [
-          { roleValue: '0', label: '普通用户' }, 
-          { roleValue: '1', label: '讲师' } 
         ]
       }
     },
@@ -115,17 +81,18 @@
     methods: {
       // 获取数据列表
       getDataList () {
-        console.log(this.dataForm.social_source)
+        // 标识符
+        let flag = 1;
         this.dataListLoading = true
         this.$http({
           url: this.$http.adornUrl('/xry/user/list'),
           method: 'get',
           params: this.$http.adornParams({
+            'flag':flag,
             'page': this.pageIndex,
             'limit': this.pageSize,
             'phone': this.dataForm.phone,
-            'role': this.dataForm.role,
-            'status': this.dataForm.status,
+            'recommend': this.dataForm.recommend,
             'socialSource': this.dataForm.social_source
           })
         }).then(({ data }) => {
@@ -184,18 +151,18 @@
           })
         }).catch(() => {})
       },
-      // 修改用户角色（普通用户<->讲师切换）
-      updateUserRole (id) {
+      // 讲师推荐
+      recommendUser (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
           return item.id
         })
-        this.$confirm(`确定要把该用户[${id ? '置为普通用户' : '批量置为普通用户'}]吗?`, '提示', {
+        this.$confirm(`确定要[${id ? '推荐讲师' : '批量推荐讲师'}]吗?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/xry/user/updateUserRole'),
+            url: this.$http.adornUrl('/xry/user/recommendUser'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({ data }) => {
@@ -214,18 +181,18 @@
           })
         }).catch(() => {})
       },
-      // 修改用户角色（讲师<->普通用户切换）
-      updateUserRoleTeacher (id) {
+      // 取消推荐
+      cancelRecommend (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
           return item.id
         })
-        this.$confirm(`确定要把该用户[${id ? '置为讲师' : '批量置为讲师'}]吗?`, '提示', {
+        this.$confirm(`确定要[${id ? '取消推荐' : '批量取消推荐'}]吗?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/xry/user/updateUserRoleTeacher'),
+            url: this.$http.adornUrl('/xry/user/cancelRecommend'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({ data }) => {
@@ -243,14 +210,6 @@
             }
           })
         }).catch(() => {})
-      },
-      // 用户状态下拉选中事件
-      statusCurrentSel(selVal){
-        this.status = selVal;
-      },
-      // 用户角色下拉选中事件
-      roleCurrentSel(selVal){
-        this.role = selVal;
       },
       // 第三方登录来源下拉选中事件
       socialSourceCurrentSel(selVal){
