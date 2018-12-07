@@ -111,7 +111,6 @@
               'status': this.dataForm.status
             })
           }).then(({ data }) => {
-            console.log(JSON.stringify(data))
             if (data && data.code === 0) {
               this.dataList = data.page.list
               this.totalPage = data.page.totalCount
