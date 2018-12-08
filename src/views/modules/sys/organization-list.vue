@@ -1,11 +1,14 @@
 <template>
   <div class="mod-xryuser">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item label="手机号">
-        <el-input v-model="dataForm.phone" placeholder="请填写手机号" clearable></el-input>
+      <el-form-item label="机构代码">
+        <el-input v-model="dataForm.Organ_number" placeholder="请填写机构代码" clearable></el-input>
       </el-form-item>
-       <el-form-item label="讲师姓名">
-      <el-input v-model="dataForm.teacherName" placeholder="请填写讲师姓名" clearable></el-input>
+       <el-form-item label="机构名称">
+      <el-input v-model="dataForm.organizationName" placeholder="请填写机构名称" clearable></el-input>
+      </el-form-item>
+      <el-form-item label="法人代表">
+      <el-input v-model="dataForm.corporateName" placeholder="请填写机构法人姓名" clearable></el-input>
       </el-form-item>
       <el-form-item label="用户状态">
           <el-select v-model="value" placeholder="请选择用户状态" @change="statusCurrentSel">
@@ -13,8 +16,8 @@
           </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('xry:teacher:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('xry:organization:list')" type="primary" @click="getDataList()">查询</el-button>
+        <el-button v-if="isAuth('xry:organization:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataForm" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
@@ -25,19 +28,19 @@
        <el-table-column prop="organizationName" header-align="center" align="center" label="机构名称">
        </el-table-column>
       <el-table-column prop="contactInfo" header-align="center" align="center" label="联系方式"></el-table-column>
-      <el-table-column prop="Organ_number" header-align="center" align="center" label="机构代码"></el-table-column>
+      <el-table-column prop="Organ_number" header-align="center" align="center" label="机构代码" width="200px"></el-table-column>
        <el-table-column prop="certificateImage" header-align="center" align="center" label="资质图片">
        </el-table-column>
       <el-table-column prop="corporateName" header-align="center" align="center" label="法人姓名">
        </el-table-column>
-        <el-table-column prop="corporateIDnumber" header-align="center" align="center" label="法人证件号">
+        <el-table-column prop="corporateIDnumber" header-align="center" align="center" label="法人证件号" width="180px">
        </el-table-column>
-      <el-table-column prop="status" header-align="center" align="center" label="用户状态" width="100">
+      <el-table-column prop="status" header-align="center" align="center" label="用户状态" width="80px">
       </el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="认证时间"></el-table-column>
-      <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作" prop="role">
+      <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作" >
         <template slot-scope="scope">
-          <el-button v-if="isAuth('xry:teacher:delete')" type="danger" size="small" icon="el-icon-delete"  @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button v-if="isAuth('xry:organization:delete')" type="danger" size="small" icon="el-icon-delete"  @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -48,6 +51,7 @@
 </template>
 
 <script>
+import { treeDataTranslate } from '@/utils'
   export default {
     data () {
       return {

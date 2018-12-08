@@ -1,6 +1,6 @@
 <template>
     <div id="dataReceive">
-     <el-tabs  type="card" class="card" @tab-click="handleClick">
+     <el-tabs type="card" class="card" @tab-click="handleClick">
     <el-tab-pane label="讲师资料认证审核" name="teacher_certificate"></el-tab-pane>
     <el-tab-pane label="机构资料认证审核" name="organ_certificate"></el-tab-pane>
    </el-tabs>
@@ -36,6 +36,10 @@ export default {
 </script>
 <style scoped>
 .card{
-    margin-bottom: 20px;
+    margin-bottom: 40px;
+    background: #fafafa;
+    height:40px;
+    border: none;
+    font: 微软雅黑 bolder 16px;
 }
 </style>

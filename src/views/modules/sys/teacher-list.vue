@@ -13,7 +13,7 @@
           </el-select>
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
+        <el-button v-if="isAuth('xry:teacher:list')" type="primary" @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('xry:teacher:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
@@ -33,7 +33,7 @@
       <el-table-column prop="created" header-align="center" align="center" width="180" label="认证时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作" prop="role">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('xry:teacher:delete')" type="danger" size="small" icon="el-icon-delete"  @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button v-if="isAuth('xry:teacher:delete')" type="danger"  size="small" class="el-icon-delete"  @click="deleteHandle(scope.row.id)">删除</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -44,6 +44,7 @@
 </template>
 
 <script>
+import { treeDataTranslate } from '@/utils'
   export default {
     data () {
       return {

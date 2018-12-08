@@ -42,29 +42,31 @@
         this.dataForm.id = id || 0
         this.dataForm.type = examineType
         let urlType = '';
-        if (1 == examineType) {urlType = 'course'} else if(2 == examineType){urlType = 'video'} else{urlType = 'certificateData'}
-        if (!this.dataForm.id) {
-          // 新增
-        } else {
-          this.$http({
-            url: this.$http.adornUrl(`/xry/${urlType}/info/${this.dataForm.id}`),
-            method: 'get',
-            params: this.$http.adornParams()
-          }).then(({ data }) => {
-            this.visible = true
-            if (data && data.code === 0) {
-              if (data.course) {
-                this.dataForm.id = data.course.id
-              } else if (data.video) {
-                this.dataForm.id = data.video.id
-              }else{
-              this.data.id = data.certificateData.id
-              }
+        if (1 == examineType) {urlType = 'course'} 
+        else if(2 == examineType){urlType = 'video'} 
+        else if(3 == examineType){urlType = 'certificateTeacher'}
+        else{urlType = 'certificateOrganization'}
+       this.$http({
+          url: this.$http.adornUrl(`/xry/${urlType}/info/${this.dataForm.id}`),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({ data }) => {
+          this.visible = true
+          if (data && data.code === 0) {
+            if (data.course) {
+              this.dataForm.id = data.course.id
+            } else if (data.video) {
+              this.dataForm.id = data.video.id
+            }else if(data.certificateTeacher){
+            this.dataForm.id = data.certificateTeacher.id
+            }else{
+            this.dataForm.id = data.certificateOrganization.id
             }
-          })
-        } 
+          }
+        })
+        
       },
-      // 审核记录弹框
+      // 审核记录提交
       dataFormSubmit () {
         this.visible = false
         this.$refs['dataForm'].validate((valid) => {
