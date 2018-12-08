@@ -20,7 +20,7 @@
     <el-table :data="dataForm" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column>
-      <el-table-column prop="nickname" header-align="center" align="center" label="用户昵称"></el-table-column>
+      <el-table-column prop="nickname" header-align="center" align="center" label="账号/昵称"></el-table-column>
       <el-table-column prop="name" header-align="center" align="center" label="讲师姓名"></el-table-column>
       <el-table-column prop="phone" header-align="center" align="center" label="手机号"></el-table-column>
        <el-table-column prop="organization" header-align="center" align="center" label="所属机构">

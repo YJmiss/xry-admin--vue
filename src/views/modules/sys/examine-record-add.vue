@@ -42,7 +42,7 @@
         this.dataForm.id = id || 0
         this.dataForm.type = examineType
         let urlType = '';
-        if (1 == examineType) {urlType = 'course'} else {urlType = 'video'}
+        if (1 == examineType) {urlType = 'course'} else if(2 == examineType){urlType = 'video'} else{urlType = 'certificateData'}
         if (!this.dataForm.id) {
           // 新增
         } else {
@@ -55,8 +55,10 @@
             if (data && data.code === 0) {
               if (data.course) {
                 this.dataForm.id = data.course.id
-              } else {
+              } else if (data.video) {
                 this.dataForm.id = data.video.id
+              }else{
+              this.data.id = data.certificateData.id
               }
             }
           })
