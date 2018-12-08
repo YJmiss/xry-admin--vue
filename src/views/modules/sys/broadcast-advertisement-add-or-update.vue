@@ -29,10 +29,9 @@
         <el-input type="textarea" :rows="6" placeholder="请输入内容描述" v-model="dataForm.titie_desc"></el-input>
       </el-form-item>
       <el-form-item label="广告图片" prop="pic">
-        <el-upload class="load" drag :action="url" ref="upload" :before-upload="beforeUploadHandle" :on-success="successHandle" multiple :file-list="fileList">
-          <i class="el-icon-upload"></i>
-          <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-          <div class="el-upload__tip" slot="tip">只支持jpg、png、gif格式的图片！</div>
+        <el-upload :action="url" ref="upload" :before-upload="beforeUploadHandle" :on-success="successHandle" multiple :file-list="fileList">
+          <el-button type="primary" round>选择图片</el-button>
+          <div class="el-upload__tip" slot="tip">只支持jpg、png、gif/格式的图片！</div>
         </el-upload>
       </el-form-item>
     </el-form>
@@ -156,6 +155,22 @@
         this.fileList = fileList
         this.successNum++
         this.dataForm.pic = response.url
+        this.showUploadImg(this.dataForm.pic,response.url)
+      },
+      // 上传后预览图片
+      showUploadImg (img, url) {
+        this.$nextTick(() => {
+          let upload_list_li = document.getElementsByClassName('el-upload-list')[0].children;
+          for (let i = 0; i < upload_list_li.length; i++) {
+              let li_a = upload_list_li[i].children[0];
+              let imgElement = document.createElement("img");
+              imgElement.setAttribute('src', img);
+              imgElement.setAttribute('style', "max-width:50%;padding-left:25%");
+              if (li_a.lastElementChild.nodeName !== 'IMG') {
+                  li_a.appendChild(imgElement);
+              }
+          }
+        })
       },
       // 表单提交
       dataFormSubmit () {

@@ -14,15 +14,13 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('xry:article:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('xry:article:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
       <!-- <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column> -->
-      <el-table-column prop="catName" header-align="center" align="left" width="250" label="文章分类"></el-table-column>
-      <el-table-column prop="title" header-align="center" align="left" width="320" label="课程标题"></el-table-column>
+      <el-table-column prop="catName" header-align="center" align="left" width="380" label="文章分类"></el-table-column>
+      <el-table-column prop="title" header-align="center" align="left" width="380" label="课程标题"></el-table-column>
       <el-table-column prop="share_count" header-align="center" align="center" width="100" label="分享次数"></el-table-column>
       <el-table-column prop="thumbs_count" header-align="center" align="center" width="100" label="点赞次数"></el-table-column>
       <el-table-column prop="collect_count" header-align="center" align="center" width="100" label="收藏人数"></el-table-column>
@@ -33,20 +31,10 @@
           <el-tag v-else size="small" type="info">未推荐</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="status" header-align="center" align="center" width="140" label="是否发布">
-        <template slot-scope="scope">
-          <el-tag v-if="scope.row.status === 1" size="small" type="success">已发布</el-tag>
-          <el-tag v-else size="small" type="info">未发布</el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column prop="publish_time" header-align="center" align="center" width="220" label="发布时间"></el-table-column>
-      <el-table-column prop="username" header-align="center" align="center" width="220" label="创建人"></el-table-column>
-      <el-table-column fixed="right" header-align="center" align="left" width="250" label="操作">
+      <el-table-column fixed="right" header-align="center" align="center" width="250" label="操作">
         <template slot-scope="scope" porp="status">
-          <el-button v-if="isAuth('xry:article:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)" :disabled="scope.row.status ===1"></el-button>
-          <el-button v-if="isAuth('xry:article:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)" :disabled="scope.row.status ===1"></el-button>
-          <el-button v-if="isAuth('xry:article:publishArticle')" type="primary" round size="small" @click="publishArticle(scope.row.id)" v-show="scope.row.status ===0">发布文章</el-button>
-          <el-button v-if="isAuth('xry:article:cancelPublish')" type="warning" round size="small" @click="cancelPublish(scope.row.id)" v-show="scope.row.status ===1">取消发布</el-button>
+          <el-button v-if="isAuth('xry:article:recommendArticle')" type="primary" round size="small" @click="recommendArticle(scope.row.id)" v-show="scope.row.recommend ===0">推荐文章</el-button>
+          <el-button v-if="isAuth('xry:article:cancelRecommend')" type="warning" round size="small" @click="cancelRecommend(scope.row.id)" v-show="scope.row.recommend ===1">取消推荐</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -101,6 +89,8 @@
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
+        // 标识符
+        let flag = 1;
         // 查询所有文章分类，构造成一棵树
         this.$http({
           url: this.$http.adornUrl('/xry/course/cat/treeCourseCat'),
@@ -113,6 +103,7 @@
             url: this.$http.adornUrl('/xry/article/list'),
             method: 'get',
             params: this.$http.adornParams({
+              'flag':flag,
               'page': this.pageIndex,
               'limit': this.pageSize,
               'type':this.dataForm.type,
@@ -192,18 +183,18 @@
           })
         }).catch(() => {})
       },
-      // 发布文章
-      publishArticle (id) {
+      // 推荐文章
+      recommendArticle (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
           return item.id
         })
-        this.$confirm(`确定要[id=${ids.join(',')}]进行[${id ? '发布' : '批量发布'}]操作?`, '提示', {
+        this.$confirm(`确定要[id=${ids.join(',')}]进行[${id ? '推荐文章' : '批量推荐文章'}]操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/xry/article/publishArticle'),
+            url: this.$http.adornUrl('/xry/article/recommendArticle'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({ data }) => {
@@ -222,18 +213,18 @@
           })
         }).catch(() => {})
       },
-      // 发布文章
-      cancelPublish (id) {
+      // 取消推荐
+      cancelRecommend (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
           return item.id
         })
-        this.$confirm(`确定要[id=${ids.join(',')}]进行[${id ? '取消发布' : '批量取消发布'}]操作?`, '提示', {
+        this.$confirm(`确定要[id=${ids.join(',')}]进行[${id ? '取消推荐' : '批量取消推荐'}]操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/xry/article/cancelPublish'),
+            url: this.$http.adornUrl('/xry/article/cancelRecommend'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({ data }) => {
