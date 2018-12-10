@@ -2,27 +2,27 @@
   <div class="mod-xryuser">
     <el-dialog  :title="!dataForm.id ? '' : '查看讲师认证资料详情'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :inline="true" :data="dataForm" >
-     <el-form-item label="账号/昵称"  prop="nickname">
-      <el-input type="text" v-model="dataForm.nickname" readonly="readonly" disabled="true"></el-input>
-     </el-form-item><br>
-      <el-form-item label="讲师姓名"  prop="name">
-      <el-input type="text" v-model="dataForm.name" readonly="readonly" disabled="true"></el-input>
-     </el-form-item><br>
-      <el-form-item label="所属机构"  prop="organization">
-      <el-input type="text" v-model="dataForm.organization" readonly="readonly" disabled="true"></el-input>
-     </el-form-item><br>
-      <el-form-item label="身份证号"  prop="IDnumber">
-      <el-input type="text" v-model="dataForm.IDnumber" readonly="readonly" disabled="true"></el-input>
-     </el-form-item><br>
-      <el-form-item label="证件图片"  prop="certificateImage">
-      <img :src="imgUrl" v-model="dataForm.certificateImage1">
-      <img :src="imgUrl" v-model="dataForm.certificateImage2">
-     </el-form-item><br>
+      <el-form-item label="账号/昵称"  prop="nickname">
+      <el-input type="text" v-model="dataForm.nickname" :disabled="true" width="100"></el-input>
+      </el-form-item>
+      <el-form-item label="讲师姓名"  prop="realName">
+        <el-input type="text" v-model="dataForm.realName" :disabled="true"></el-input>
+      </el-form-item>
+      <el-form-item label="所属机构"  prop="realName">
+      <el-input type="text" v-model="dataForm.realName" :disabled="true"></el-input>
+     </el-form-item>
+      <el-form-item label="身份证号"  prop="idCard">
+      <el-input type="text" v-model="dataForm.idCard" :disabled="true"></el-input>
+     </el-form-item>
+      <el-form-item label="证件图片">
+      <img :src="dataForm.idCardFront">
+      <img :src="dataForm.idCardBack">
+     </el-form-item>
       <el-form-item label="审核状态"  prop="status">
-      <el-input v-model="dataForm.status" readonly="readonly" disabled="true"></el-input>
-     </el-form-item><br>
+      <el-input v-model="dataForm.status" :disabled="true"></el-input>
+     </el-form-item>
       <el-form-item label="申请时间"  prop="created" >
-       <el-input type="text" v-model="dataForm.created" readonly="readonly" disabled="true"></el-input>
+       <el-input type="text" v-model="dataForm.created" :disabled="true"></el-input>
      </el-form-item>
     </el-form>
     </el-dialog>
@@ -38,13 +38,13 @@ import { treeDataTranslate } from '@/utils'
         imgUrl:'',
         teacherList:[],
         dataForm:{
-          nickname:'',
-          name:'',
-          organization:'',
-          IDnumber:'',
-          certificateImage1:'',
-          certificateImage2:'',
+          idCard:'',
+          idCardBack:'',
+          idCardFront:'',
+          realName:'',
+          type:'',
           status: '',
+          userId:'',
           created: ''
         },
         dataList: []
@@ -54,19 +54,27 @@ import { treeDataTranslate } from '@/utils'
       //初始化数据方法
        init (id) {
         this.dataForm.id = id
-     this.$http({
-        url: this.$http.adornUrl('/xry/teacher/list'),
-        method: 'get',
-        params: this.$http.adornParams()
-      }).then(({ data }) => {
-          this.teacherList = treeDataTranslate(data.teacherList, 'id')
-        }).then(() => { 
-      this.visible = true
-      this.$nextTick(() => {
-        // 重置form表单（清空form表单的内容）
-        this.$refs['dataForm'].resetFields()
-        })
-      }) 
+        this.visible = true 
+        if (this.dataForm.id) {
+          this.$http({
+            url: this.$http.adornUrl(`/xry/teacher/info/${this.dataForm.id}`),
+            method: 'get',
+            params: this.$http.adornParams()
+          }).then(({ data }) => {
+            console.log(data)
+            if (data && data.code === 0) {
+              this.dataForm.id = data.teacher.id
+              this.dataForm.idCard = data.teacher.idCard
+              this.dataForm.idCardBack = data.teacher.idCardBack
+              this.dataForm.idCardFront = data.teacher.idCardFront
+              this.dataForm.realName = data.teacher.realName
+              this.dataForm.type = data.teacher.type
+              this.dataForm.status = data.teacher.status
+              this.dataForm.userId = data.teacher.userId
+              this.dataForm.created = data.teacher.created
+            }
+          })
+        }
       }
     }
   }
