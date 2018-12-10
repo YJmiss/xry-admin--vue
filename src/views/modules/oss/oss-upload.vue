@@ -4,22 +4,19 @@
     :close-on-click-modal="false"
     @close="closeHandle"
     :visible.sync="visible">
-    <el-upload
-      drag
-      :action="url"
-      :before-upload="beforeUploadHandle"
-      :on-success="successHandle"
-      multiple
-      :file-list="fileList"
-      style="text-align: center;">
-      <i class="el-icon-upload"></i>
-      <div class="el-upload__text">将文件拖到此处，或<em>点击上传</em></div>
-      <div class="el-upload__tip" slot="tip">只支持jpg、png、gif格式的图片！</div>
+    <el-form :model="dataForm">
+    <el-form-item label="选择文件"  prop="image">
+    <el-upload :action="url" ref="upload" :before-upload="beforeUploadHandle" :on-success="successHandle" multiple :file-list="fileList">
+    <el-button type="primary">选择文件</el-button>
+    <div class="el-upload__tip" slot="tip">只支持jpg、png、gif/格式的图片！</div>
     </el-upload>
+    </el-form-item>
+    </el-form>
   </el-dialog>
 </template>
 
 <script>
+ import { treeDataTranslate} from '@/utils'
   export default {
     data () {
       return {
@@ -27,7 +24,10 @@
         url: '',
         num: 0,
         successNum: 0,
-        fileList: []
+        fileList: [],
+        dataForm:{
+        image: ''
+        }
       }
     },
     methods: {
@@ -47,24 +47,28 @@
       successHandle (response, file, fileList) {
         this.fileList = fileList
         this.successNum++
-        if (response && response.code === 0) {
-          if (this.num === this.successNum) {
-            this.$confirm('操作成功, 是否继续操作?', '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              type: 'warning'
-            }).catch(() => {
-              this.visible = false
-            })
-          }
-        } else {
-          this.$message.error(response.msg)
-        }
+        this.dataForm.image = response.url
+        this.showUploadImg(this.dataForm.image,response.url)
       },
       // 弹窗关闭时
       closeHandle () {
         this.fileList = []
         this.$emit('refreshDataList')
+      },
+      // 上传后预览图片
+      showUploadImg (img, url) {
+        this.$nextTick(() => {
+          let upload_list_li = document.getElementsByClassName('el-upload-list')[0].children;
+          for (let i = 0; i < upload_list_li.length; i++) {
+              let li_a = upload_list_li[i].children[0];
+              let imgElement = document.createElement("img");
+              imgElement.setAttribute('src', img);
+              imgElement.setAttribute('style', "max-width:50%;padding-left:25%");
+              if (li_a.lastElementChild.nodeName !== 'IMG') {
+                  li_a.appendChild(imgElement);
+              }
+          }
+        })
       }
     }
   }
