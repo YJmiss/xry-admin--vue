@@ -33,8 +33,8 @@
         <el-table-column prop="status" header-align="center" align="center" label="状态" width="100">
           <template slot-scope="scope">
             <el-tag v-if="scope.row.status === 1" size="small" type="info">认证中</el-tag>
-            <el-tag v-else-if="scope.row.status === 2" size="small" type="success">未通过</el-tag>
-            <el-tag v-else size="small" type="warning">已通过</el-tag>
+            <el-tag v-else-if="scope.row.status === 2" size="small" type="warning">未通过</el-tag>
+            <el-tag v-else size="small" type="success">已通过</el-tag>
           </template>  
         </el-table-column>
         <el-table-column prop="created" header-align="center" align="center" width="180" label="申请时间"></el-table-column>

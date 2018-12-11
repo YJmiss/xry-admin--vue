@@ -50,15 +50,15 @@
       <!-- 弹窗, 机构认证资料认证记录 -->
       <examine-record-add v-show="RecordVisible" ref="examineRecordAdd"></examine-record-add> 
       <!-- 弹窗，查看机构认证申请资料详情 -->
-      <!-- <organiz-certificate-info v-show="infoVisible" ref="OrganizCertificateInfo"></organiz-certificate-info> -->
+      <organiz-certificate-info v-show="infoVisible" ref="OrganizCertificateInfo"></organiz-certificate-info> 
     </div>
 </template>
 <script>
 import { treeDataTranslate } from '@/utils'
 import examineRecordAdd from './examine-record-add'
-// import OrganizCertificateInfo from './organization-certificate-info'
+import OrganizCertificateInfo from './organization-certificate-info'
   export default {
-  components:{examineRecordAdd},
+  components:{examineRecordAdd, OrganizCertificateInfo},
     data () {
       return {
         RecordVisible:false,
