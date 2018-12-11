@@ -55,31 +55,45 @@
           <el-tag v-else size="small" type="info">讲师评价</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="detail" header-align="center" align="left" label="详情" width="360">
+      <el-table-column prop="detail" header-align="center" align="left" label="评论详情" width="360">
         <template slot-scope="scope">
           <el-popover ref="detailPopover" placement="top-start" trigger="hover">
-            <span>点击查看详情</span>
+            <span>点击查看评论详情</span>
           </el-popover>
           <el-button show-overflow-tooltip size="small" type="text" v-popover:detailPopover @click="showDetail(scope.row.detail)">{{scope.row.detail}}</el-button>
         </template>
       </el-table-column>
-      <el-table-column prop="created" header-align="center" align="center" width="180" label="时间"></el-table-column>
-      <el-table-column fixed="right" header-align="center" align="center" width="230" label="操作" prop="status">
+      <el-table-column prop="created" header-align="center" align="center" width="180" label="评论时间"></el-table-column>
+      <el-table-column prop="reply" header-align="center" align="left" label="回复内容" width="360">
+        <template slot-scope="scope">
+          <el-popover ref="replyPopover" placement="top-start" trigger="hover">
+            <span>点击查看回复内容</span>
+          </el-popover>
+          <el-button show-overflow-tooltip size="small" type="text" v-popover:replyPopover @click="showReply(scope.row.reply)">{{scope.row.reply}}</el-button>
+        </template>
+      </el-table-column>
+      <el-table-column prop="reply_time" header-align="center" align="center" width="180" label="回复时间"></el-table-column>
+      <el-table-column fixed="right" header-align="center" align="left" width="260" label="操作" prop="status">
         <template slot-scope="scope">
           <el-button v-if="isAuth('xry:comment:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
           <el-button v-if="isAuth('xry:comment:hideComment')" type="warning" round size="small" @click="hideComment(scope.row.id)" v-show="scope.row.status == 1">删除评论</el-button>
           <el-button v-if="isAuth('xry:comment:recoverComment')" type="primary" round size="small" @click="recoverComment(scope.row.id)" v-show="scope.row.status == 0">恢复显示</el-button>
+          <el-button v-if="isAuth('xry:comment:reply')" type="info" round size="small" @click="reply(scope.row.id)" v-show="scope.row.reply === ''">回复</el-button>
+          <el-button v-if="isAuth('xry:comment:reply')" type="success" round size="small" @click="reply(scope.row.id)" v-show="scope.row.reply !== ''">已回复</el-button>
         </template>
       </el-table-column>
     </el-table>
     <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex" :page-sizes="[10, 20, 50, 100]" 
           :page-size="pageSize" :total="totalPage" layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
+    <!-- 评论回复 -->
+    <comment-reply v-if="commentReplyVisible" ref="commentReply" @refreshDataList="getDataList"></comment-reply>
   </div>
 </template>
 
 <script>
   import { treeDataTranslate } from '@/utils'
+  import commentReply from './comment-reply'
   export default {
     data () {
       return {
@@ -92,7 +106,10 @@
           teacherName:'',
           nickname:'',
           parentName:'',
-          type: ''
+          type: '',
+          detail:'',
+          reply:'',
+          reply_time:''
         },
         dataList: [],
         pageIndex: 1,
@@ -100,7 +117,7 @@
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        addOrUpdateVisible: false,
+        commentReplyVisible: false,
         statusValue: '',
         statusValues: [
           { statusValue: '1', label: '正常显示' }, 
@@ -123,7 +140,7 @@
         }
       }
     },
-    components: {},
+    components: {commentReply},
     activated () {
       this.getDataList()
     },
@@ -169,6 +186,13 @@
               this.dataListLoading = false
             })
           })
+        })
+      },
+      // 弹出评论回复框
+      reply (id) {
+        this.commentReplyVisible = true
+        this.$nextTick(() => {
+          this.$refs.commentReply.init(id)
         })
       },
       // 课程类目树选中
@@ -304,9 +328,16 @@
       typeCurrentSel(selVal){
         this.type = selVal;
       },
-      // 点击->详情弹出框
+      // 点击->评论详情弹出框
       showDetail (detail) {
-        this.$alert(detail, '审核详情', {
+        this.$alert(detail, '评论详情', {
+          confirmButtonText: '确定',
+          callback: action => {}
+        });
+      },
+      // 点击->回复内容弹出框
+      showReply (reply) {
+        this.$alert(reply, '回复内容', {
           confirmButtonText: '确定',
           callback: action => {}
         });

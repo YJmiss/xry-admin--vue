@@ -46,7 +46,7 @@
         </el-table-column>
       </el-table>
       <!-- 弹窗, 讲师认证资料审核并记录 -->
-      <examine-record-add v-show="examineRecordAddVisible" ref="examineRecordAdd"></examine-record-add> 
+      <examine-record-add v-show="examineRecordAddVisible" ref="examineRecordAdd" @refreshDataList="getDataList"></examine-record-add> 
       <!-- 弹窗，讲师认证资料详情查看 -->
       <teacher-certificate-info v-show="infoVisible" ref="TeacherCertificateInfo"></teacher-certificate-info>
     </div>

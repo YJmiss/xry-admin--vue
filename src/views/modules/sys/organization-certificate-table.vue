@@ -48,7 +48,7 @@
             :page-size="pageSize" :total="totalPage" layout="total, sizes, prev, pager, next, jumper">
       </el-pagination>
       <!-- 弹窗, 机构认证资料认证记录 -->
-      <examine-record-add v-show="RecordVisible" ref="examineRecordAdd"></examine-record-add> 
+      <examine-record-add v-show="RecordVisible" ref="examineRecordAdd" @refreshDataList="getDataList"></examine-record-add> 
       <!-- 弹窗，查看机构认证申请资料详情 -->
       <organiz-certificate-info v-show="infoVisible" ref="OrganizCertificateInfo"></organiz-certificate-info> 
     </div>
