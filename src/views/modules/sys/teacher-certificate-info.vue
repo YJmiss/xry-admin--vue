@@ -1,30 +1,33 @@
 <template>
   <div class="mod-xryuser">
     <el-dialog  :title="!dataForm.id ? '' : '查看讲师认证资料详情'" :close-on-click-modal="false" :visible.sync="visible">
-    <el-form :inline="true" :data="dataForm" >
-     <el-form-item label="账号/昵称"  prop="nickname">
-      <el-input type="text" v-model="dataForm.nickname" readonly="readonly" disabled="true"></el-input>
-     </el-form-item><br>
-      <el-form-item label="讲师姓名"  prop="name">
-      <el-input type="text" v-model="dataForm.name" readonly="readonly" disabled="true"></el-input>
-     </el-form-item><br>
-      <el-form-item label="所属机构"  prop="organization">
-      <el-input type="text" v-model="dataForm.organization" readonly="readonly" disabled="true"></el-input>
-     </el-form-item><br>
-      <el-form-item label="身份证号"  prop="IDnumber">
-      <el-input type="text" v-model="dataForm.IDnumber" readonly="readonly" disabled="true"></el-input>
-     </el-form-item><br>
-      <el-form-item label="证件图片"  prop="certificateImage">
-      <img :src="imgUrl" v-model="dataForm.certificateImage1">
-      <img :src="imgUrl" v-model="dataForm.certificateImage2">
-     </el-form-item><br>
-      <el-form-item label="审核状态"  prop="status">
-      <el-input v-model="dataForm.status" readonly="readonly" disabled="true"></el-input>
-     </el-form-item><br>
-      <el-form-item label="申请时间"  prop="created" >
-       <el-input type="text" v-model="dataForm.created" readonly="readonly" disabled="true"></el-input>
-     </el-form-item>
-    </el-form>
+      <el-form :inline="true" :data="dataForm" >
+        <el-form-item label="账号/昵称：">
+          <div>{{dataForm.userName}}  /  {{dataForm.userPhone}}</div>
+        </el-form-item>
+        <el-form-item label="讲师姓名：">
+          <div>{{dataForm.real_name}}</div>
+        </el-form-item>
+        <el-form-item label="所属机构：">
+          <div>{{dataForm.org_name}}</div>
+        </el-form-item>
+        <el-form-item label="审核状态：">
+          <div v-if="dataForm.status === 1"><el-tag type="info">认证中</el-tag></div>
+          <div v-else-if="dataForm.status === 2"><el-tag type="warning">未通过</el-tag></div>
+          <div v-else><el-tag type="success">已通过</el-tag></div>
+        </el-form-item>
+        <el-form-item label="身份证号：">
+          <div>{{dataForm.id_card}}</div>
+        </el-form-item>
+        </el-form-item>
+          <el-form-item label="申请时间：">
+          <div>{{dataForm.created}}</div>
+        </el-form-item>
+        <el-form-item label="证件图片：">
+          <img :src="dataForm.id_card_front">
+          <img :src="dataForm.id_card_back">
+        </el-form-item>
+      </el-form>
     </el-dialog>
   </div>
 </template>
@@ -38,13 +41,16 @@ import { treeDataTranslate } from '@/utils'
         imgUrl:'',
         teacherList:[],
         dataForm:{
-          nickname:'',
-          name:'',
-          organization:'',
-          IDnumber:'',
-          certificateImage1:'',
-          certificateImage2:'',
+          userName:'',
+          userPhone:'',
+          id_card:'',
+          id_card_front:'',
+          id_card_back:'',
+          real_name:'',
+          org_name:'',
+          type:'',
           status: '',
+          user_id:'',
           created: ''
         },
         dataList: []
@@ -54,19 +60,29 @@ import { treeDataTranslate } from '@/utils'
       //初始化数据方法
        init (id) {
         this.dataForm.id = id
-     this.$http({
-        url: this.$http.adornUrl('/xry/teacher/list'),
-        method: 'get',
-        params: this.$http.adornParams()
-      }).then(({ data }) => {
-          this.teacherList = treeDataTranslate(data.teacherList, 'id')
-        }).then(() => { 
-      this.visible = true
-      this.$nextTick(() => {
-        // 重置form表单（清空form表单的内容）
-        this.$refs['dataForm'].resetFields()
-        })
-      }) 
+        this.visible = true 
+        if (this.dataForm.id) {
+          this.$http({
+            url: this.$http.adornUrl(`/xry/teacher/info/${this.dataForm.id}`),
+            method: 'get',
+            params: this.$http.adornParams()
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.dataForm.id = data.teacher.id
+              this.dataForm.id_card = data.teacher.id_card
+              this.dataForm.org_name = data.teacher.org_name
+              this.dataForm.id_card_back = data.teacher.id_card_back
+              this.dataForm.id_card_front = data.teacher.id_card_front
+              this.dataForm.real_name = data.teacher.real_name
+              this.dataForm.type = data.teacher.type
+              this.dataForm.status = data.teacher.status
+              this.dataForm.user_id = data.teacher.user_id
+              this.dataForm.created = data.teacher.created
+              this.dataForm.userName = data.teacher.userName
+              this.dataForm.userPhone = data.teacher.userPhone
+            }
+          })
+        }
       }
     }
   }

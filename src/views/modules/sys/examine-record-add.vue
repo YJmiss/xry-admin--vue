@@ -44,8 +44,8 @@
         let urlType = '';
         if (1 == examineType) {urlType = 'course'} 
         else if(2 == examineType){urlType = 'video'} 
-        else if(3 == examineType){urlType = 'certificateTeacher'}
-        else{urlType = 'certificateOrganization'}
+        else if(3 == examineType){urlType = 'teacher'}
+        else{urlType = 'organization'}
        this.$http({
           url: this.$http.adornUrl(`/xry/${urlType}/info/${this.dataForm.id}`),
           method: 'get',
@@ -57,10 +57,10 @@
               this.dataForm.id = data.course.id
             } else if (data.video) {
               this.dataForm.id = data.video.id
-            }else if(data.certificateTeacher){
-            this.dataForm.id = data.certificateTeacher.id
-            }else{
-            this.dataForm.id = data.certificateOrganization.id
+            } else if (data.teacher) {
+              this.dataForm.id = data.teacher.id
+            } else {
+              this.dataForm.id = data.org.id
             }
           }
         })
