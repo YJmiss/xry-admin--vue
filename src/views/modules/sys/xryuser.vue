@@ -57,8 +57,6 @@
       <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作" prop="role">
         <template slot-scope="scope">
           <el-button v-if="isAuth('xry:user:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
-          <el-button v-if="isAuth('xry:user:updateUserRoleTeacher')" type="primary" round size="small" @click="updateUserRoleTeacher(scope.row.id)" v-show="scope.row.role == 0">置为讲师</el-button>
-          <el-button v-if="isAuth('xry:user:updateUserRole')" type="success" round size="small" @click="updateUserRole(scope.row.id)" v-show="scope.row.role == 1">置为普通用户</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -166,66 +164,6 @@
         }).then(() => {
           this.$http({
             url: this.$http.adornUrl('/xry/user/delete'),
-            method: 'post',
-            data: this.$http.adornData(ids, false)
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.getDataList()
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
-        }).catch(() => {})
-      },
-      // 修改用户角色（普通用户<->讲师切换）
-      updateUserRole (id) {
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定要把该用户[${id ? '置为普通用户' : '批量置为普通用户'}]吗?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.$http({
-            url: this.$http.adornUrl('/xry/user/updateUserRole'),
-            method: 'post',
-            data: this.$http.adornData(ids, false)
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.getDataList()
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
-        }).catch(() => {})
-      },
-      // 修改用户角色（讲师<->普通用户切换）
-      updateUserRoleTeacher (id) {
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定要把该用户[${id ? '置为讲师' : '批量置为讲师'}]吗?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.$http({
-            url: this.$http.adornUrl('/xry/user/updateUserRoleTeacher'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({ data }) => {

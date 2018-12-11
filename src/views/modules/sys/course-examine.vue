@@ -72,6 +72,7 @@
       return {
         dataForm: {
           id: 0,
+          status:0,
           title: '',
           parentName: '',
           courseCatName: '',

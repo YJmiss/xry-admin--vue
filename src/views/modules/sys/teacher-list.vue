@@ -1,41 +1,40 @@
 <template>
   <div class="mod-xryuser">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
+
       <el-form-item label="手机号">
-        <el-input v-model="dataForm.phone" placeholder="请填写手机号" clearable></el-input>
+      <el-input v-model="dataForm.userPhone" placeholder="请填写手机号" clearable></el-input>
       </el-form-item>
        <el-form-item label="讲师姓名">
-      <el-input v-model="dataForm.teacherName" placeholder="请填写讲师姓名" clearable></el-input>
-      </el-form-item>
-      <el-form-item label="用户状态">
-          <el-select v-model="dataForm.status" placeholder="请选择用户状态" @change="statusCurrentSel">
-            <el-option v-for="item in statusValues" :key="item.statusValue" :label="item.label" :value="item.statusValue"></el-option>
-          </el-select>
+      <el-input v-model="dataForm.real_name" placeholder="请填写讲师姓名" clearable></el-input>
       </el-form-item>
       <el-form-item>
         <el-button v-if="isAuth('xry:teacher:list')" type="primary" @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('xry:teacher:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('xry:teacher:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">删除&nbsp; /&nbsp;批量删除</el-button>
       </el-form-item>
     </el-form>
-    <el-table :data="dataForm" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
+    <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column>
-      <el-table-column prop="nickname" header-align="center" align="center" label="账号/昵称"></el-table-column>
-      <el-table-column prop="name" header-align="center" align="center" label="讲师姓名"></el-table-column>
-      <el-table-column prop="phone" header-align="center" align="center" label="手机号"></el-table-column>
-       <el-table-column prop="organization" header-align="center" align="center" label="所属机构">
-       </el-table-column>
-      <el-table-column prop="IDnumber" header-align="center" align="center" label="身份证号"></el-table-column>
-       <el-table-column prop="certificateImage" header-align="center" align="center" label="资质图片">
-       </el-table-column>
-      <el-table-column prop="status" header-align="center" align="center" label="用户状态" width="100">
+      <el-table-column prop="nickname" header-align="center" align="center" label="昵称" width="180">
       </el-table-column>
-      <el-table-column prop="created" header-align="center" align="center" width="180" label="认证时间"></el-table-column>
-      <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作" prop="role">
-        <template slot-scope="scope">
-          <el-button v-if="isAuth('xry:teacher:delete')" type="danger"  size="small" class="el-icon-delete"  @click="deleteHandle(scope.row.id)">删除</el-button>
+      <el-table-column prop="real_name" header-align="center" align="center" label="讲师姓名"></el-table-column>
+      <el-table-column prop="userPhone" header-align="center" align="center" label="手机号"></el-table-column>
+       <el-table-column prop="orgName" header-align="center" align="center" label="所属机构" width="200">
+       </el-table-column>
+      <el-table-column prop="id_card" header-align="center" align="center" label="身份证号"></el-table-column>
+       <el-table-column prop="id_card_front" header-align="center" align="center" label="证件照正面">
+           <img :src="dataForm.id_card_front">
+       </el-table-column>
+        <el-table-column prop="id_card_back" header-align="center" align="center" label="证件照反面">
+        <img :src="dataForm.id_card_back">
+       </el-table-column>
+      <el-table-column prop="status" header-align="center" align="center" label="认证状态" width="100">
+         <template slot-scope="scope">
+         <el-tag v-if="scope.row.status === 3" size="small"  type="success" >认证通过</el-tag>
         </template>
       </el-table-column>
+      <el-table-column prop="created" header-align="center" align="center" width="180" label="认证时间"></el-table-column>
     </el-table>
     <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex" :page-sizes="[10, 20, 50, 100]" 
           :page-size="pageSize" :total="totalPage" layout="total, sizes, prev, pager, next, jumper">
@@ -48,41 +47,66 @@ import { treeDataTranslate } from '@/utils'
   export default {
     data () {
       return {
-        dataForm:[{
-          nickname:'菲菲',
-          phone: '18487194104',
-          name:'孔子',
-          organization:'昆明源力教育',
-          IDnumber:'532627199408153529',
-          certificateImage:'这里显示讲师身份证照片',
-          status: '正常',
-          created: '2018-12-07'
-        },{
-          nickname:'嘿嘿',
-          phone: '18587156704',
-          name:'孟子',
-          organization:'暂无组织机构',
-          IDnumber:'532427188408153523',
-          certificateImage:'这里显示讲师身份证照片',
-          status: '删除',
-          created: '2018-11-17'
-        }],
+        dataForm:{
+        nickname:'',
+        userPhone:'',
+        real_name:'',
+        orgName:'',
+        id_card:'',
+        id_card_front:'',
+        id_card_back:'',
+        type:'',
+        status:3,
+        created: ''
+        },
         dataList: [],
         pageIndex: 1,
         pageSize: 10,
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
+        options: [ 
+        { label:'正常', value:'1' },
+        { label:'删除', value:'2' },
+      ],
+      value: '',
+      teacherList: [],
+        teacherListTreeProps: {
+          label: 'nickname',
+          children: 'children'
+        }
       }
+       
     },
     components: {},
-    /* activated () {
+     activated () {
       this.getDataList()
-    }, */
+    }, 
     methods: {
       // 获取数据列表
     getDataList () {
-       
+    this.dataListLoading = true
+    this.visible = true
+    this.$http({
+      url: this.$http.adornUrl('/xry/teacher/list'),
+      method: 'get',
+      params: this.$http.adornParams({
+        'page': this.pageIndex,
+        'limit': this.pageSize,
+        'realName':this.dataForm.real_name,
+        'userPhone':this.dataForm.userPhone,
+        'status':this.dataForm.status
+      })
+    }).then(({ data }) => {
+      if (data && data.code === 0) {
+        this.dataList = data.page.list
+        this.totalPage = data.page.totalCount
+      } else {
+        this.dataList = []
+        this.totalPage = 0
+      }
+      this.dataListLoading = false
+    })
       }, 
       // 每页数
       sizeChangeHandle (val) {
@@ -110,7 +134,7 @@ import { treeDataTranslate } from '@/utils'
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/xry/user/delete'),
+            url: this.$http.adornUrl('/xry/teacher/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({ data }) => {

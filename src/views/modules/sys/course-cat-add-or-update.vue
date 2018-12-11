@@ -4,21 +4,20 @@
       <el-form-item label="类目名称" prop="name">
         <el-input v-model="dataForm.name" placeholder="类目名称"></el-input>
       </el-form-item>
-      <el-form-item label="父类目" size="mini" prop="flag">
+      <el-form-item label="选父类目" size="mini" prop="flag">
         <el-radio-group v-model="dataForm.flag" @change="changeHandler">
           <el-radio :label="0">否</el-radio>
           <el-radio :label="1">是</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="父类目" prop="parentName"> 
+      <el-form-item label="父类目" prop="parentName"  v-show="parentShow"> 
         <el-popover ref="courseCatListPopover" placement="bottom-start" trigger="click">
           <el-tree :data="courseCatList" :props="courseCatListTreeProps" node-key="id" ref="courseCatListTree"
             @current-change="courseCatListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input v-model="dataForm.parentName" v-if="dataForm.parentAbled" :readonly="true" v-popover:courseCatListPopover placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
-        <el-input v-if="dataForm.parentDisabled" disabled="disabled" class="cat-list__input"></el-input>
+        <el-input v-model="dataForm.parentName" :readonly="true" v-popover:courseCatListPopover placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="排列序号" prop="sortOrder">
         <el-input-number v-model="dataForm.sortOrder" controls-position="right" :min="0" placeholder="排列序号"></el-input-number>
@@ -43,6 +42,7 @@
     data () {
       return {
         visible: false,
+        parentShow:false,
         dataForm: {
           id: 0,
           parentId: 0,
@@ -51,8 +51,6 @@
           status: 1,
           sortOrder: 0,
           flag: 0,
-          parentAbled:1,
-          parentDisabled: 0
         },
         dataRule: {
           name: [
@@ -152,14 +150,11 @@
       },
       changeHandler(value) {
         if (1 == value) {
-          this.dataForm.parentAbled = 0,
-          this.dataForm.parentDisabled = 1
+        this.parentShow = true
         } else {
-          this.dataForm.parentAbled = 1,
-          this.dataForm.parentDisabled = 0
+          this.parentShow = false
         }
-        console.log(this.dataForm.parentAbled)
-        console.log(this.dataForm.parentDisabled)
+        console.log(this.parentShow)
       }
     }
   }

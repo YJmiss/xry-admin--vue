@@ -33,7 +33,7 @@
         <el-input v-model="dataForm.videoUrl" type="text" placeholder="视频路径" readonly="readonly"></el-input>
       </el-form-item>
       <el-form-item label="上传视频" >
-        <UE id="video-upload" :defaultMsg="defaultMsg" :config="config" ref="ue"></UE>
+      <UE id="video-upload" :defaultMsg="defaultMsg" :config="config" ref="ue"></UE>
     </el-form-item>
      </el-form>
     <span slot="footer" class="dialog-footer">
@@ -50,7 +50,6 @@
   export default {
     components: {UE},
     data () {
-
       return {
         visible: false,
         roleList: [],
