@@ -19,7 +19,7 @@
         <el-input v-model="dataForm.teacherName" v-popover:teacherListPopover :readonly="true" placeholder="点击选择讲师" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="消息类型">
-        <el-select v-model="dataForm.type" placeholder="请选择消息类型" @change="currentSel">
+        <el-select v-model="dataForm.msg_type" placeholder="请选择消息类型" @change="currentSel">
           <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
         </el-select>
       </el-form-item>
@@ -34,8 +34,8 @@
       <!-- <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column> -->
       <el-table-column prop="type" header-align="center" align="center" width="150" label="消息类型">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.type === 1" size="small" type="success">课程消息</el-tag>
-          <el-tag v-else-if="scope.row.type === 2" size="small" type="danger">我关注的</el-tag>
+          <el-tag v-if="scope.row.msg_type === 1" size="small" type="success">课程消息</el-tag>
+          <el-tag v-else-if="scope.row.msg_type === 2" size="small" type="danger">我关注的</el-tag>
           <el-tag v-else size="small" type="warning">平台通知</el-tag>
         </template>
       </el-table-column>
@@ -88,7 +88,7 @@
     data () {
       return {
         dataForm: {
-          type: '',
+          msg_type: '',
           course_type: '',
           status: 0,
           publish_date:'',
@@ -122,8 +122,7 @@
         ],
         value: '',
         // sockjs的变量
-        stompClient:'',
-        timer:''
+        websocket:''
       }
     },
     components: {
@@ -161,7 +160,7 @@
                 'limit': this.pageSize,
                 'objId': this.dataForm.objId,
                 'userId':this.dataForm.userId,
-                'type':this.dataForm.type
+                'type':this.dataForm.msg_type
               })
             }).then(({ data }) => {
               if (data && data.code === 0) {
@@ -310,7 +309,7 @@
       },
       // 消息类型下拉选中事件
       currentSel(selVal){
-        this.dataForm.type = selVal;
+        this.dataForm.msg_type = selVal;
       },
       // 点击->详情弹出框
       showDetail (detail) {
@@ -321,61 +320,38 @@
       },
       // WebSocket连接初始化
       initWebSocket() {
-        this.connection();
-        let that= this;
-        // 断开重连机制,尝试发送消息,捕获异常发生时重连
-        this.timer = setInterval(() => {
-          try {
-            that.stompClient.send("发送消息给服务器！");
-          } catch (err) {
-            console.log("断线了: " + err);
-            that.connection();
-          }
-        }, 5000);
-      }, 
-      // WebSocket连接后台 
-      connection() {
-        // 建立连接对象（messageWebSocket对应WebSocketConfig下的addEndpoint()的第一个参数）
-        let url = this.$http.adornUrl('/messageWebSocket');
-        let topicURL = this.$http.adornUrl("/topic/ip");
-        console.log(url)
-        console.log(topicURL)
-        let socket = new SockJS(url);
-        // 获取STOMP子协议的客户端对象
-        this.stompClient = Stomp.over(socket);
-        // 定义客户端的认证信息,按需求配置
-        // 可以传参数到后台
-        let headers = { Authorization:'' }
-        // 向服务器发起websocket连接
-        this.stompClient.connect(headers,(frame) => {
-          // 订阅服务端提供的某个topic（对应后台WebSocketComponent下的convertAndSend方法第一个参数）
-          this.stompClient.subscribe(topicURL, (msg) => { 
-            console.log('广播成功')
-            // msg.body存放的是服务端发送给我们的信息
-            console.log(msg);  
-          });
-          //用户加入接口
-          //this.stompClient.send("/app/chat.addUser", headers, JSON.stringify({sender: '',chatType: 'JOIN'}))  
-        }, (err) => {
-          // 连接发生错误时的处理函数
-          console.log('失败')
-          console.log(err);
-        });
-      },    
-      // WebSocket断开连接
-      disconnect() {
-        if (this.stompClient) {
-          this.stompClient.disconnect();
-        }
-        console.log("WebSocket断开连接")
-      },  
-      mounted(){
-        this.initWebSocket();
+        const wsuri = "ws://localhost:9001/xry/messageWebSocket";
+        this.websock = new WebSocket(wsuri);
+        this.websock.onopen = this.websocketOnOpen;
+        this.websock.onmessage = this.websocketOnMessage;
+        this.websock.onclose = this.websocketClose;
+        this.websock.over = this.websocketOver;
       },
-      // 页面离开时断开连接,清除定时器
-      beforeDestroy: function () {
-        this.disconnect();
-        clearInterval(this.timer);
+      // 
+      websocketOnOpen() {
+        console.log("-------------连接初始化----------------")    
+      },
+      //数据发送
+      websocketSend(agentData) { 
+        this.websock.send(agentData, function(data) { 
+          console.log("客户端发送数据:" + data) 
+        });
+      },
+      //数据接收
+      websocketOnMessage: function(e) {
+        console.log("客户端接收数据：" + e.data); 
+        //const redata = JSON.parse(e.data);
+        //console.log("客户端接收数据：" + redata);
+      },
+      // 关闭连接 
+      websocketClose() {
+        //this.websocket.close();
+        console.log("-------------断开连接----------------")
+      },
+      // 结束连接
+      websocketOver(){
+        //this.websocket.close();
+        console.log("-------------结束连接----------------")
       }
     }
   }

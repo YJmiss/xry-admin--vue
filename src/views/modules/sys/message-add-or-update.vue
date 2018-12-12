@@ -1,21 +1,21 @@
 <template>
   <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-      <el-form-item label="消息类型" size="mini" prop="type">
-        <el-radio-group v-model="dataForm.type">
+      <el-form-item label="消息类型" size="mini" prop="msgType">
+        <el-radio-group v-model="dataForm.msgType">
           <el-radio :label="1">课程消息</el-radio>
           <el-radio :label="2">我关注的</el-radio>
           <el-radio :label="3">平台通知</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="课程消息" size="mini" prop="courseType" v-show="dataForm.type ==1">
+      <el-form-item label="课程消息" size="mini" prop="courseType" v-show="dataForm.msgType ==1">
         <el-radio-group v-model="dataForm.courseType">
           <el-radio :label="1">开课通知</el-radio>
           <el-radio :label="2">课程章节更新</el-radio>
           <el-radio :label="3">其它</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="选择课程" prop="parentName" v-show="dataForm.type ==1"> 
+      <el-form-item label="选择课程" prop="parentName" v-show="dataForm.msgType ==1"> 
         <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
           <el-tree :data="courseList" :props="courseListTreeProps" node-key="id" ref="courseListTree"
             @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
@@ -24,7 +24,7 @@
         </el-popover>
         <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择所属课程" class="cat-list__input"></el-input>
       </el-form-item>
-      <el-form-item label="选择讲师" prop="teacherName" v-show="dataForm.type ==2">
+      <el-form-item label="选择讲师" prop="teacherName" v-show="dataForm.msgType ==2">
         <el-popover ref="teacherListPopover" placement="bottom-start" trigger="click">
           <el-tree :data="teacherList" :props="teacherListTreeProps" node-key="id" ref="teacherListTree" @current-change="teacherListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">
@@ -50,7 +50,7 @@
       return {
         dataForm: {
           id: 0,
-          type:1,
+          msgType:1,
           courseType:1,
           parentName: '',
           teacherName:'',
@@ -109,7 +109,7 @@
               }).then(({ data }) => {
                 if (data && data.code === 0) {
                   this.dataForm.id = data.message.id
-                  this.dataForm.type = data.message.type
+                  this.dataForm.msgType = data.message.msgType
                   this.dataForm.courseType = data.message.courseType
                   this.dataForm.objId = data.message.objId
                   this.dataForm.userId = data.message.userId
@@ -158,7 +158,7 @@
                 method: 'post',
                 data: this.$http.adornData({
                   'id': this.dataForm.id || undefined,
-                  'type': this.dataForm.type,
+                  'type': this.dataForm.msgType,
                   'courseType': this.dataForm.courseType,
                   'objId': this.dataForm.objId,
                   'userId': this.dataForm.userId,
@@ -187,7 +187,7 @@
       // 校验form表单
       dataValidate () {
         let isPass = false;
-        if (this.dataForm.type == 1) {
+        if (this.dataForm.msgType == 1) {
           // 课程消息
           if (!this.dataForm.parentName) {
             this.$confirm(`请选择课程`, '提示', {
@@ -200,7 +200,7 @@
           } else {
             isPass = true
           }
-        } else if (this.dataForm.type == 2) {
+        } else if (this.dataForm.msgType == 2) {
           // 我关注的
           if (!this.dataForm.teacherName) {
             this.$confirm(`请选择讲师`, '提示', {
@@ -213,7 +213,7 @@
           } else {
             isPass = true
           }
-        } else if (this.dataForm.type == 3) {
+        } else if (this.dataForm.msgType == 3) {
           // 平台消息
           if (!this.dataForm.info) {
             this.$confirm(`请填写具体消息`, '提示', {
