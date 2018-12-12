@@ -10,15 +10,14 @@
           </el-select>
         </el-form-item>
         <el-form-item>
-            <el-button v-if="isAuth('xry:teacher:list')" type="primary" @click="getDataList()">查询</el-button>
+        <el-button v-if="isAuth('xry:teacher:list')" type="primary" @click="getDataList()">查询</el-button>
         </el-form-item>
       </el-form>
       <el-table :data="dataList" v-loading="dataListLoading" @selection-change="selectionChangeHandle" border style="width: 100%">
         <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
         <el-table-column prop="nickname" header-align="center" align="center" label="账号/昵称" width="300">
           <template slot-scope="scope">
-            <el-tag size="small" type="info">{{scope.row.nickname}}</el-tag>
-            <el-tag size="small" type="info">{{scope.row.userPhone}}</el-tag>
+           <span>{{scope.row.nickname}}</span>&nbsp;/&nbsp;<span>{{scope.row.userPhone}}</span>
           </template>    
         </el-table-column>
         <el-table-column prop="real_name" header-align="center" align="center" label="讲师姓名" width="150"></el-table-column>
@@ -26,7 +25,7 @@
         <el-table-column prop="id_card" header-align="center" align="center" label="身份证号" width="250"></el-table-column>
         <el-table-column prop="type" header-align="center" align="center" label="类型" width="100">
           <template slot-scope="scope">
-            <el-tag v-if="scope.row.type === 1" size="small" type="success">个人认证</el-tag>
+            <el-tag v-if="scope.row.type === 1" size="small" type="success">讲师认证</el-tag>
             <el-tag v-else size="small"  type="danger">机构认证</el-tag>
           </template>  
         </el-table-column>
@@ -46,7 +45,7 @@
         </el-table-column>
       </el-table>
       <!-- 弹窗, 讲师认证资料审核并记录 -->
-      <examine-record-add v-show="examineRecordAddVisible" ref="examineRecordAdd" @refreshDataList="getDataList"></examine-record-add> 
+      <examine-record-add v-show="examineRecordAddVisible" ref="examineRecordAdd"></examine-record-add> 
       <!-- 弹窗，讲师认证资料详情查看 -->
       <teacher-certificate-info v-show="infoVisible" ref="TeacherCertificateInfo"></teacher-certificate-info>
     </div>
@@ -103,7 +102,7 @@ export default {
     examine(id) {
       this.examineRecordAddVisible = true
       this.$nextTick(() => {
-        this.$refs.examineRecordAdd.init(id,this.examineType)
+      this.$refs.examineRecordAdd.init(id,this.examineType)
       })
     },
     //获取数据

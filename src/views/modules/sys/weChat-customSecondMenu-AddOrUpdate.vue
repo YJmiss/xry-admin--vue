@@ -7,8 +7,8 @@
       <el-form-item label="菜单名称" prop="menuName">
       <el-input v-model="dataForm.menuName" placeholder="菜单名称"></el-input>
       </el-form-item>
-      <el-form-item label="菜单类型" prop="menuType">
-      <el-select v-model="value" placeholder="请选择">
+      <el-form-item label="菜单类型" prop="menuType" >
+      <el-select v-model="value" placeholder="请选择"  @change="menuEventsHandle(value)">
       <el-option
       v-for="item in options"
       :key="item.value"
@@ -17,8 +17,21 @@
      </el-option>
       </el-select>
     </el-form-item>
-    <el-form-item label="点击事件key" prop="key_value" label-width="120px">
-      <el-input v-model="dataForm.key_value" placeholder="输入key值" style="margin-left:-120px;padding:0;"></el-input>
+    <el-form-item label="点击事件key" prop="eventKey" label-width="120px" v-show="eventKeyVisible">
+    <el-input v-model="dataForm.eventKey" placeholder="输入key值" style="margin-left:-120px;padding:0;"></el-input>
+    </el-form-item>
+    <el-form-item label="链接地址" prop="url" v-show="urlVisible" label-width="120px" >
+    <el-input v-model="dataForm.url" placeholder="输入链接地址" style="position:relative;left:-40px;"></el-input>
+    </el-form-item>
+    <el-form-item label="选择素材" prop="material" v-show="materialVisible" label-width="120px">
+     <el-select v-model="value2" placeholder="请选择" style="position:relative;left:-40px;">
+     <el-option
+      v-for="item in options2"
+      :key="item.value"
+      :label="item.label"
+      :value="item.value">
+     </el-option>
+    </el-select>
     </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -33,12 +46,16 @@ export default {
     return{
      visible:false,
      radio:1,
-     menuTypeVisible:false,
+     eventKeyVisible:false,
+     urlVisible:false,
+     materialVisible:false,
      dataForm:{
        id:0,
       menuName:'',
       menuType:'',
-      key_value:''
+      eventKey:'',
+      url:'',
+      material:''
      },
        options: [{
           value: '1',
@@ -73,6 +90,17 @@ export default {
         }
         ],
         value: '',
+        options2: [{
+          value: '1',
+          label: '素材1'
+        }, {
+          value: '2',
+          label: '素材2'
+        }, {
+          value: '3',
+          label: '素材3'
+        }],
+        value2: '',
       dataRule: {
            menuName:[
             { required: true, message: '请输入菜单名称', trigger: 'blur' },
@@ -80,9 +108,15 @@ export default {
           menuType:[
             {required:true, message: '请选择菜单类型', trigger: 'blur' },
           ],
-          key_value:[
-            { required:true, message: '请输入点击事件key值', trigger: 'blur' },
-          ]
+          eventKey:[
+            { required:true, message: '该项为必填项', trigger: 'blur' },
+          ],
+          url:[
+             { required:true, message: '链接地址为必填项', trigger: 'blur' },
+          ],
+          material:[
+          { required:true, message: '选择素材', trigger: 'blur' },
+           ]
           }
     }
     },
@@ -91,10 +125,56 @@ export default {
      init (id) {
         this.dataForm.id =id || 0
         this.visible=true
+        this.$http.adornUrl(`/sys/weChat/secondCustomMenu/${this.dataForm.id}`)
       },
+      //菜单事件处理函数
+      menuEventsHandle(value){
+      if(1==value || 3==value || 4==value || 5==value || 6==value || 7==value || 8==value){
+     this.eventKeyVisible=true,
+     this.urlVisible=false,
+     this.materialVisible=false
+      }else if(2==value){
+     this.eventKeyVisible=false,
+     this.urlVisible=true,
+     this.materialVisible=false
+      }else{
+     this.eventKeyVisible=false,
+     this.urlVisible=false,
+     this.materialVisible=true
+      }
+    },
       //表单提交
       dataFormSubmit(){
-        
+       this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.$http({
+              url: this.$http.adornUrl(`/sys/weChat/secondCustomMenu/${!this.dataForm.id ? 'save' : ''}`),
+              method: 'post',
+              data: this.$http.adornData({
+                'menuId': this.dataForm.id,
+                'menuName': this.dataForm.menuName,
+                'menuType': this.dataForm.menuType,
+                'eventKey': this.dataForm.eventKey || '',
+                'url' :this.dataForm.url || '',
+                'material':this.dataForm.material || '',
+              })
+            }).then(({ data }) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible = false
+                    this.$emit('refreshDataList')
+                  }
+                })
+              } else {
+                this.$message.error(data.msg)
+              }
+            })
+          }
+        })
       }
     }
 };

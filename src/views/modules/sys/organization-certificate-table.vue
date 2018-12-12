@@ -20,11 +20,10 @@
         <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
         <el-table-column prop="nickname" header-align="center" align="center" label="账号/昵称" width="300">
           <template slot-scope="scope">
-            <el-tag size="small" type="info">{{scope.row.nickname}}</el-tag>
-            <el-tag size="small" type="info">{{scope.row.phone}}</el-tag>
+           <span>{{scope.row.nickname}}</span> &nbsp;/&nbsp; <span>{{scope.row.phone}}</span>
           </template>      
         </el-table-column>
-        <el-table-column prop="org_name" header-align="center" align="left" label="机构名称" width="300"></el-table-column>
+        <el-table-column prop="org_name" header-align="center" align="center" label="机构名称" width="300"></el-table-column>
         <el-table-column prop="org_code" header-align="center" align="center" label="机构代码" width="200px"></el-table-column>
         <el-table-column prop="corporator" header-align="center" align="center" label="法人姓名" width="100"></el-table-column>
         <el-table-column prop="id_card" header-align="center" align="center" label="法人证件号" width="180px"></el-table-column>
@@ -48,7 +47,7 @@
             :page-size="pageSize" :total="totalPage" layout="total, sizes, prev, pager, next, jumper">
       </el-pagination>
       <!-- 弹窗, 机构认证资料认证记录 -->
-      <examine-record-add v-show="RecordVisible" ref="examineRecordAdd" @refreshDataList="getDataList"></examine-record-add> 
+      <examine-record-add v-show="RecordVisible" ref="examineRecordAdd"></examine-record-add> 
       <!-- 弹窗，查看机构认证申请资料详情 -->
       <organiz-certificate-info v-show="infoVisible" ref="OrganizCertificateInfo"></organiz-certificate-info> 
     </div>

@@ -153,11 +153,41 @@ export default {
     //初始化表单
      init () {
         this.visible=true
-        this.$http.adornUrl(`/sys/weChat/cunstomMenuAdd/firstMenu/${this.dataForm.id}`)
+        this.dataForm.id = id
+        this.$http.adornUrl(`/sys/weChat/firstCustomMenu/${this.dataForm.id}`)
       },
       //表单提交
       dataFormSubmit(){
-        
+         this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.$http({
+              url: this.$http.adornUrl(`/sys/weChat/firstCustomMenu/${!this.dataForm.id ? 'save' : ''}`),
+              method: 'post',
+              data: this.$http.adornData({
+                'menuId': this.dataForm.id,
+                'menuName': this.dataForm.menuName,
+                'menuType': this.dataForm.menuType,
+                'eventKey': this.dataForm.eventKey || '',
+                'url' :this.dataForm.url || '',
+                'material':this.dataForm.material || '',
+              })
+            }).then(({ data }) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible = false
+                    this.$emit('refreshDataList')
+                  }
+                })
+              } else {
+                this.$message.error(data.msg)
+              }
+            })
+          }
+        })
       }
     }
 }
@@ -186,7 +216,7 @@ left:20%;
  .el-input,.el-select{
   width:40%;
   padding:0;
-  position: relative;
+  position:relative;
   display: flex;
   justify-content:left;
   align-items: left;
