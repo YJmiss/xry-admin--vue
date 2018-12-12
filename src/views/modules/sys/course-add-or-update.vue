@@ -137,6 +137,7 @@
                   this.dataForm.image = data.course.image
                   this.courseCatListTreeSetCurrentNode()
                   this.teacherListTreeSetCurrentNode()
+                  console.log(dataForm.image)
                 }
               })
             } else {

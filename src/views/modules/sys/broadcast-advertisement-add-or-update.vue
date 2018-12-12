@@ -174,6 +174,46 @@
       },
       // 表单提交
       dataFormSubmit () {
+        if (!this.dataValidate()) {
+
+        } else {
+          this.$refs['dataForm'].validate((valid) => {
+            if (valid) {
+              this.$http({
+                url: this.$http.adornUrl(`/xry/content/${!this.dataForm.id ? 'save' : 'update'}`),
+                method: 'post',
+                data: this.$http.adornData({
+                  'id': this.dataForm.id || undefined,
+                  'title': this.dataForm.title,
+                  'category': this.dataForm.category,
+                  'title_desc': this.dataForm.title_desc,
+                  'url': this.dataForm.url,
+                  'pic': this.dataForm.pic,
+                  'status': this.dataForm.status,
+                  'course_id': this.dataForm.course_id
+                })
+              }).then(({ data }) => {
+                if (data && data.code === 0) {
+                  this.$message({
+                    message: '操作成功',
+                    type: 'success',
+                    duration: 1500,
+                    onClose: () => {
+                      this.visible = false
+                      this.$emit('refreshDataList')
+                    }
+                  })
+                } else {
+                  this.$message.error(data.msg)
+                }
+              })
+            }
+          })
+        }
+      },
+      // 校验form表单
+      dataValidate () {
+        let isPass = false;
         // 单独校验"所属课程"、"跳转链接"
         if (1 == this.dataForm.category || 3 == this.dataForm.category) {
             // 校验"所属课程"
@@ -185,6 +225,8 @@
               }).then(() => {
                 return;
               })
+            } else {
+              isPass = true;
             }
         } else {
           // 校验"跳转链接"
@@ -196,40 +238,11 @@
             }).then(() => {
               return;
             })
+          }else {
+            isPass = true;
           }
         }
-        this.$refs['dataForm'].validate((valid) => {
-          if (valid) {
-            this.$http({
-              url: this.$http.adornUrl(`/xry/content/${!this.dataForm.id ? 'save' : 'update'}`),
-              method: 'post',
-              data: this.$http.adornData({
-                'id': this.dataForm.id || undefined,
-                'title': this.dataForm.title,
-                'category': this.dataForm.category,
-                'title_desc': this.dataForm.title_desc,
-                'url': this.dataForm.url,
-                'pic': this.dataForm.pic,
-                'course_id': this.dataForm.course_id
-              })
-            }).then(({ data }) => {
-              if (data && data.code === 0) {
-                this.$message({
-                  message: '操作成功',
-                  type: 'success',
-                  duration: 1500,
-                  onClose: () => {
-                    this.visible = false
-                    this.$emit('refreshDataList')
-                  }
-                })
-              } else {
-                this.$message.error(data.msg)
-              }
-            })
-          }
-        })
-      }
+      }  
     }
   }
 </script>
