@@ -320,7 +320,9 @@
       },
       // WebSocket连接初始化
       initWebSocket() {
-        const wsuri = "ws://localhost:9001/xry/messageWebSocket";
+        // 测试使用的用户id
+        let userId = '1';
+        const wsuri = "ws://localhost:9001/xry/messageWebSocket?userId=" + userId;
         this.websock = new WebSocket(wsuri);
         this.websock.onopen = this.websocketOnOpen;
         this.websock.onmessage = this.websocketOnMessage;

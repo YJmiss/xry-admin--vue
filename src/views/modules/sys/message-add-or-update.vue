@@ -55,6 +55,7 @@
           parentName: '',
           teacherName:'',
           nickname:'',
+          status:1
         },
         num: 0,
         successNum: 0,
@@ -158,9 +159,10 @@
                 method: 'post',
                 data: this.$http.adornData({
                   'id': this.dataForm.id || undefined,
-                  'type': this.dataForm.msgType,
+                  'msgType': this.dataForm.msgType,
                   'courseType': this.dataForm.courseType,
                   'objId': this.dataForm.objId,
+                  'status':this.dataForm.status,
                   'userId': this.dataForm.userId,
                   'publishDate': this.dataForm.publishDate,
                   'info': this.dataForm.info
