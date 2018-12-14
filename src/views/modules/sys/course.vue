@@ -34,7 +34,7 @@
       <!-- <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column> -->
       <el-table-column prop="title" header-align="center" align="left" width="320" label="课程标题"></el-table-column>
       <el-table-column prop="catName" header-align="center" align="left" width="300" label="所属类目"></el-table-column>
-      <el-table-column prop="nickname" header-align="center" align="center" width="150" label="所属讲师"></el-table-column>
+      <el-table-column prop="realName" header-align="center" align="center" width="150" label="所属讲师"></el-table-column>
       <el-table-column prop="price" header-align="center" align="center" label="课程价格（元）"></el-table-column>
       <el-table-column prop="status" header-align="center" align="center" width="150" label="审核状态">
         <template slot-scope="scope">
@@ -75,7 +75,7 @@
           name: '',
           teacherName:'',
           catName:'',
-          nickname:''
+          realName:''
         },
         dataList: [],
         pageIndex: 1,
@@ -91,7 +91,7 @@
         },
         teacherList: [],
         teacherListTreeProps: {
-          label: 'nickname',
+          label: 'realName',
           children: 'children'
         }
       }
@@ -116,11 +116,11 @@
         }).then(() => {
           // 查询讲师列表，构造成一棵树
           this.$http({
-            url: this.$http.adornUrl('/xry/user/treeUser'),
+            url: this.$http.adornUrl('/xry/teacher/treeTeacher'),
             method: 'get',
             params: this.$http.adornParams()
           }).then(({ data }) => {
-            this.teacherList = treeDataTranslate(data.userList, 'id')
+            this.teacherList = treeDataTranslate(data.teacherList, 'id')
           }).then(() => {
             this.$http({
               url: this.$http.adornUrl('/xry/course/list'),
@@ -158,12 +158,12 @@
       // 讲师树选中
       teacherListTreeCurrentChangeHandle (data, node) {
         this.dataForm.teacherId = data.id
-        this.dataForm.teacherName = data.nickname
+        this.dataForm.teacherName = data.realName
       },
       // 讲师树设置当前选中节点
       teacherListTreeSetCurrentNode () {
         this.$refs.teacherListTree.setCurrentKey(this.dataForm.teacherId)
-        this.dataForm.teacherName = (this.$refs.teacherListTree.getCurrentNode() || {})['nickname']
+        this.dataForm.teacherName = (this.$refs.teacherListTree.getCurrentNode() || {})['realName']
       },
       // 每页数
       sizeChangeHandle (val) {
