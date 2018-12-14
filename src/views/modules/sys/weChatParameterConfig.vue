@@ -16,7 +16,7 @@
   </div>
 </template>
 <script>
-import WeChatAuth from './weChat-authForm'
+import WeChatAuth from './weChat-authTable'
 import WeChatPay from './weChat-payForm'
 import WeChatFollow from './weChat-firstFollowForm'
 import WeChatKeyReply from './weChat-keyReplyTable'

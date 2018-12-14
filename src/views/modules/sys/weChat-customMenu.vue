@@ -8,42 +8,66 @@
  5. 微信公众平台规定，<span class="red">菜单发布24小时后生效</span>。您也可先取消关注，再重新关注即可马上看到菜单。<br>
  6. 点击“<span class="red">删除菜单</span>”操作只删除微信公众平台上的菜单，并不是删除本系统已经设置好的菜单。
 </div>
-<el-button type="primary" class="button" @click="addOrUpdateHandle(0)">添加一级菜单</el-button> 
-<el-button  class="button" type="primary">生成菜单</el-button>
+<el-button type="primary" class="button" @click="AddHandle(1)">添加一级菜单</el-button> 
+<el-button type="primary" class="button" @click="AddHandle(2)">添加二级菜单</el-button> 
 <div class="first-menu-list">
  <p class="title">一级菜单列表</p>
- <el-table :data="firstMenuData" border>
- <el-table-column prop="menuId" label="序号" width="60px">
+ <el-table :data="parentList" border>
+    <el-table-column prop="menuId" header-align="center" align="center" label="序号" width="200px">
     </el-table-column>
- <el-table-column prop="menuName" label="菜单名称" >
+    <el-table-column prop="menuName" header-align="center" align="center" label="菜单名称" width="100px">
     </el-table-column>
-    <el-table-column prop="type" label="类型">
+    <el-table-column prop="menuType" header-align="center" align="center" label="菜单类型" width="90px">
+      <template slot-scope="scope">
+      <el-tag v-if="scope.row.menuType === '1'" size="small" type="success">发送消息</el-tag>
+      <el-tag v-else-if="scope.row.menuType === '2'" size="small" type="success">跳转网页</el-tag>
+      <el-tag v-else-if="scope.row.menuType === '3'" size="small" type="success">跳转小程序</el-tag>
+      </template>
     </el-table-column>
-     <el-table-column  fixed="right" header-align="center" align="center" label="操作" style="width:auto">
-        <template slot-scope="scope" porp="status">
-          <span class="td-span">二级菜单</span>
-         <span> <a class="td-a" href="#"  @click="addOrUpdateHandle(scope.row.menuId)">添加</a>
-          <a class="td-a" href="#"  @click="viewHandle(scope.row.id)">查看</a></span> |
-          <a class="td-a red"  href="#" @click="deleteHandle(scope.row.id)">删除</a>
+    <el-table-column prop="status" header-align="center" align="center" label="状态" width="80px">
+      <template slot-scope="scope">
+      <el-tag v-if="scope.row.status === 0" size="small" type="success">启用</el-tag>
+      <el-tag v-else-if="scope.row.status === 1" size="small" type="info">停用</el-tag>
+      <el-tag v-else-if="scope.row.status === 2" size="small" type="info">移除</el-tag>
+      </template>
+    </el-table-column>
+     <el-table-column  fixed="right" header-align="center" align="center" label="操作">
+        <template slot-scope="scope">
+           <el-button   type="success" size="small" @click="EnableOrDisableHandle(scope.row.menuId)" :disabled="scope.row.status ===2">启用</el-button>
+          <el-button   type="warning" size="small" @click="EnableOrDisableHandle(scope.row.menuId)" :disabled="scope.row.status === 1" >停用</el-button>
+          <el-button   type="danger" size="small" @click="removeHandle(scope.row.menuId)" :disabled="scope.row.status === 0">移除</el-button>
         </template>
       </el-table-column>
   </el-table>
 </div>
 <div class="second-menu-list">
  <p class="title">二级菜单列表</p>
- <el-table :data="secondMenuData" border highlight-current-row empty-text="改菜单没有二级菜单">
- <el-table-column prop="menuId" label="序号" width="60px">
+ <el-table :data="sonList" border >
+ <el-table-column prop="menuId" header-align="center" align="center"  label="序号" width="200px">
     </el-table-column>
-<el-table-column prop="parentMenu" label="父级菜单" >
-</el-table-column>
- <el-table-column prop="menuName" label="菜单名称" >
+    <el-table-column prop="parentId" header-align="center" align="center" label="父级菜单" width="100px">
     </el-table-column>
-    <el-table-column prop="type" label="类型">
+    <el-table-column prop="menuName" header-align="center" align="center"  label="菜单名称" width="100px">
     </el-table-column>
-     <el-table-column  fixed="right" header-align="center" align="center" label="操作" style="width:auto">
+    <el-table-column prop="menuType" header-align="center" align="center"  label="菜单类型"  width="90px">
+      <template slot-scope="scope">
+      <el-tag v-if="scope.row.menuType === '1'" size="small" type="success">文字消息</el-tag>
+      <el-tag v-else-if="scope.row.menuType === '2'" size="small" type="success">图文消息</el-tag>
+      <el-tag v-else-if="scope.row.menuType === '3'" size="small" type="success">跳转页面</el-tag>
+      </template>
+    </el-table-column>
+    <el-table-column prop="status" header-align="center" align="center"  label="状态" width="80px">
+      <template slot-scope="scope">
+      <el-tag v-if="scope.row.status === 0" size="small" type="success">启用</el-tag>
+      <el-tag v-else-if="scope.row.status === 1" size="small" type="info">停用</el-tag>
+      <el-tag v-else-if="scope.row.status === 2" size="small" type="info">移除</el-tag>
+      </template>
+    </el-table-column>
+     <el-table-column  fixed="right" header-align="center" align="center" label="操作">
         <template slot-scope="scope" porp="status">
-         <a class="td-a" href="#"  @click="addOrUpdateHandle(scope.row.menuId)">编辑</a>
-          <a class="td-a red"  href="#" @click="deleteHandle(scope.row.id)">删除</a>
+          <el-button   type="success" size="small" @click="EnableOrDisableHandle(scope.row.menuId)" :disabled="scope.row.status ===2">启用</el-button>
+          <el-button   type="warning" size="small" @click="EnableOrDisableHandle(scope.row.menuId)" :disabled="scope.row.status === 1" >停用</el-button>
+          <el-button   type="danger" size="small" @click="removeHandle(scope.row.menuId)" :disabled="scope.row.status === 0">移除</el-button>
         </template>
       </el-table-column>
   </el-table>
@@ -51,61 +75,85 @@
  <!-- 弹窗，添加一级菜单  -->
  <add-first-menu v-show="AddFirstMenuVisible" ref="AddFirstMenu"> </add-first-menu>
  <!-- 弹窗，添加或修改二级菜单  -->
- <add-or-update-second-menu v-show="AddOrUpdateSecondMenuVisible" ref="AddOrUpdateSecondMenu"></add-or-update-second-menu>
+ <add-second-menu v-show="AddSecondMenuVisible" ref="AddSecondMenu"></add-second-menu>
 </div>
 </template>
 <script>
 import { treeDataTranslate } from '@/utils'
-import AddFirstMenu from './weChat-customFirstMenuAdd'
-import AddOrUpdateSecondMenu from './weChat-customSecondMenu-AddOrUpdate'
+import AddFirstMenu from './weChat-customFirstMenu-Add'
+import AddSecondMenu from './weChat-customSecondMenu-Add'
 export default {
-  components:{AddFirstMenu,AddOrUpdateSecondMenu},
+  components:{AddFirstMenu,AddSecondMenu},
     data(){
     return{
-    AddFirstMenuVisible:false,
-    AddOrUpdateSecondMenuVisible:false,
-    firstMenuData:[{
-          menuId: '1',
-         menuName: '积分中心',
-         type: '点击跳转URL'
-        }],
-   secondMenuData:[{
-   menuId: '1',
-    parentMenu: '积分中心',
-    menuName: 'VIP专项',
-    type: '单图文'
-   }]
+     dataForm:{
+        parentId:'',
+        parentMenu:'',
+        menuId: '',
+        menuName: '',
+        menuType: '',
+        eventType:'',
+        status:0
+      },
+      parentList:[],
+      sonList:[],
+      AddFirstMenuVisible:false,
+      AddSecondMenuVisible:false
     }
     },
+    activated () {
+    this.getDataList()
+    },
     methods:{
-      //添加和修改操作处理
-     addOrUpdateHandle(id) {
-        if(id==0){
-         this.AddFirstMenuVisible=true
-        this.$nextTick(() => {
-         this.$refs.AddFirstMenu.init()
-        }) 
-        }else{
-        this.AddOrUpdateSecondMenuVisible=true
-        this.$nextTick(() => {
-        this.$refs.AddOrUpdateSecondMenu.init(id)
-        }) 
-        }
-      },
-      //删除数据处理
-      deleteHandle(id){
-          var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
+      // 获取数据
+    getDataList () {
+        this.$http({
+          url: this.$http.adornUrl('/sys/weChatParentMeunList'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({ data }) => {
+          if (data && data.code === 0) {
+           this.parentList = data.parentMeun
+          }
+        }).then(() =>{
           this.$http({
-            url: this.$http.adornUrl('/xry/weChat/customMenu/delete'),
-            method: 'post',
-            data: this.$http.adornData(ids, false)
+          url: this.$http.adornUrl('/sys/weChatSonMeunList'),
+          method: 'get',
+          params: this.$http.adornParams()
+        }).then(({ data }) => {
+          if (data && data.code === 0) {
+            this.sonList = data.sonMeun
+           }
+        })
+        })
+      },
+    //菜单添加操作处理
+      AddHandle(menuId){
+      if(menuId == 1){
+      this.AddFirstMenuVisible = true
+      this.$nextTick(() =>{
+      this.$refs.AddFirstMenu.init()
+      })
+      }else{
+      this.AddSecondMenuVisible = true
+      this.$nextTick(() =>{
+      this.$refs.AddSecondMenu.init()
+      })
+      }
+      },
+      //移除操作处理
+     removeHandle(menuId){
+       
+      },
+       //菜单启用和停用
+     EnableOrDisableHandle(menuId){
+         this.$http({
+            url: this.$http.adornUrl(`/sys/weChatUpdateMeun`),
+            method: 'get',
+            params: this.$http.adornParams({
+              'menuId':menuId,
+              'status':this.dataForm.status
+            })
           }).then(({ data }) => {
             if (data && data.code === 0) {
               this.$message({
@@ -120,70 +168,76 @@ export default {
               this.$message.error(data.msg)
             }
           })
-        }).catch(() => {})
-      }
+        }
     }
 }
-</script>
-<style scoped>
-.customMenu{
-clear:both;
-padding: 0;
-width: 100%;
-}
-.explain{
-height:auto;
-margin: 0 auto 30px auto;
-font-size:14px;
-font-family: 微软雅黑;
-color: #333333;
-padding: 10px;
-background: #fefefe;
-line-height:30px;
-border-bottom: 1px solid #cccccc;
-}
-.red{
-color:#ff0000;
-}
-.light{
-color:#17B3A3;
-}
-.button{
-margin:0 40px 20px 0;
-width:180px;
-float:left;
-}
-.td-a{
-font-size:16px;
-padding:2px;
-}
-.td-span{
-font-size: 14px;
-float: left;
-font-family: 微软雅黑;
-color:#222222;
-}
-.first-menu-list{
-clear:both;
-width: 46%;
-float:left;
-}
-.second-menu-list{
-float:right;
-width: 48%;
-height: auto;
-margin: auto;
-}
-.title{
-font: 18px bolder 微软雅黑;
-color: #222222;
-margin-bottom: 20px;
-}
-.el-table{
-width: 100%;
-}
-.el-table-column{
-color:#222222;
-}
-</style>
+        </script>
+        <style scoped>
+        .el-card__body{
+         min-height:1200px;
+        }
+        .customMenu{
+        clear:both;
+        padding: 0;
+        width:100%;
+        }
+        .explain{
+        height:auto;
+        width: 100%;
+        margin:20px 0 16px -20px;
+        font-size:14px;
+        font-family: 微软雅黑;
+        color: #333333;
+        padding: 10px;
+        background: #ebebeb;
+        line-height:30px;
+        clear: both;
+        position:fixed;
+        bottom: 0;
+        }
+        .red{
+        color:#ff0000;
+        }
+        .light{
+        color:#17B3A3;
+        }
+        .button{
+        margin:0 40px 20px 0;
+        width:180px;
+        float:left;
+        }
+        .td-a{
+        font-size:16px;
+        padding:2px;
+        }
+        .td-span{
+        font-size: 14px;
+        float: left;
+        font-family: 微软雅黑;
+        color:#222222;
+        }
+        .first-menu-list{
+        clear:both;
+        width:45%;
+        height:auto;
+        float: left;
+        }
+        .second-menu-list{
+        float: right;
+        width: 50%;
+        height: auto;
+        margin: auto;
+        }
+        .title{
+        font: 18px bolder 微软雅黑;
+        color: #222222;
+        margin-bottom: 20px;
+        }
+        .el-table{
+        width: 100%;
+        }
+        .el-table-column{
+        color:#222222;
+        }
+        </style>
 

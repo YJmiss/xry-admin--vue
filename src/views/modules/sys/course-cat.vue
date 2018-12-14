@@ -23,12 +23,11 @@
         <el-button v-if="isAuth('xry:course:cat:toDisable')" type="warning" @click="courseCatToDisable()" :disabled="dataListSelections.length <= 0">批量禁用</el-button>
       </el-form-item>
     </el-form>
-    <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
+    <el-table :data="dataList" border @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
-      <!-- <el-table-column prop="parentId" header-align="center" align="center" label="父类目ID"></el-table-column> -->
-      <el-table-column prop="name" header-align="center" align="left" label="类目名称"></el-table-column>
-      <el-table-column prop="status" header-align="center" align="center" label="状态" width="120">
+      <table-tree-column prop="name" header-align="center" align="center" label="类目名称" treeKey="id" width="300"></table-tree-column>
+       <el-table-column prop="status" header-align="center" align="center" label="状态" width="120">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === 1" size="small" type="success">已启用</el-tag>
           <el-tag v-else size="small"  type="danger">已禁用</el-tag>
@@ -54,8 +53,9 @@
 </template>
 
 <script>
+  import TableTreeColumn from '@/components/table-tree-column'
   import AddOrUpdate from './course-cat-add-or-update'
-  import { treeDataTranslate } from '@/utils'
+  import {treeDataTranslate} from '@/utils'
   export default {
     data () {
       return {
@@ -79,11 +79,15 @@
           { value: '1', label: '启用' }, 
           { value: '2', label: '禁用' }
         ],
-        value: ''
+        value: '',
+          defaultProps: {
+          children: 'children',
+          label: 'label'
+        }
       }
     },
     components: {
-      AddOrUpdate
+     TableTreeColumn,AddOrUpdate
     },
     activated () {
       this.getDataList()
