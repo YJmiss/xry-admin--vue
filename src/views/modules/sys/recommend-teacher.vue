@@ -1,12 +1,12 @@
 <template>
-  <div class="mod-xryuser">
+  <div>
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item label="手机号">
-        <el-input v-model="dataForm.phone" placeholder="请填写手机号" clearable></el-input>
+      <el-form-item label="真实名字">
+        <el-input v-model="dataForm.realName" placeholder="请填写真实名字" clearable></el-input>
       </el-form-item>
-      <el-form-item label="第三方登录来源">
-          <el-select v-model="dataForm.social_source" placeholder="请选择第三方登录来源" @change="socialSourceCurrentSel">
-            <el-option v-for="item in socialSourceValues" :key="item.socialSourceValue" :label="item.label" :value="item.socialSourceValue"></el-option>
+      <el-form-item label="状态">
+          <el-select v-model="dataForm.status" placeholder="请选择状态" @change="socialSourceCurrentSel">
+            <el-option v-for="item in statusValues" :key="item.statusValue" :label="item.label" :value="item.statusValue"></el-option>
           </el-select>
       </el-form-item>
       <el-form-item>
@@ -14,29 +14,41 @@
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
-      <el-table-column type="selection" header-align="center" align="center" width="50">
-      </el-table-column>
-      <el-table-column prop="phone" header-align="center" align="center" label="注册手机号"></el-table-column>
-      <el-table-column prop="email" header-align="center" align="center" label="邮箱"></el-table-column>
-      <el-table-column prop="social_source" header-align="center" align="center" label="第三方登录来源">
+      <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
+      <el-table-column header-align="center" align="center" label="认证账号" width="300">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.social_source === 0" size="small" type="warning">手机号</el-tag>
-          <el-tag v-else-if="scope.row.social_source === 1" size="small" type="danger">微信</el-tag>
-          <el-tag v-else-if="scope.row.social_source === 2" size="small" type="success">QQ</el-tag>
-          <el-tag v-else-if="scope.row.social_source === 3" size="small" type="warning">支付宝</el-tag>
-          <el-tag v-else size="small" type="warning">手机号</el-tag>
+          <el-tag size="small" type="warning">{{scope.row.nickname}}</el-tag>
+          <el-tag size="small" type="success">{{scope.row.userPhone}}</el-tag>
+        </template>  
+      </el-table-column>
+      <el-table-column prop="real_name" header-align="center" align="center" label="真实名字" width="150"></el-table-column>
+      <el-table-column prop="id_card" header-align="center" align="center" label="身份证号" width="200"></el-table-column>
+      <el-table-column prop="status" header-align="center" align="center" label="状态">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.status === 1" size="small" type="warning">认证中</el-tag>
+          <el-tag v-else-if="scope.row.status === 2" size="small" type="danger">未通过</el-tag>
+          <el-tag v-else size="small" type="success">已通过</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="recommend" header-align="center" align="center" label="是否推荐">
+      <el-table-column prop="type" header-align="center" align="center" label="类型" width="160">
+        <template slot-scope="scope">
+          <el-tag v-if="scope.row.type === 1" size="small" type="warning">个人认证</el-tag>
+          <el-tag v-else size="small" type="success">机构认证</el-tag>
+        </template>
+      </el-table-column>
+      <el-table-column prop="orgName" header-align="center" align="left" label="所属机构（机构名字）" width="300"></el-table-column>
+      <el-table-column prop="orgCode" header-align="center" align="center" label="所属机构（结构代码）" width="300"></el-table-column>
+      <el-table-column prop="recommend" header-align="center" align="center" label="是否推荐" width="150">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.recommend === 0" size="small" type="warning">未推荐</el-tag>
-          <el-tag v-else size="small" type="danger">已推荐</el-tag>
+          <el-tag v-else size="small" type="success">已推荐</el-tag>
         </template>
       </el-table-column>
+      <el-table-column prop="created" header-align="center" align="center" label="创建时间" width="200"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作" prop="role">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('xry:user:recommendUser')" type="primary" round size="small" @click="recommendUser(scope.row.id)" v-show="scope.row.recommend == 0">推荐讲师</el-button>
-          <el-button v-if="isAuth('xry:user:cancelRecommend')" type="success" round size="small" @click="cancelRecommend(scope.row.id)" v-show="scope.row.recommend == 1">取消推荐</el-button>
+          <el-button v-if="isAuth('xry:teacher:recommendTeacher')" type="primary" round size="small" @click="recommendTeacher(scope.row.id)" v-show="scope.row.recommend == 0">推荐讲师</el-button>
+          <el-button v-if="isAuth('xry:teacher:cancelRecommend')" type="success" round size="small" @click="cancelRecommend(scope.row.id)" v-show="scope.row.recommend == 1">取消推荐</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -51,11 +63,13 @@
     data () {
       return {
         dataForm: {
-          phone: '',
-          email: '',
-          role: '',
-          social_source: '',
-          openuserId: '',
+          real_name: '',
+          nickname:'',
+          userPhone:'',
+          id_card:'',
+          orgName: '',
+          orgCode: '',
+          status: '',
           created: ''
         },
         dataList: [],
@@ -65,12 +79,11 @@
         dataListLoading: false,
         dataListSelections: [],
         addOrUpdateVisible: false,
-        socialSourceValue: '',
-        socialSourceValues: [
-          { socialSourceValue: '0', label: '手机号' }, 
-          { socialSourceValue: '1', label: '微信' }, 
-          { socialSourceValue: '2', label: 'QQ' },
-          { socialSourceValue: '3', label: '支付宝' }
+        statusValue: '',
+        statusValues: [
+          { statusValue: '1', label: '认证中' }, 
+          { statusValue: '2', label: '未通过' },
+          { statusValue: '3', label: '已通过' }
         ]
       }
     },
@@ -81,22 +94,19 @@
     methods: {
       // 获取数据列表
       getDataList () {
-        // 标识符
-        let flag = 1;
         this.dataListLoading = true
         this.$http({
-          url: this.$http.adornUrl('/xry/user/list'),
+          url: this.$http.adornUrl('/xry/teacher/list'),
           method: 'get',
           params: this.$http.adornParams({
-            'flag':flag,
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'phone': this.dataForm.phone,
-            'recommend': this.dataForm.recommend,
-            'socialSource': this.dataForm.social_source
+            'realName': this.dataForm.real_name,
+            'status': this.dataForm.status
           })
         }).then(({ data }) => {
           if (data && data.code === 0) {
+            console.log(data)
             this.dataList = data.page.list
             this.totalPage = data.page.totalCount
           } else {
@@ -132,7 +142,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/xry/user/delete'),
+            url: this.$http.adornUrl('/xry/teacher/delete'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({ data }) => {
@@ -152,7 +162,7 @@
         }).catch(() => {})
       },
       // 讲师推荐
-      recommendUser (id) {
+      recommendTeacher (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
           return item.id
         })
@@ -162,7 +172,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/xry/user/recommendUser'),
+            url: this.$http.adornUrl('/xry/teacher/recommendTeacher'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({ data }) => {
@@ -192,7 +202,7 @@
           type: 'warning'
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/xry/user/cancelRecommend'),
+            url: this.$http.adornUrl('/xry/teacher/cancelRecommend'),
             method: 'post',
             data: this.$http.adornData(ids, false)
           }).then(({ data }) => {

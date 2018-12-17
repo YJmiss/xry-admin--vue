@@ -44,6 +44,9 @@
           </template>
         </el-table-column>
       </el-table>
+      <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex" :page-sizes="[10, 20, 50, 100]" 
+              :page-size="pageSize" :total="totalPage" layout="total, sizes, prev, pager, next, jumper">
+      </el-pagination>
       <!-- 弹窗, 讲师认证资料审核并记录 -->
       <examine-record-add v-show="examineRecordAddVisible" ref="examineRecordAdd"></examine-record-add> 
       <!-- 弹窗，讲师认证资料详情查看 -->

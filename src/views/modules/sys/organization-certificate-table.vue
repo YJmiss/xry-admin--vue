@@ -60,6 +60,9 @@ import OrganizCertificateInfo from './organization-certificate-info'
   components:{examineRecordAdd, OrganizCertificateInfo},
     data () {
       return {
+        pageIndex: 1,
+        pageSize: 10,
+        totalPage: 0,
         RecordVisible:false,
         infoVisible:false,
         examineType:4, // 用于区别认证类型

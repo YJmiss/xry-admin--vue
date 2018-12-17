@@ -26,15 +26,15 @@
     <el-table :data="dataList" border @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
-      <table-tree-column prop="name" header-align="center" align="center" label="类目名称" treeKey="id" width="300"></table-tree-column>
-       <el-table-column prop="status" header-align="center" align="center" label="状态" width="120">
+      <table-tree-column prop="name" header-align="center" align="left" label="类目名称" treeKey="id" width="400"></table-tree-column>
+       <el-table-column prop="status" header-align="center" align="center" label="状态" width="200">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === 1" size="small" type="success">已启用</el-tag>
           <el-tag v-else size="small"  type="danger">已禁用</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="sortOrder" header-align="center" align="center" label="排列序号" width="120"></el-table-column>
-      <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
+      <el-table-column prop="created" header-align="center" align="center" width="350" label="创建时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="400" label="操作">
         <template slot-scope="scope">
           <el-button v-if="isAuth('xry:course:cat:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>

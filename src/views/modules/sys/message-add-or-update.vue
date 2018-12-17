@@ -54,7 +54,7 @@
           courseType:1,
           parentName: '',
           teacherName:'',
-          nickname:'',
+          realName:'',
           status:1
         },
         num: 0,
@@ -72,7 +72,7 @@
         },
         teacherList: [],
         teacherListTreeProps: {
-          label: 'nickname',
+          label: 'realName',
           children: 'children'
         }
       }
@@ -90,11 +90,11 @@
         }).then(() => {
           // 查询讲师列表，构造成一棵树
           this.$http({
-            url: this.$http.adornUrl('/xry/user/treeUser'),
+            url: this.$http.adornUrl('/xry/teacher/treeTeacher'),
             method: 'get',
             params: this.$http.adornParams()
           }).then(({ data }) => {
-            this.teacherList = treeDataTranslate(data.userList, 'id')
+            this.teacherList = treeDataTranslate(data.teacherList, 'id')
           }).then(() => { 
             this.visible = true
             this.$nextTick(() => {
@@ -140,12 +140,12 @@
       // 讲师树选中
       teacherListTreeCurrentChangeHandle (data, node) {
         this.dataForm.userId = data.id
-        this.dataForm.teacherName = data.nickname
+        this.dataForm.teacherName = data.realName
       },
       // 讲师树设置当前选中节点
       teacherListTreeSetCurrentNode () {
         this.$refs.teacherListTree.setCurrentKey(this.dataForm.userId)
-        this.dataForm.teacherName = (this.$refs.teacherListTree.getCurrentNode() || {})['nickname']
+        this.dataForm.teacherName = (this.$refs.teacherListTree.getCurrentNode() || {})['realName']
       },
       // 表单提交
       dataFormSubmit () {
