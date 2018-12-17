@@ -50,11 +50,18 @@ export default {
        },
     options: [{
         value: '1',
-        label: '文字消息'
-    }, {
-        value: '2',
-        label: '图文消息'
-    }],
+            label: '文字消息'
+        }, {
+            value: '2',
+            label: '图文消息'
+        },
+        {
+        value: '3',
+            label: '语音消息'
+        }, {
+            value: '4',
+            label: '视频消息'
+        }],
     value: '',
     dataRule: {
           keywords: [
@@ -79,16 +86,12 @@ export default {
         this.visible=true
         }else{
           this.$http({
-              url: this.$http.adornUrl(`/sys/weChat/keyReply/info/${this.dataForm.id}`),
+              url: this.$http.adornUrl(``),
               method: 'get',
               params: this.$http.adornParams()
             }).then(({ data }) => {
               if (data && data.code === 0) {
-                this.dataForm.keywords = data.role.keywords
-                this.dataForm.matchMode.radio.label = data.radio.label
-                this.dataForm.replyType = data.replyType
-                this.replyContent = data.replyContent
-                this.visible = true
+               
               }else{
                 alert('数据获取失败！')
               }

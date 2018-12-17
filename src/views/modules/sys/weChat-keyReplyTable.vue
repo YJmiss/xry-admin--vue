@@ -1,6 +1,7 @@
 <template>
     <div class="keyReply">
      <el-button type="primary" class="addKeyWords" @click="addOrUpdateHandle()">添加关键词</el-button>
+     <el-button type="primary" class="addKeyWords"  @click="firstFollowHandle()">首次关注设置</el-button>
      <el-table :data="dataForm" border>
     <el-table-column prop="id" label="序号" width="250">
     </el-table-column>
@@ -13,24 +14,28 @@
     <el-table-column prop="replyContent" label="回复内容" width="250">
     </el-table-column>
      <el-table-column  fixed="right" header-align="center" align="left" label="操作" >
-        <template slot-scope="scope" porp="status" >
-          <el-button  type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
-          <el-button  type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
-        </template>
-      </el-table-column>
+      <template slot-scope="scope">
+        <el-button  type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
+        <el-button  type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
+      </template>
+    </el-table-column>
    </el-table>
     <!-- 弹窗, 新增 / 修改 -->
-    <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate"></add-or-update>
+    <add-or-update v-show="addOrUpdateVisible" ref="addOrUpdate"></add-or-update>
+    <!-- 首次关注设置 -->
+    <first-follow v-show="firstFollowVisible" ref="FirstFollow"></first-follow>
     </div>
 </template>
 <script>
 import { treeDataTranslate } from '@/utils'
 import AddOrUpdate from './weChat-keyReplyAddorUpdate'
+import FirstFollow from './weChat-firstFollowForm'
 export default {
-  components:{AddOrUpdate},
+  components:{AddOrUpdate,FirstFollow},
   data() {
     return {
     addOrUpdateVisible:false,
+    firstFollowVisible:false,
      dataForm:[{
         id:1,
         keyword:'母婴',
@@ -41,12 +46,19 @@ export default {
   }
   },
   methods: {
-     // 新增 / 修改
+     // 关键词新增或修改
       addOrUpdateHandle (id) {
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
         this.$refs.addOrUpdate.init(id)
         })
+      },
+      //首次关注设置
+      firstFollowHandle(){
+       this.firstFollowVisible = true
+       this.$nextTick(() =>{
+       this.$refs.FirstFollow.init()
+       })
       },
        // 删除
       deleteHandle (id) {
@@ -98,7 +110,7 @@ body {
 }
 .addKeyWords {
   float: left;
-  width: 200px;
+  width: 120px;
   height: 40px;
   margin:0 auto 30px 18px;
 }
