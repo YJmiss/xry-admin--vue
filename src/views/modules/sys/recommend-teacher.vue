@@ -15,10 +15,10 @@
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-      <el-table-column header-align="center" align="center" label="认证账号" width="300">
+      <el-table-column header-align="center" align="center" label="认证账号" width="200">
         <template slot-scope="scope">
-          <el-tag size="small" type="warning">{{scope.row.nickname}}</el-tag>
-          <el-tag size="small" type="success">{{scope.row.userPhone}}</el-tag>
+          <span size="small" type="warning">{{scope.row.nickname}}</span>&nbsp;/&nbsp;
+          <span size="small" type="success">{{scope.row.userPhone}}</span>
         </template>  
       </el-table-column>
       <el-table-column prop="real_name" header-align="center" align="center" label="真实名字" width="150"></el-table-column>
@@ -30,25 +30,29 @@
           <el-tag v-else size="small" type="success">已通过</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="type" header-align="center" align="center" label="类型" width="160">
+      <el-table-column prop="type" header-align="center" align="center" label="类型" width="120">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.type === 1" size="small" type="warning">个人认证</el-tag>
+          <el-tag v-if="scope.row.type === 1" size="small" type="warning">讲师认证</el-tag>
           <el-tag v-else size="small" type="success">机构认证</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="orgName" header-align="center" align="left" label="所属机构（机构名字）" width="300"></el-table-column>
-      <el-table-column prop="orgCode" header-align="center" align="center" label="所属机构（结构代码）" width="300"></el-table-column>
-      <el-table-column prop="recommend" header-align="center" align="center" label="是否推荐" width="150">
+      <el-table-column header-align="center" align="center" label="所属机构名称/代码" width="300">
+        <template slot-scope="scope">
+         <p>{{scope.row.orgName}}</p>
+         <p>{{scope.row.orgCode}}</p>
+        </template>
+      </el-table-column>
+      <el-table-column prop="recommend" header-align="center" align="center" label="是否推荐" width="100">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.recommend === 0" size="small" type="warning">未推荐</el-tag>
-          <el-tag v-else size="small" type="success">已推荐</el-tag>
+          <el-tag v-else-if="scope.row.recommend === 1" size="small" type="success">已推荐</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="created" header-align="center" align="center" label="创建时间" width="200"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作" prop="role">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('xry:teacher:recommendTeacher')" type="primary" round size="small" @click="recommendTeacher(scope.row.id)" v-show="scope.row.recommend == 0">推荐讲师</el-button>
-          <el-button v-if="isAuth('xry:teacher:cancelRecommend')" type="success" round size="small" @click="cancelRecommend(scope.row.id)" v-show="scope.row.recommend == 1">取消推荐</el-button>
+          <el-button v-if="isAuth('xry:teacher:recommendTeacher')" type="primary" round size="small" @click="recommendTeacher(scope.row.id)" :disabled="scope.row.recommend === 0">推荐讲师</el-button>
+          <el-button v-if="isAuth('xry:teacher:cancelRecommend')" type="success" round size="small" @click="cancelRecommend(scope.row.id)" :disabled="scope.row.recommend === 1">取消推荐</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -70,7 +74,8 @@
           orgName: '',
           orgCode: '',
           status: '',
-          created: ''
+          created: '',
+          recommend:0
         },
         dataList: [],
         pageIndex: 1,
@@ -109,6 +114,7 @@
             console.log(data)
             this.dataList = data.page.list
             this.totalPage = data.page.totalCount
+            console.log(data.page)
           } else {
             this.dataList = []
             this.totalPage = 0

@@ -40,7 +40,8 @@
       <el-table-column prop="role" header-align="center" align="center" label="角色">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.role === 0" size="small" type="success">普通用户</el-tag>
-          <el-tag v-else size="small" type="info">讲师</el-tag>
+          <el-tag v-else-if="scope.row.role === 1" size="small" type="info">讲师</el-tag>
+          <el-tag v-else-if="scope.row.role === 2" size="small" type="info">机构</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="social_source" header-align="center" align="center" label="第三方登录来源">
@@ -101,8 +102,9 @@
         ],
         roleValue: '',
         roleValues: [
-          { roleValue: '0', label: '普通用户' }, 
-          { roleValue: '1', label: '讲师' } 
+          { roleValue: '0', label: '普通用户'}, 
+          { roleValue: '1', label: '讲师' },
+          { roleValue: '2', label: '机构' } 
         ]
       }
     },
@@ -130,6 +132,7 @@
           if (data && data.code === 0) {
             this.dataList = data.page.list
             this.totalPage = data.page.totalCount
+            console.log(this.dataList)
           } else {
             this.dataList = []
             this.totalPage = 0

@@ -45,7 +45,7 @@
           <el-tag v-else size="small" type="success">课程章节更新</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="courseTitle" header-align="center" align="left" width="300" label="消息->课程"></el-table-column>
+      <el-table-column prop="courseTitle" header-align="center" align="center" width="300" label="消息->课程"></el-table-column>
       <el-table-column prop="realName" header-align="center" align="center" width="130" label="消息->讲师"></el-table-column>
       <el-table-column prop="status" header-align="center" align="center" width="150" label="发布状态">
         <template slot-scope="scope">
@@ -54,7 +54,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="publish_date" header-align="center" align="center" width="200" label="发布日期"></el-table-column>
-      <el-table-column prop="info" header-align="center" align="left" label="具体信息" width="350">
+      <el-table-column prop="info" header-align="center" align="center" label="具体信息" width="350">
         <template slot-scope="scope">
           <el-popover ref="detailPopover" placement="top-start" trigger="hover">
             <span>点击查看详情</span>
@@ -62,7 +62,7 @@
           <el-button show-overflow-tooltip size="small" type="text" v-popover:detailPopover @click="showDetail(scope.row.info)">{{scope.row.info}}</el-button>
         </template>
       </el-table-column>
-      <el-table-column fixed="right" header-align="center" align="left" width="230" label="操作">
+      <el-table-column fixed="right" header-align="center" align="center" width="230" label="操作">
         <template slot-scope="scope" porp="status">
           <el-button v-if="isAuth('xry:message:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
           <el-button v-if="isAuth('xry:message:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
@@ -96,7 +96,7 @@
           courseTitle:'',
           realName:'',
           parentName:'',
-          teacherName:''
+          teacherName:'',
         },
         dataList: [],
         pageIndex: 1,
@@ -166,6 +166,7 @@
               if (data && data.code === 0) {
                 this.dataList = data.page.list
                 this.totalPage = data.page.totalCount
+                console.log(this.dataList)
               } else {
                 this.dataList = []
                 this.totalPage = 0

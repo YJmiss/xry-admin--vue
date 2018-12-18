@@ -17,10 +17,11 @@
         <el-popover ref="courseCatalogListPopover" placement="bottom-start" trigger="click">
           <el-tree :data="courseCatalogList" :props="courseCatalogListTreeProps" node-key="catalogId" ref="courseCatalogListTree"
             @current-change="courseCatalogListTreeCurrentChangeHandle" :default-expand-all="true"
-            :highlight-current="true" :expand-on-click-node="false">
+            :highlight-current="true" :expand-on-click-node="false" v-show="contentVisible">
           </el-tree>
+          <span v-show="tipVisible" class="red">请先选择所属课程!</span>
         </el-popover>
-        <el-input v-model="dataForm.catalogName" v-popover:courseCatalogListPopover :readonly="true" placeholder="点击选择所属目录" class="cat-list__input"></el-input>
+        <el-input v-model="dataForm.catalogName" v-popover:courseCatalogListPopover :readonly="true" placeholder="点击选择所属目录" class="cat-list__input" @focus="checkCourseIsSelect()"></el-input>
       </el-form-item>
       <el-form-item label="是否收费" size="mini" prop="property">
         <el-radio-group v-model="dataForm.property">
@@ -52,6 +53,8 @@
     data () {
       return {
         visible: false,
+        tipVisible:false,
+        contentVisible:true,
         roleList: [],
         fileList:[],
         index:0,
@@ -219,42 +222,26 @@
           })
         }
       },
-      // 上传之前
-      beforeUploadHandle (file) {
-        if (file.type !== 'video/mp4') {
-          this.$message.error('只支持mp4格式的视频！')
-          return false
-        }
-      },
-      //上传进度
-      progressHandle(file){
-        for(index==0;index<file.size;index++){
-        this.uplodProgress=fileList[index]/file.size
-        this.uplodProgress=this.uplodProgress*100+'%'
-        }
-        return uplodProgress
-      },
-      // 上传成功
-      successHandle(file){
-        this.progressHandle
-        if(uplodProgress=file.size){
-          this.$confirm('操作成功, 是否继续操作?', '提示', {
-            confirmButtonText: '确定',
-            cancelButtonText: '取消',
-            type: 'warning'
-          }).catch(() => {
-            this.visible = false
-          })
-        }
-      },
       // 获取富文本编辑器的内容
       getVideoURL() {
         let content = this.$refs.ue.getUEContent();
         return $(content).find("video").attr("src");
+      },
+      //判断是否已选择所属课程
+      checkCourseIsSelect(){
+       if(!this.dataForm.courseName){
+       this.tipVisible = true
+       this.contentVisible =false
+       }else{
+       this.tipVisible =false
+       this.contentVisible = true
+       }
       }
     }
   }
 </script>
 <style scoped>
-
+.red{
+  color: red; 
+ }
 </style>

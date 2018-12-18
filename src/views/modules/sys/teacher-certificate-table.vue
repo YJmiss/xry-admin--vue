@@ -15,13 +15,13 @@
       </el-form>
       <el-table :data="dataList" v-loading="dataListLoading" @selection-change="selectionChangeHandle" border style="width: 100%">
         <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-        <el-table-column prop="nickname" header-align="center" align="center" label="账号/昵称" width="300">
+        <el-table-column prop="nickname" header-align="center" align="center" label="账号/昵称" width="200">
           <template slot-scope="scope">
            <span>{{scope.row.nickname}}</span>&nbsp;/&nbsp;<span>{{scope.row.userPhone}}</span>
           </template>    
         </el-table-column>
         <el-table-column prop="real_name" header-align="center" align="center" label="讲师姓名" width="150"></el-table-column>
-        <el-table-column prop="orgName" header-align="center" align="left" label="所属机构" width="350"></el-table-column>
+        <el-table-column prop="orgName" header-align="center" align="center" label="所属机构" width="250"></el-table-column>
         <el-table-column prop="id_card" header-align="center" align="center" label="身份证号" width="250"></el-table-column>
         <el-table-column prop="type" header-align="center" align="center" label="类型" width="100">
           <template slot-scope="scope">

@@ -36,6 +36,7 @@
           <el-button type="primary" round>选择图片</el-button>
           <div class="el-upload__tip" slot="tip">只支持jpg、png、gif/格式的图片！</div>
         </el-upload>
+        <img :src="url" v-model="dataForm.image" v-show="imageVisible">
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -50,6 +51,7 @@
   export default {
     data () {
       return {
+        imageVisible:false,
         dataForm: {
           id: 0,
           title: '',
@@ -137,6 +139,7 @@
                   this.dataForm.image = data.course.image
                   this.courseCatListTreeSetCurrentNode()
                   this.teacherListTreeSetCurrentNode()
+                  this.imageVisible = true
                 }
               })
             } else {

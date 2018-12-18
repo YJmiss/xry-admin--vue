@@ -18,16 +18,16 @@
       </el-form>
       <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
         <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-        <el-table-column prop="nickname" header-align="center" align="center" label="账号/昵称" width="300">
+        <el-table-column prop="nickname" header-align="center" align="center" label="账号/昵称" width="200">
           <template slot-scope="scope">
            <span>{{scope.row.nickname}}</span> &nbsp;/&nbsp; <span>{{scope.row.phone}}</span>
           </template>      
         </el-table-column>
-        <el-table-column prop="org_name" header-align="center" align="center" label="机构名称" width="300"></el-table-column>
-        <el-table-column prop="org_code" header-align="center" align="center" label="机构代码" width="200px"></el-table-column>
+        <el-table-column prop="org_name" header-align="center" align="center" label="机构名称" width="200"></el-table-column>
+        <el-table-column prop="org_code" header-align="center" align="center" label="机构代码" width="180px"></el-table-column>
         <el-table-column prop="corporator" header-align="center" align="center" label="法人姓名" width="100"></el-table-column>
         <el-table-column prop="id_card" header-align="center" align="center" label="法人证件号" width="180px"></el-table-column>
-        <el-table-column prop="contact" header-align="center" align="center" label="联系方式" width="160"></el-table-column>
+        <el-table-column prop="contact" header-align="center" align="center" label="联系方式" width="140"></el-table-column>
         <el-table-column prop="status" header-align="center" align="center" label="认证状态" width="80px">
           <template slot-scope="scope">
             <el-tag v-if="scope.row.status === 1" size="small" type="info">认证中</el-tag>
