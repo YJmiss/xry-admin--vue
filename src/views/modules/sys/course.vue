@@ -61,7 +61,7 @@
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
   </div>
-</template>
+  </template>
 
 <script>
   import { treeDataTranslate } from '@/utils'

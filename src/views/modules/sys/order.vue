@@ -2,7 +2,7 @@
     <div class="orderList">
      <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item label="订单ID">
-        <el-input v-model="dataForm.id" placeholder="请输入订单编号" clearable></el-input>
+        <el-input v-model="dataForm.orderId" placeholder="请输入订单编号" clearable></el-input>
       </el-form-item>
       <el-form-item label="订单状态">
        <el-select v-model="dataForm.status" placeholder="请选择">
@@ -11,23 +11,23 @@
       </el-select>
       </el-form-item>
        <el-form-item label="买家电话">
-        <el-input v-model="dataForm.phone" placeholder="输入买家手机号" clearable></el-input>
+        <el-input v-model="dataForm.buyerPhone" placeholder="输入买家手机号" clearable></el-input>
       </el-form-item>
       <el-form-item label="下单时间">
-        <el-date-picker v-model="dataForm.created" type="datetime" placeholder="选择日期时间"></el-date-picker>
+        <el-date-picker v-model="dataForm.createTime" type="datetime" placeholder="选择日期时间"></el-date-picker>
       </el-form-item>
      
       <el-button type="primary" @click="getDataList()">查询</el-button>
       </el-form>
       <el-table :data="dataList" border style="width: 100%;" >
-      <el-table-column prop="id" header-align="center" align="center" width="200" label="订单ID"></el-table-column>
-      <el-table-column prop="phone" header-align="center" align="center" width="150" label="买家电话"></el-table-column>
-      <el-table-column prop="payMent" header-align="center" align="center" width="80" label="实付金额"></el-table-column>
+      <el-table-column prop="orderId" header-align="center" align="center" width="200" label="订单ID"></el-table-column>
+      <el-table-column prop="buyerPhone" header-align="center" align="center" width="120" label="买家电话"></el-table-column>
+      <el-table-column prop="payment" header-align="center" align="center" width="80" label="实付金额"></el-table-column>
       <el-table-column prop="totalFee" header-align="center" align="center" width="95" label="订单总金额"></el-table-column>
-      <el-table-column prop="payType" header-align="center" align="center" width="120" label="支付方式">
+      <el-table-column prop="paymentType" header-align="center" align="center" width="120" label="支付方式">
          <template slot-scope="scope">
-          <p v-if="scope.row.payType === 1" size="small" type="info">微信支付</p>
-          <p v-else-if="scope.row.payType === 2" size="small" type="danger">支付宝</p>
+          <p v-if="scope.row.paymentType === 0" size="small" type="info">微信支付</p>
+          <p v-else-if="scope.row.paymentType === 1" size="small" type="danger">支付宝</p>
         </template>
       </el-table-column>
       <el-table-column prop="status" header-align="center" align="center" width="120" label="订单状态">
@@ -38,14 +38,14 @@
           <el-tag v-else-if="scope.row.status === 4" size="small" type="danger">交易关闭</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="created" header-align="center" align="center" label="下单时间"></el-table-column>
+      <el-table-column prop="createTime" header-align="center" align="center" label="下单时间"></el-table-column>
       <el-table-column prop="updateTime" header-align="center" align="center" label="更新时间"></el-table-column>
       <el-table-column prop="paymentTime" header-align="center" align="center" label="付款时间"></el-table-column>
       <el-table-column prop="endTime" header-align="center" align="center" label="完成时间"></el-table-column>
       <el-table-column prop="closeTime" header-align="center" align="center" label="关闭时间"></el-table-column>
-      <el-table-column fixed="right" header-align="center" align="center" label="操作" width="80">
+      <el-table-column fixed="right" header-align="center" align="center" label="操作" width="100">
         <template slot-scope="scope">
-        <el-button v-if="isAuth('xry:order:info')" type="info" class="el-icon-message" @click="viewOrderInfo(scope.row.id)">详情</el-button>
+        <el-button v-if="isAuth('xry:order:info')" type="primary" @click="viewOrderInfo(scope.row.orderId)">详情</el-button>
         </template>
       </el-table-column>
      </el-table>
@@ -68,13 +68,13 @@
             pageSize: 12,
             totalPage: 0,
             dataForm:{
-                id:'',
-                status:0, //支付状态：1、未付款，2、已付款，3、交易成功，4、交易关闭
-                phone:'',  
-                payMent:'', //实付总金额
+                orderId:'',
+                status:'', //支付状态：1、未付款，2、已付款，3、交易成功，4、交易关闭
+                buyerPhone:'',  
+                payment:'', //实付总金额
                 totalFee:'', //课程总金额
-                payType:0, //支付类型 1微信支付 2支付宝支付
-                created:'', //订单创建时间
+               paymentType:0, //支付类型 0微信支付 1支付宝支付
+                createTime:'', //订单创建时间
                 updateTime:'',//订单更新时间
                 paymentTime:'', //付款时间
                 endTime:'', //交易完成时间
@@ -96,26 +96,23 @@
         }
     },
      activated () {
-      //this.getDataList()
+      this.getDataList()
     },
     methods:{
         //获取数据
     getDataList () {
         this.$http({
-               url:this.$http.adornUrl('/xry/order/list'),
+               url:this.$http.adornUrl('/api/appOrder/list'),
                method:'get',
                params:this.$http.adornParams({
                 'page': this.pageIndex,
                 'limit': this.pageSize,
-                'orderId':this.dataForm.id,
-                'status':this.dataForm.status,
-                'buyerPhone' :this.dataForm.phone,
-                'createTime':this.dataForm.created
                })
             }).then(({data}) => {
                 if(data && data.code === 0){
+                  console.log(data)
                  this.dataList = data.page.list
-                 this.totalPage = data.page.totalCount
+                 this.totalPage = data.page.totalCount 
                 }else {
                 this.dataList = []
                 this.totalPage = 0
@@ -134,10 +131,10 @@
         this.getDataList()
       },
       //查看订单详情
-      viewOrderInfo(id){
+      viewOrderInfo(orderId){
        this.infoVisible = true
        this.$nextTick(() => {
-       this.$refs.OrderInfo.getDataList(id)
+       this.$refs.OrderInfo.getDataList(orderId)
        })
       }
     }

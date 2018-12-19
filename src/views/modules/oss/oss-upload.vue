@@ -12,6 +12,10 @@
     </el-upload>
     </el-form-item>
     </el-form>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="visible = false">取消</el-button>
+      <el-button type="primary" @click="closeHandle ()">确定</el-button>
+    </span>
   </el-dialog>
 </template>
 
@@ -54,6 +58,7 @@
       closeHandle () {
         this.fileList = []
         this.$emit('refreshDataList')
+        this.visible =false
       },
       // 上传后预览图片
       showUploadImg (img, url) {
