@@ -12,22 +12,15 @@
       </el-form-item>
       <el-form-item label="父类目" prop="parentName" v-show="parentShow"> 
         <el-popover ref="courseCatListPopover" placement="bottom-start" trigger="click">
-          <el-tree :data="courseCatList" :props="courseCatListTreeProps" node-key="id" ref="courseCatListTree"
-            @current-change="courseCatListTreeCurrentChangeHandle" :default-expand-all="true"
+          <el-tree :data="courseCatList" :props="courseCatListTreeProps" node-key="id" ref="courseCatListTree" @current-change="courseCatListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input  v-model="dataForm.parentName"  v-popover:courseCatListPopover placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
+        <el-input  v-model="dataForm.parentName" v-popover:courseCatListPopover placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="排列序号" prop="sortOrder">
         <el-input-number v-model="dataForm.sortOrder" controls-position="right" :min="0" placeholder="排列序号"></el-input-number>
       </el-form-item>
-      <!-- <el-form-item label="状态" size="mini" prop="status">
-        <el-radio-group v-model="dataForm.status">
-          <el-radio :label="1">正常</el-radio>
-          <el-radio :label="2">删除</el-radio>
-        </el-radio-group>
-      </el-form-item> -->
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>

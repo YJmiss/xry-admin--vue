@@ -206,24 +206,28 @@
     },
     closeDialog() {
       let upload_list = document.getElementsByClassName("el-upload-list__item");
-      console.log(upload_list)
       upload_list[0].remove();
     },
       // 表单提交
       dataFormSubmit () {
         if (1 == this.dataForm.category || 3 == this.dataForm.category) {
           if (!this.validateCourse()&&this.dataForm.parentName) {
+            this.dataForm.url = ""
             this.dataSubmit()  
-          }  
+          } else {
+            this.dataForm.url = ""
+          }   
         } else {
           if (!this.validateURL()&&this.dataForm.url) {
+            this.dataForm.parentName = ""
             this.dataSubmit()  
-          } 
+          } else {
+            this.dataForm.parentName = ""
+          }
         }
       },
       dataSubmit () {
         this.$refs['dataForm'].validate((valid) => {
-          console.log(this.dataForm.course_id)
           if (valid) {
             this.$http({
               url: this.$http.adornUrl(`/xry/content/${!this.dataForm.id ? 'save' : 'update'}`),
@@ -286,7 +290,7 @@
             return;
           }).catch(() => {
           }); 
-        }else {
+        } else {
           validateURL = true;
         }
       }   

@@ -55,7 +55,8 @@
           parentName: '',
           teacherName:'',
           realName:'',
-          status:1
+          status:0,
+          info:''
         },
         num: 0,
         successNum: 0,
@@ -64,6 +65,7 @@
         dataListSelections: [],
         visible: false,
         dataRule: {
+          info: [{ required: true, message: "请填写具体消息", trigger: "blur" }]
         },
         courseList: [],
         courseListTreeProps: {
@@ -149,87 +151,90 @@
       },
       // 表单提交
       dataFormSubmit () {
-        if (!this.dataValidate()) {
-
-        } else {
-          this.$refs['dataForm'].validate((valid) => {
-            if (valid) {
-              this.$http({
-                url: this.$http.adornUrl(`/xry/message/${!this.dataForm.id ? 'save' : 'update'}`),
-                method: 'post',
-                data: this.$http.adornData({
-                  'id': this.dataForm.id || undefined,
-                  'msgType': this.dataForm.msgType,
-                  'courseType': this.dataForm.courseType,
-                  'objId': this.dataForm.objId,
-                  'status':this.dataForm.status,
-                  'userId': this.dataForm.userId,
-                  'publishDate': this.dataForm.publishDate,
-                  'info': this.dataForm.info
-                })
-              }).then(({ data }) => {
-                if (data && data.code === 0) {
-                  this.$message({
-                    message: '操作成功',
-                    type: 'success',
-                    duration: 1500,
-                    onClose: () => {
-                      this.visible = false
-                      this.$emit('refreshDataList')
-                    }
-                  })
-                } else {
-                  this.$message.error(data.msg)
-                }
+        if (this.dataForm.msgType == 1) {
+          // 课程校验
+          if (!this.validateCourse()&&this.dataForm.parentName) {
+            this.dataForm.teacherName = ""
+            this.dataSubmit() 
+          } else {
+            this.dataForm.teacherName = ""
+          }
+        } else if (this.dataForm.msgType == 2) {
+          // 讲师校验
+          if (!this.validateTeacher()&&this.dataForm.teacherName) {
+            this.dataForm.parentName = ""
+            this.dataSubmit() 
+          } else {
+            this.dataForm.parentName = ""
+          }
+        }
+      },
+      dataSubmit () {
+        console.log(this.dataForm.status)
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.$http({
+              url: this.$http.adornUrl(`/xry/message/${!this.dataForm.id ? 'save' : 'update'}`),
+              method: 'post',
+              data: this.$http.adornData({
+                'id': this.dataForm.id || undefined,
+                'msgType': this.dataForm.msgType,
+                'courseType': this.dataForm.courseType,
+                'objId': this.dataForm.objId,
+                'status':this.dataForm.status,
+                'userId': this.dataForm.userId,
+                'publishDate': this.dataForm.publishDate,
+                'info': this.dataForm.info
               })
-            }
-          })
+            }).then(({ data }) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible = false
+                    this.$emit('refreshDataList')
+                  }
+                })
+              } else {
+                this.$message.error(data.msg)
+              }
+            })
+          }
+        })
+      },
+      // 校验form表单
+      validateCourse () {
+        let isPass = false;
+        if (!this.dataForm.parentName) {
+          this.$confirm(`请选择课程`, '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            return;
+          }).catch(() => {
+          });
+        } else {
+          isPass = true
         }
       },
       // 校验form表单
-      dataValidate () {
+      validateTeacher () {
         let isPass = false;
-        if (this.dataForm.msgType == 1) {
-          // 课程消息
-          if (!this.dataForm.parentName) {
-            this.$confirm(`请选择课程`, '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              type: 'warning'
-            }).then(() => {
-              isPass = false
-            })
-          } else {
-            isPass = true
-          }
-        } else if (this.dataForm.msgType == 2) {
-          // 我关注的
-          if (!this.dataForm.teacherName) {
-            this.$confirm(`请选择讲师`, '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              type: 'warning'
-            }).then(() => {
-              isPass = false;
-            })
-          } else {
-            isPass = true
-          }
-        } else if (this.dataForm.msgType == 3) {
-          // 平台消息
-          if (!this.dataForm.info) {
-            this.$confirm(`请填写具体消息`, '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              type: 'warning'
-            }).then(() => {
-              isPass = false;
-            })
-          } else {
-            isPass = true
-          }
+        if (!this.dataForm.teacherName) {
+          this.$confirm(`请选择讲师`, '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            return;
+          }).catch(() => {
+          }); 
+        } else {
+          isPass = true
         }
-        return isPass;
       }
     }
   }

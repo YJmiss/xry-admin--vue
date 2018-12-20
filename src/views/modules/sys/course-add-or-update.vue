@@ -27,7 +27,7 @@
           <el-radio :label="2">免费</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="课程价格" prop="price">
+      <el-form-item label="课程价格" prop="price" v-show="dataForm.property == 1">
         <el-input class="course-price" v-model="dataForm.price" type="text" placeholder="课程价格"></el-input>
         <p class="price-tip">单位：（元）</p>
       </el-form-item>
@@ -36,7 +36,6 @@
           <el-button type="primary" round>选择图片</el-button>
           <div class="el-upload__tip" slot="tip">只支持jpg、png、gif/格式的图片！</div>
         </el-upload>
-         <!-- <ul class="el-upload-img el-upload-list__item is-success" v-show="imageVisible" @click="handleRemove()"></ul> -->
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -86,7 +85,6 @@ export default {
         status: [
           { required: true, message: "请设置课程审核状态", trigger: "blur" }
         ],
-        price: [{ required: true, message: "请填写课程价格", trigger: "blur" }],
         image: [
           { required: true, message: "请上传课程封面图", trigger: "blur" }
         ]
@@ -105,30 +103,24 @@ export default {
   },
   methods: {
     init(id) {
-      this.url = this.$http.adornUrl(
-        `/sys/oss/uploadImg?token=${this.$cookie.get("token")}`
-      );
+      this.url = this.$http.adornUrl(`/sys/oss/uploadImg?token=${this.$cookie.get("token")}`);
       this.dataForm.id = id || 0;
       // 查询所有课程类目，构造成一棵树
       this.$http({
         url: this.$http.adornUrl("/xry/course/cat/treeCourseCat"),
         method: "get",
         params: this.$http.adornParams()
-      })
-        .then(({ data }) => {
+      }).then(({ data }) => {
           this.courseCatList = treeDataTranslate(data.courseCatList, "id");
-        })
-        .then(() => {
+        }).then(() => {
           // 查询讲师列表，构造成一棵树
           this.$http({
             url: this.$http.adornUrl("/xry/teacher/treeTeacher"),
             method: "get",
             params: this.$http.adornParams()
-          })
-            .then(({ data }) => {
+          }).then(({ data }) => {
               this.teacherList = treeDataTranslate(data.teacherList, "id");
-            })
-            .then(() => {
+            }).then(() => {
               this.visible = true;
               this.$nextTick(() => {
                 // 重置form表单（清空form表单的内容）
@@ -136,13 +128,10 @@ export default {
                 // 清除el-upload上次操作数据
                 this.$refs.upload.clearFiles();
               });
-            })
-            .then(() => {
+            }).then(() => {
               if (this.dataForm.id) {
                 this.$http({
-                  url: this.$http.adornUrl(
-                    `/xry/course/info/${this.dataForm.id}`
-                  ),
+                  url: this.$http.adornUrl(`/xry/course/info/${this.dataForm.id}`),
                   method: "get",
                   params: this.$http.adornParams()
                 }).then(({ data }) => {
@@ -174,8 +163,7 @@ export default {
     // 课程类目树设置当前选中节点
     courseCatListTreeSetCurrentNode() {
       this.$refs.courseCatListTree.setCurrentKey(this.dataForm.cid);
-      this.dataForm.parentName = (this.$refs.courseCatListTree.getCurrentNode() ||
-        {})["name"];
+      this.dataForm.parentName = (this.$refs.courseCatListTree.getCurrentNode() || {})["name"];
     },
     // 讲师树选中
     teacherListTreeCurrentChangeHandle(data, node) {
@@ -185,18 +173,23 @@ export default {
     // 讲师树设置当前选中节点
     teacherListTreeSetCurrentNode() {
       this.$refs.teacherListTree.setCurrentKey(this.dataForm.tid);
-      this.dataForm.teacherName = (this.$refs.teacherListTree.getCurrentNode() ||
-        {})["realName"];
+      this.dataForm.teacherName = (this.$refs.teacherListTree.getCurrentNode() || {})["realName"];
+    },
+    dataFormSubmit () {
+      if (1 == this.dataForm.property) {
+        if (!this.validatePrice()&&this.dataForm.price) {
+          this.dataSubmit()  
+        }  
+      } else {
+        this.dataSubmit()  
+      }
     },
     // 表单提交
-    dataFormSubmit() {
-      console.log(this.dataForm.image);
+    dataSubmit() {
       this.$refs["dataForm"].validate(valid => {
         if (valid) {
           this.$http({
-            url: this.$http.adornUrl(
-              `/xry/course/${!this.dataForm.id ? "save" : "update"}`
-            ),
+            url: this.$http.adornUrl(`/xry/course/${!this.dataForm.id ? "save" : "update"}`),
             method: "post",
             data: this.$http.adornData({
               id: this.dataForm.id || undefined,
@@ -226,6 +219,23 @@ export default {
         }
       });
     },
+    // 校验form表单
+    validatePrice () {
+      let validatePrice = false;
+      // 单独校验"所属课程"
+      if (!this.dataForm.price) {
+        this.$confirm(`请填写课程价格`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          return;
+        }).catch(() => {
+        }); 
+      } else {
+        validatePrice = true;
+      }
+    },
     // 上传之前
     beforeUploadHandle(file) {
       if (
@@ -250,9 +260,7 @@ export default {
     // 上传后预览图片
     showUploadImg(img) {
       this.$nextTick(() => {
-        let upload_list_li = document.getElementsByClassName(
-          "el-upload-list"
-        )[0].children;
+        let upload_list_li = document.getElementsByClassName("el-upload-list")[0].children;
         for (let i = 0; i < upload_list_li.length; i++) {
           let li_a = upload_list_li[i].children[0];
           let imgElement = document.createElement("img");
@@ -292,7 +300,6 @@ export default {
     },
     closeDialog() {
       let upload_list = document.getElementsByClassName("el-upload-list__item");
-      console.log(upload_list)
       upload_list[0].remove();
     }
   }

@@ -39,8 +39,8 @@
         <template slot-scope="scope">
           <el-button v-if="isAuth('xry:course:cat:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
           <el-button v-if="isAuth('xry:course:cat:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
-          <el-button v-if="isAuth('xry:course:cat:toUse')" type="success" round size="small" v-show="scope.row.status === 2" @click="courseCatToUse(scope.row.id)">启用类目</el-button>
-          <el-button v-if="isAuth('xry:course:cat:toDisable')" type="warning" round size="small" v-show="scope.row.status === 1" @click="courseCatToDisable(scope.row.id)">禁用类目</el-button>
+          <el-button v-if="isAuth('xry:course:cat:toUse')" type="success" round size="small" v-show="scope.row.status === 2 && scope.row.parentId !==0" @click="courseCatToUse(scope.row.id)">启用类目</el-button>
+          <el-button v-if="isAuth('xry:course:cat:toDisable')" type="warning" round size="small" v-show="scope.row.status === 1 && scope.row.parentId !==0" @click="courseCatToDisable(scope.row.id)">禁用类目</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -61,7 +61,8 @@
       return {
         dataForm: {
           parentName: '',
-          status: ''
+          status: '',
+          parentId:''
         },
         courseCatList: [],
         courseCatListTreeProps: {
