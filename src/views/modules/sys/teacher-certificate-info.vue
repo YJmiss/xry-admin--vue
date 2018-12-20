@@ -27,6 +27,9 @@
           <img :src="dataForm.id_card_front">
           <img :src="dataForm.id_card_back">
         </el-form-item>
+        <el-form-item label="简介：" width="100">
+          <div>{{dataForm.brief_intro}}</div>
+        </el-form-item>
       </el-form>
     </el-dialog>
   </div>
@@ -48,6 +51,7 @@ import { treeDataTranslate } from '@/utils'
           id_card_back:'',
           real_name:'',
           org_name:'',
+          brief_intro:'',
           type:'',
           status: '',
           user_id:'',
@@ -80,6 +84,7 @@ import { treeDataTranslate } from '@/utils'
               this.dataForm.created = data.teacher.created
               this.dataForm.userName = data.teacher.userName
               this.dataForm.userPhone = data.teacher.userPhone
+              this.dataForm.brief_intro = data.teacher.brief_intro
             }
           })
         }
