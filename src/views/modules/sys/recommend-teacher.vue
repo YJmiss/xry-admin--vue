@@ -4,9 +4,9 @@
       <el-form-item label="真实名字">
         <el-input v-model="dataForm.realName" placeholder="请填写真实名字" clearable></el-input>
       </el-form-item>
-      <el-form-item label="状态">
-          <el-select v-model="dataForm.status" placeholder="请选择状态" @change="socialSourceCurrentSel">
-            <el-option v-for="item in statusValues" :key="item.statusValue" :label="item.label" :value="item.statusValue"></el-option>
+      <el-form-item label="推荐状态">
+          <el-select v-model="dataForm.recommend" placeholder="请选择状态" @change="socialSourceCurrentSel">
+            <el-option v-for="item in recommendValues" :key="item.value" :label="item.label" :value="item.value"></el-option>
           </el-select>
       </el-form-item>
       <el-form-item>
@@ -36,10 +36,10 @@
           <el-tag v-else size="small" type="success">机构认证</el-tag>
         </template>
       </el-table-column>
-      <el-table-column header-align="center" align="center" label="所属机构名称/代码" width="300">
+      <el-table-column prop="orgName" header-align="center" align="center" label="所属机构名称" width="200">
         <template slot-scope="scope">
-         <p v-if="scope.row.orgCode = ''">该讲师暂无所属机构</p>
-         <p v-else>{{scope.row.orgName}}<br>{{scope.row.orgCode}}</p> 
+         <p v-if="scope.row.orgName === ''">{{dataForm.nullMsg}}</p>
+         <p v-else>{{scope.row.orgName}}</p> 
         </template>
       </el-table-column>
       <el-table-column prop="recommend" header-align="center" align="center" label="是否推荐" width="100">
@@ -51,8 +51,8 @@
       <el-table-column prop="created" header-align="center" align="center" label="创建时间" width="200"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作" prop="role">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('xry:teacher:recommendTeacher')" type="primary" round size="small" @click="recommendTeacher(scope.row.id)" :disabled="scope.row.recommend === 0">推荐讲师</el-button>
-          <el-button v-if="isAuth('xry:teacher:cancelRecommend')" type="success" round size="small" @click="cancelRecommend(scope.row.id)" :disabled="scope.row.recommend === 1">取消推荐</el-button>
+          <el-button v-if="isAuth('xry:teacher:recommendTeacher')" type="primary" round size="small" @click="recommendTeacher(scope.row.id)" :disabled="scope.row.recommend === 1">推荐讲师</el-button>
+          <el-button v-if="isAuth('xry:teacher:cancelRecommend')" type="success" round size="small" @click="cancelRecommend(scope.row.id)" :disabled="scope.row.recommend === 0">取消推荐</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -73,9 +73,10 @@
           id_card:'',
           orgName: '',
           orgCode: '',
-          status: '',
+          status: 0,
           created: '',
-          recommend:0
+          recommend:'',
+          nullMsg:'该讲师暂无所属机构'
         },
         dataList: [],
         pageIndex: 1,
@@ -84,11 +85,10 @@
         dataListLoading: false,
         dataListSelections: [],
         addOrUpdateVisible: false,
-        statusValue: '',
-        statusValues: [
-          { statusValue: '1', label: '认证中' }, 
-          { statusValue: '2', label: '未通过' },
-          { statusValue: '3', label: '已通过' }
+         Value: '',
+        recommendValues: [
+          { Value: '0', label: '未推荐' }, 
+          { Value: '1', label: '已推荐' },
         ]
       }
     },
@@ -107,15 +107,14 @@
             'page': this.pageIndex,
             'limit': this.pageSize,
             'realName': this.dataForm.real_name,
-            'status': this.dataForm.status
+            'recommend': this.dataForm.recommend
           })
         }).then(({ data }) => {
           if (data && data.code === 0) {
             console.log(data)
             this.dataList = data.page.list
             this.totalPage = data.page.totalCount
-            console.log(data.page)
-          } else {
+           } else {
             this.dataList = []
             this.totalPage = 0
           }

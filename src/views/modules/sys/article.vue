@@ -1,7 +1,7 @@
 <template>
   <div class="mod-course">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item label="文章分类" prop="parentName"> 
+      <el-form-item label="相关类别" prop="parentName"> 
         <el-popover ref="courseCatListPopover" placement="bottom-start" trigger="click">
           <el-tree :data="courseCatList" :props="courseCatListTreeProps" node-key="id" ref="courseCatListTree" @current-change="courseCatListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">
@@ -21,26 +21,26 @@
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
       <!-- <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column> -->
-      <el-table-column prop="catName" header-align="center" align="left" width="250" label="文章分类"></el-table-column>
-      <el-table-column prop="title" header-align="center" align="left" width="320" label="课程标题"></el-table-column>
+      <el-table-column prop="catName" header-align="center" align="center" width="150" label="相关类别"></el-table-column>
+      <el-table-column prop="title" header-align="center" align="center" width="250" label="课程标题"></el-table-column>
       <el-table-column prop="share_count" header-align="center" align="center" width="100" label="分享次数"></el-table-column>
       <el-table-column prop="thumbs_count" header-align="center" align="center" width="100" label="点赞次数"></el-table-column>
       <el-table-column prop="collect_count" header-align="center" align="center" width="100" label="收藏人数"></el-table-column>
       <el-table-column prop="browse_count" header-align="center" align="center" width="100" label="浏览次数"></el-table-column>
-      <el-table-column prop="recommend" header-align="center" align="center" width="140" label="是否推荐">
+      <el-table-column prop="recommend" header-align="center" align="center" width="100" label="是否推荐">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.recommend === 1" size="small" type="success">已推荐</el-tag>
           <el-tag v-else size="small" type="info">未推荐</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="status" header-align="center" align="center" width="140" label="是否发布">
+      <el-table-column prop="status" header-align="center" align="center" width="100" label="是否发布">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === 1" size="small" type="success">已发布</el-tag>
           <el-tag v-else size="small" type="info">未发布</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="publish_time" header-align="center" align="center" width="220" label="发布时间"></el-table-column>
-      <el-table-column prop="username" header-align="center" align="center" width="220" label="创建人"></el-table-column>
+      <el-table-column prop="publish_time" header-align="center" align="center" width="180" label="发布时间"></el-table-column>
+      <el-table-column prop="username" header-align="center" align="center" width="120" label="创建人"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="left" width="250" label="操作">
         <template slot-scope="scope" porp="status">
           <el-button v-if="isAuth('xry:article:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)" :disabled="scope.row.status ===1"></el-button>

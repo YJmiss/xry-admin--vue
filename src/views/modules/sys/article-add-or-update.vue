@@ -1,13 +1,13 @@
 <template>
   <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
-      <el-form-item label="文章分类" prop="parentName"> 
+      <el-form-item label="相关类别" prop="parentName"> 
         <el-popover ref="courseCatListPopover" placement="bottom-start" trigger="click">
           <el-tree :data="courseCatList" :props="courseCatListTreeProps" node-key="id" ref="courseCatListTree" @current-change="courseCatListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input v-model="dataForm.parentName" v-popover:courseCatListPopover :readonly="true" placeholder="点击选择文章分类" class="cat-list__input"></el-input>
+        <el-input v-model="dataForm.parentName" v-popover:courseCatListPopover :readonly="true" placeholder="点击选择相关课程类别" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="文章标题" prop="title">
         <el-input v-model="dataForm.title" type="text"placeholder="文章标题"></el-input>

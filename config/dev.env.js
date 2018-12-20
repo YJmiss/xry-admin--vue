@@ -1,6 +1,6 @@
 module.exports = {
   NODE_ENV: '"development"',
   ENV_CONFIG: '"dev"',
-  BASE_API: '"http://192.168.1.30:9001/xry"'
+  BASE_API: '"http://192.168.1.27:9001/xry"'
 }
 

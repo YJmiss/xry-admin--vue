@@ -32,8 +32,8 @@
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
       <!-- <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column> -->
-      <el-table-column prop="title" header-align="center" align="left" width="320" label="课程标题"></el-table-column>
-      <el-table-column prop="catName" header-align="center" align="left" width="300" label="所属类目"></el-table-column>
+      <el-table-column prop="title" header-align="center" align="center" width="320" label="课程标题"></el-table-column>
+      <el-table-column prop="catName" header-align="center" align="center" width="300" label="所属类目"></el-table-column>
       <el-table-column prop="realName" header-align="center" align="center" width="150" label="所属讲师"></el-table-column>
       <el-table-column prop="price" header-align="center" align="center" label="课程价格（元）"></el-table-column>
       <el-table-column prop="status" header-align="center" align="center" width="150" label="审核状态">
