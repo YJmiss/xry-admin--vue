@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
+  <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible" @close='closeDialog'>
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
       <el-form-item label="广告类别">
         <template>
@@ -28,7 +28,7 @@
       <el-form-item label="内容描述" prop="titie_desc">
         <el-input type="textarea" :rows="6" placeholder="请输入内容描述" v-model="dataForm.titie_desc"></el-input>
       </el-form-item>
-      <el-form-item label="广告图片" prop="pic">
+      <el-form-item label="广告图片" prop="pic" class="imageList">
         <el-upload :action="url" ref="upload" :before-upload="beforeUploadHandle" :on-success="successHandle" multiple :file-list="fileList">
           <el-button type="primary" round>选择图片</el-button>
           <div class="el-upload__tip" slot="tip">只支持jpg、png、gif/格式的图片！</div>
@@ -59,7 +59,8 @@
           url: '',
           pic: '',
           parentName:'',
-          status: 1
+          status: 1,
+          course_id:''
         },
         visible: false,
         url: '',
@@ -123,8 +124,13 @@
                 this.dataForm.url = data.content.url
                 this.dataForm.pic = data.content.pic
                 this.dataForm.course_id = data.content.course_id
+                this.dataForm.parentName = data.content.courseTitle
                 this.dataForm.status = data.content.status
                 this.courseListTreeSetCurrentNode()
+                this.showUploadImg2(data.content.pic);
+                console.log('cid:'+data.content.course_id)
+                console.log('所属课程:'+data.content.courseTitle)
+                console.log('描述:'+data.content.title_desc)
               }
             })
           } else {
@@ -132,14 +138,14 @@
           }
         })
       },
-      // 课程类目树选中
+      // 课程树选中
       courseListTreeCurrentChangeHandle (data, node) {
-        this.dataForm.courseid = data.id
+        this.dataForm.course_id = data.id
         this.dataForm.parentName = data.title
       },
-      // 课程类目树设置当前选中节点
+      // 课程树设置当前选中节点
       courseListTreeSetCurrentNode () {
-        this.$refs.courseListTree.setCurrentKey(this.dataForm.courseid)
+        this.$refs.courseListTree.setCurrentKey(this.dataForm.course_id)
         this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
       },
        // 上传之前
@@ -172,77 +178,118 @@
           }
         })
       },
+      // 修改阅览图片el-upload-list
+      showUploadImg2(img) {
+      let ul_tag = document.createElement("ul");
+      ul_tag.setAttribute("class", "el-upload-img");
+      ul_tag.setAttribute("class", "el-upload-list__item is-success");
+      let imgElement = document.createElement("img");
+      imgElement.setAttribute("src", img);
+      imgElement.setAttribute("style", "max-width:50%;");
+      ul_tag.appendChild(imgElement);
+      let del_icon = document.createElement("i");
+      del_icon.setAttribute("class", "el-icon-close");
+      del_icon.setAttribute("style", "position:absolute;top:4px;right:4px;");
+      ul_tag.appendChild(del_icon);
+      let imageControl = document.getElementsByClassName("imageList");
+      imageControl[0].appendChild(ul_tag);
+      del_icon.addEventListener("click",function(){
+        ul_tag.setAttribute('style',"display:none")
+      })
+      this.dataForm.image = ""
+    },
+    uploadOverrun() {
+      this.$message({
+        type: "error",
+        message: "上传文件个数超出限制!只能上传1张图片!"
+      });
+    },
+    closeDialog() {
+      let upload_list = document.getElementsByClassName("el-upload-list__item");
+      console.log(upload_list)
+      upload_list[0].remove();
+    },
       // 表单提交
       dataFormSubmit () {
-        if (!this.dataValidate()) {
-
+        if (1 == this.dataForm.category || 3 == this.dataForm.category) {
+          if (!this.validateCourse()&&this.dataForm.parentName) {
+            this.dataSubmit()  
+          }  
         } else {
-          this.$refs['dataForm'].validate((valid) => {
-            if (valid) {
-              this.$http({
-                url: this.$http.adornUrl(`/xry/content/${!this.dataForm.id ? 'save' : 'update'}`),
-                method: 'post',
-                data: this.$http.adornData({
-                  'id': this.dataForm.id || undefined,
-                  'title': this.dataForm.title,
-                  'category': this.dataForm.category,
-                  'title_desc': this.dataForm.title_desc,
-                  'url': this.dataForm.url,
-                  'pic': this.dataForm.pic,
-                  'status': this.dataForm.status,
-                  'course_id': this.dataForm.course_id
-                })
-              }).then(({ data }) => {
-                if (data && data.code === 0) {
-                  this.$message({
-                    message: '操作成功',
-                    type: 'success',
-                    duration: 1500,
-                    onClose: () => {
-                      this.visible = false
-                      this.$emit('refreshDataList')
-                    }
-                  })
-                } else {
-                  this.$message.error(data.msg)
-                }
-              })
-            }
-          })
+          if (!this.validateURL()&&this.dataForm.url) {
+            this.dataSubmit()  
+          } 
         }
       },
-      // 校验form表单
-      dataValidate () {
-        let isPass = false;
-        // 单独校验"所属课程"、"跳转链接"
-        if (1 == this.dataForm.category || 3 == this.dataForm.category) {
-            // 校验"所属课程"
-            if (!this.dataForm.parentName) {
-              this.$confirm(`请选择所属课程`, '提示', {
-                confirmButtonText: '确定',
-                cancelButtonText: '取消',
-                type: 'warning'
-              }).then(() => {
-                return;
+      dataSubmit () {
+        this.$refs['dataForm'].validate((valid) => {
+          console.log(this.dataForm.course_id)
+          if (valid) {
+            this.$http({
+              url: this.$http.adornUrl(`/xry/content/${!this.dataForm.id ? 'save' : 'update'}`),
+              method: 'post',
+              data: this.$http.adornData({
+                'id': this.dataForm.id || undefined,
+                'title': this.dataForm.title,
+                'category': this.dataForm.category,
+                'title_desc': this.dataForm.title_desc,
+                'url': this.dataForm.url,
+                'pic': this.dataForm.pic,
+                'status': this.dataForm.status,
+                'course_id': this.dataForm.course_id
               })
-            } else {
-              isPass = true;
-            }
-        } else {
-          // 校验"跳转链接"
-          if (!this.dataForm.parentName) {
-            this.$confirm(`请选择跳转链接`, '提示', {
-              confirmButtonText: '确定',
-              cancelButtonText: '取消',
-              type: 'warning'
-            }).then(() => {
-              return;
+            }).then(({ data }) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible = false
+                    this.$emit('refreshDataList')
+                  }
+                })
+              } else {
+                this.$message.error(data.msg)
+              }
             })
-          }else {
-            isPass = true;
           }
+        })
+      },
+      // 校验form表单
+      validateCourse () {
+        let validateCourse = false;
+        // 单独校验"所属课程"
+        if (!this.dataForm.parentName) {
+          this.$confirm(`请选择所属课程`, '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            return;
+          }).catch(() => {
+          }); 
+        } else {
+          validateCourse = true;
         }
-      }  
+      },
+      // 校验form表单validateURL
+      validateURL () {
+        let validateURL = false;
+        // 单独校验"跳转链接"
+        if (!this.dataForm.url) {
+          this.$confirm(`请填写跳转链接`, '提示', {
+            confirmButtonText: '确定',
+            cancelButtonText: '取消',
+            type: 'warning'
+          }).then(() => {
+            return;
+          }).catch(() => {
+          }); 
+        }else {
+          validateURL = true;
+        }
+      }   
     }
   }
 </script>

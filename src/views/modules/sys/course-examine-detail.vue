@@ -2,10 +2,10 @@
   <el-dialog :title="!dataForm.id ? '新增' : '课程详情'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
       <el-form-item label="课程标题" prop="title">
-        <el-input v-model="dataForm.title" :disabled="true" type="text"placeholder="课程标题"></el-input>
+        <el-input v-model="dataForm.title" :disabled="true" type="text"></el-input>
       </el-form-item>
       <el-form-item label="所属类目" prop="parentName"> 
-        <el-popover placement="bottom-start" trigger="click">
+       <el-popover placement="bottom-start" trigger="click">
           <el-tree :data="courseCatList" node-key="id" ref="courseCatListTree" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
@@ -30,7 +30,7 @@
         <el-input class="course-price" v-model="dataForm.price" :disabled="true" type="text" placeholder="课程价格"></el-input>
         <p class="price-tip">单位：（元）</p>
       </el-form-item>
-      <el-form-item label="课程图片" prop="image">
+      <el-form-item label="课程图片" class="Image">
         <img :src="dataForm.image" alt="课程封面图">
       </el-form-item>
     </el-form>
@@ -66,6 +66,7 @@
         dataRule: {
           
         },
+        courseList:[],
         courseCatList: [],
         courseCatListTreeProps: {
           label: 'name',
@@ -91,11 +92,11 @@
         }).then(() => {
           // 查询讲师列表，构造成一棵树
           this.$http({
-            url: this.$http.adornUrl('/xry/user/treeUser'),
+            url: this.$http.adornUrl('/xry/teacher/treeTeacher'),
             method: 'get',
             params: this.$http.adornParams()
           }).then(({ data }) => {
-            this.teacherList = treeDataTranslate(data.userList, 'id')
+            this.teacherList = treeDataTranslate(data.teacherList, 'id')
           }).then(() => { 
             this.visible = true
             this.$nextTick(() => {
@@ -112,6 +113,7 @@
                 params: this.$http.adornParams()
               }).then(({ data }) => {
                 if (data && data.code === 0) {
+                  this.courseList = data.course
                   this.dataForm.id = data.course.id
                   this.dataForm.title = data.course.title
                   this.dataForm.cid = data.course.cid
@@ -122,11 +124,10 @@
                   this.dataForm.image = data.course.image
                   this.courseCatListTreeSetCurrentNode()
                   this.teacherListTreeSetCurrentNode()
+                  console.log(this.courseList)
                 }
               })
-            } else {
-              // 新增
-            }
+            } 
           })
         })
       },

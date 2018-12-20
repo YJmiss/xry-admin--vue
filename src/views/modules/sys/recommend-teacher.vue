@@ -38,8 +38,8 @@
       </el-table-column>
       <el-table-column header-align="center" align="center" label="所属机构名称/代码" width="300">
         <template slot-scope="scope">
-         <p>{{scope.row.orgName}}</p>
-         <p>{{scope.row.orgCode}}</p>
+         <p v-if="scope.row.orgCode = ''">该讲师暂无所属机构</p>
+         <p v-else>{{scope.row.orgName}}<br>{{scope.row.orgCode}}</p> 
         </template>
       </el-table-column>
       <el-table-column prop="recommend" header-align="center" align="center" label="是否推荐" width="100">

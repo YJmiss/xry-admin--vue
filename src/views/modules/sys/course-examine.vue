@@ -32,7 +32,7 @@
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
-      <el-table-column prop="title" header-align="center" align="left" label="课程标题" width="380"></el-table-column>
+      <el-table-column prop="title" header-align="center" align="center" label="课程标题" width="380"></el-table-column>
       <el-table-column prop="realName" header-align="center" align="center" label="所属讲师" width="160"></el-table-column>
       <el-table-column prop="price" header-align="center" align="center" label="课程价格（元）" width="160"></el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="审核状态">
@@ -180,7 +180,7 @@
         this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
       },
       // 每页数
-      sizeChangeHandle (val) {
+      sizeChangeHandle (val){
         this.pageSize = val
         this.pageIndex = 1
         this.getDataList()

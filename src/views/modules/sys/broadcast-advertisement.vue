@@ -33,10 +33,10 @@
           <el-tag v-else size="small" type="success">分类页广告</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="title" header-align="center" align="left" label="广告标题"></el-table-column>
-      <el-table-column prop="url" header-align="center" align="left" label="跳转链接" width="300"></el-table-column>
-      <el-table-column prop="courseTitle" header-align="center" align="left" label="所属课程" width="300"></el-table-column>
-      <el-table-column prop="pic" header-align="center" align="left" label="广告缩略图" width="100">
+      <el-table-column prop="title" header-align="center" align="center" label="广告标题"></el-table-column>
+      <el-table-column prop="url" header-align="center" align="center" label="跳转链接" width="300"></el-table-column>
+      <el-table-column prop="courseTitle" header-align="center" align="center" label="所属课程" width="300"></el-table-column>
+      <el-table-column prop="pic" header-align="center" align="center" label="广告缩略图" width="100">
         <template slot-scope="scope">
           <el-popover ref="imgPopover" placement="left" trigger="hover">
             <img class="big-img" :src="scope.row.pic"/>
@@ -125,6 +125,7 @@
               'status': this.dataForm.status
             })
           }).then(({ data }) => {
+            console.log(data)
             if (data && data.code === 0) {
               this.dataList = data.page.list
               this.totalPage = data.page.totalCount
