@@ -85,10 +85,10 @@
         dataListLoading: false,
         dataListSelections: [],
         addOrUpdateVisible: false,
-         Value: '',
+        value: '',
         recommendValues: [
-          { Value: '0', label: '未推荐' }, 
-          { Value: '1', label: '已推荐' },
+          { value: '0', label: '未推荐' }, 
+          { value: '1', label: '已推荐' },
         ]
       }
     },
@@ -106,12 +106,11 @@
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'realName': this.dataForm.real_name,
+            'realName': this.dataForm.realName,
             'recommend': this.dataForm.recommend
           })
         }).then(({ data }) => {
           if (data && data.code === 0) {
-            console.log(data)
             this.dataList = data.page.list
             this.totalPage = data.page.totalCount
            } else {
@@ -226,9 +225,8 @@
           })
         }).catch(() => {})
       },
-      // 第三方登录来源下拉选中事件
       socialSourceCurrentSel(selVal){
-        this.social_source = selVal;
+        this.recommend = selVal;
       }
     }
   }

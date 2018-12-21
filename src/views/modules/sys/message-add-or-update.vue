@@ -155,22 +155,31 @@
           // 课程校验
           if (!this.validateCourse()&&this.dataForm.parentName) {
             this.dataForm.teacherName = ""
+            this.dataForm.userId = ""
             this.dataSubmit() 
           } else {
             this.dataForm.teacherName = ""
+            this.dataForm.userId = ""
           }
         } else if (this.dataForm.msgType == 2) {
           // 讲师校验
           if (!this.validateTeacher()&&this.dataForm.teacherName) {
             this.dataForm.parentName = ""
+            this.dataForm.objId = ""
             this.dataSubmit() 
           } else {
             this.dataForm.parentName = ""
+            this.dataForm.objId = ""
           }
+        } else {
+          this.dataForm.parentName = ""
+          this.dataForm.objId = ""
+          this.dataForm.teacherName = ""
+          this.dataForm.userId = ""
+          this.dataSubmit() 
         }
       },
       dataSubmit () {
-        console.log(this.dataForm.status)
         this.$refs['dataForm'].validate((valid) => {
           if (valid) {
             this.$http({

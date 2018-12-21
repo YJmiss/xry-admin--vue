@@ -6,8 +6,7 @@
       </el-form-item>
       <el-form-item label="所属类目" prop="parentName"> 
        <el-popover placement="bottom-start" trigger="click">
-          <el-tree :data="courseCatList" node-key="id" ref="courseCatListTree" :default-expand-all="true"
-            :highlight-current="true" :expand-on-click-node="false">
+          <el-tree :data="courseCatList" node-key="id" ref="courseCatListTree" :default-expand-all="true" :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
         <el-input v-model="dataForm.parentName" :disabled="true" v-popover:courseCatListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
@@ -18,7 +17,7 @@
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input v-model="dataForm.teacherName" v-popover:teacherListPopover :readonly="true" :disabled="true" placeholder="点击选择所属讲师" class="cat-list__input"></el-input>
+        <el-input v-model="dataForm.teacherName" :readonly="true" :disabled="true" placeholder="点击选择所属讲师" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="是否收费" size="mini" prop="property">
        <span>{{dataForm.property}}</span>
@@ -27,7 +26,7 @@
           <el-radio :label="2">免费</el-radio>
         </el-radio-group> -->
       </el-form-item>
-      <el-form-item label="课程价格" prop="price">
+      <el-form-item label="课程价格" prop="price" v-show="dataForm.property === 1">
        <span>{{dataForm.price}}元</span>
       </el-form-item>
       <el-form-item label="课程图片" class="Image">
@@ -74,7 +73,7 @@
         },
         teacherList: [],
         teacherListTreeProps: {
-          label: 'nickname',
+          label: 'realName',
           children: 'children'
         }
       }
@@ -148,12 +147,12 @@
       // 讲师树选中
       teacherListTreeCurrentChangeHandle (data, node) {
         this.dataForm.tid = data.id
-        this.dataForm.teacherName = data.nickname
+        this.dataForm.teacherName = data.realName
       },
       // 讲师树设置当前选中节点
       teacherListTreeSetCurrentNode () {
         this.$refs.teacherListTree.setCurrentKey(this.dataForm.tid)
-        this.dataForm.teacherName = (this.$refs.teacherListTree.getCurrentNode() || {})['nickname']
+        this.dataForm.teacherName = (this.$refs.teacherListTree.getCurrentNode() || {})['realName']
       },
       // 表单提交
       dataFormSubmit () {

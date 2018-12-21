@@ -25,8 +25,8 @@
         </el-popover>
         <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择所属课程" class="cat-list__input"></el-input>
       </el-form-item>
-      <el-form-item label="内容描述" prop="titie_desc">
-        <el-input type="textarea" :rows="6" placeholder="请输入内容描述" v-model="dataForm.titie_desc"></el-input>
+      <el-form-item label="内容描述">
+        <el-input type="textarea" :rows="6" placeholder="请输入内容描述" v-model="dataForm.titleDesc"></el-input>
       </el-form-item>
       <el-form-item label="广告图片" prop="pic" class="imageList">
         <el-upload :action="url" ref="upload" :before-upload="beforeUploadHandle" :on-success="successHandle" multiple :file-list="fileList">
@@ -55,12 +55,12 @@
           id: 0,
           title: '',
           category: 1,
-          title_desc: '',
+          courseId:'',
+          titleDesc: '',
           url: '',
           pic: '',
           parentName:'',
-          status: 1,
-          course_id:''
+          status: 1
         },
         visible: false,
         url: '',
@@ -120,17 +120,14 @@
                 this.dataForm.id = data.content.id
                 this.dataForm.category = data.content.category
                 this.dataForm.title = data.content.title
-                this.dataForm.title_desc = data.content.title_desc
+                this.dataForm.titleDesc = data.content.titleDesc
                 this.dataForm.url = data.content.url
                 this.dataForm.pic = data.content.pic
-                this.dataForm.course_id = data.content.course_id
+                this.dataForm.courseId = data.content.courseId
                 this.dataForm.parentName = data.content.courseTitle
                 this.dataForm.status = data.content.status
                 this.courseListTreeSetCurrentNode()
                 this.showUploadImg2(data.content.pic);
-                console.log('cid:'+data.content.course_id)
-                console.log('所属课程:'+data.content.courseTitle)
-                console.log('描述:'+data.content.title_desc)
               }
             })
           } else {
@@ -140,12 +137,12 @@
       },
       // 课程树选中
       courseListTreeCurrentChangeHandle (data, node) {
-        this.dataForm.course_id = data.id
+        this.dataForm.courseId = data.id
         this.dataForm.parentName = data.title
       },
       // 课程树设置当前选中节点
       courseListTreeSetCurrentNode () {
-        this.$refs.courseListTree.setCurrentKey(this.dataForm.course_id)
+        this.$refs.courseListTree.setCurrentKey(this.dataForm.courseId)
         this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
       },
        // 上传之前
@@ -180,23 +177,23 @@
       },
       // 修改阅览图片el-upload-list
       showUploadImg2(img) {
-      let ul_tag = document.createElement("ul");
-      ul_tag.setAttribute("class", "el-upload-img");
-      ul_tag.setAttribute("class", "el-upload-list__item is-success");
-      let imgElement = document.createElement("img");
-      imgElement.setAttribute("src", img);
-      imgElement.setAttribute("style", "max-width:50%;");
-      ul_tag.appendChild(imgElement);
-      let del_icon = document.createElement("i");
-      del_icon.setAttribute("class", "el-icon-close");
-      del_icon.setAttribute("style", "position:absolute;top:4px;right:4px;");
-      ul_tag.appendChild(del_icon);
-      let imageControl = document.getElementsByClassName("imageList");
-      imageControl[0].appendChild(ul_tag);
-      del_icon.addEventListener("click",function(){
-        ul_tag.setAttribute('style',"display:none")
-      })
-      this.dataForm.image = ""
+        let ul_tag = document.createElement("ul");
+        ul_tag.setAttribute("class", "el-upload-img");
+        ul_tag.setAttribute("class", "el-upload-list__item is-success");
+        let imgElement = document.createElement("img");
+        imgElement.setAttribute("src", img);
+        imgElement.setAttribute("style", "max-width:50%;");
+        ul_tag.appendChild(imgElement);
+        let del_icon = document.createElement("i");
+        del_icon.setAttribute("class", "el-icon-close");
+        del_icon.setAttribute("style", "position:absolute;top:4px;right:4px;");
+        ul_tag.appendChild(del_icon);
+        let imageControl = document.getElementsByClassName("imageList");
+        imageControl[0].appendChild(ul_tag);
+        del_icon.addEventListener("click",function(){
+          ul_tag.setAttribute('style',"display:none")
+        })
+        this.dataForm.image = ""
     },
     uploadOverrun() {
       this.$message({
@@ -236,11 +233,11 @@
                 'id': this.dataForm.id || undefined,
                 'title': this.dataForm.title,
                 'category': this.dataForm.category,
-                'title_desc': this.dataForm.title_desc,
+                'titleDesc': this.dataForm.titleDesc,
                 'url': this.dataForm.url,
                 'pic': this.dataForm.pic,
                 'status': this.dataForm.status,
-                'course_id': this.dataForm.course_id
+                'courseId': this.dataForm.courseId
               })
             }).then(({ data }) => {
               if (data && data.code === 0) {

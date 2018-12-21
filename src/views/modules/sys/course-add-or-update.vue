@@ -59,7 +59,6 @@ export default {
         cid: 1,
         parentName: "",
         teacherName: "",
-        nickname: "",
         tid: "",
         property: 1,
         status: 1,

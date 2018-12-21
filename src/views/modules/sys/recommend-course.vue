@@ -51,8 +51,8 @@
       </el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="250" label="操作">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('xry:course:recommendCourse')" type="primary" size="small" round @click="recommendCourse(scope.row.id)" v-show="scope.row.recommend ===0" :disabled="scope.row.status === 1 || scope.row.status ===2">推荐课程</el-button>
-          <el-button  v-if="isAuth('xry:course:cancelRecommend')" type="danger" size="small" round @click="cancelRecommend(scope.row.id)" v-show="scope.row.recommend ===1">取消推荐</el-button>
+          <el-button v-if="isAuth('xry:course:recommendCourse')" type="primary" size="small" round @click="recommendCourse(scope.row.id)" :disabled="scope.row.recommend ===1">推荐课程</el-button>
+          <el-button  v-if="isAuth('xry:course:cancelRecommend')" type="danger" size="small" round @click="cancelRecommend(scope.row.id)" :disabled="scope.row.recommend ===0">取消推荐</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -110,6 +110,7 @@
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
+        let status = 4;
         // 查询所有课程类目，构造成一棵树
         this.$http({
           url: this.$http.adornUrl('/xry/course/cat/treeCourseCat'),
@@ -134,7 +135,8 @@
                 'limit': this.pageSize,
                 'title': this.dataForm.title,
                 'cid': this.dataForm.parentId,
-                'tid': this.dataForm.teacherId
+                'tid': this.dataForm.teacherId,
+                'status':status
               })
             }).then(({ data }) => {
               if (data && data.code === 0) {
