@@ -112,6 +112,7 @@
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
+        let status = 1;
         // 查询课程树
         this.$http({
           url: this.$http.adornUrl('/xry/course/treeCourse'),
@@ -138,7 +139,8 @@
                 'limit': this.pageSize,
                 'title': this.dataForm.title,
                 'courseId': this.dataForm.courseId,
-                'catalogId': this.dataForm.catalogId
+                'catalogId': this.dataForm.catalogId,
+                'status':status
               })
             }).then(({ data }) => {
               if (data && data.code === 0) {

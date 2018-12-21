@@ -7,11 +7,6 @@
           <el-form-item label="法人代表">
           <el-input v-model="dataForm.corporator" placeholder="请填写机构法人姓名" clearable></el-input>
         </el-form-item>
-        <el-form-item label="认证状态">
-            <el-select v-model="dataForm.status" placeholder="请选择用户状态">
-            <el-option v-for="item in statusValues" :key="item.value" :label="item.label" :value="item.value"></el-option>
-            </el-select>
-        </el-form-item>
         <el-form-item>
           <el-button v-if="isAuth('xry:organization:list')" type="primary" @click="getDataList()">查询</el-button>
         </el-form-item>
@@ -84,12 +79,6 @@ import OrganizCertificateInfo from './organization-certificate-info'
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],
-        statusValues:[
-          { label:'认证中', value:'1' },
-          { label:'未通过', value:'2' },
-          { label:'已通过', value:'3' } 
-          ],
-        value:''
       }
     },
     activated () {
@@ -99,6 +88,7 @@ import OrganizCertificateInfo from './organization-certificate-info'
       // 获取数据列表
     getDataList () {
         this.dataListLoading = true
+        let status = 1;
         this.$http({
           url: this.$http.adornUrl('/xry/organization/list'),
           method: 'get',
@@ -107,7 +97,7 @@ import OrganizCertificateInfo from './organization-certificate-info'
             'limit': this.pageSize,
             'orgName':this.dataForm.org_name,
             'corporator':this.dataForm.corporator,
-            'status':this.dataForm.status
+            'status':status
           })
         }).then(({ data }) => {
           if (data && data.code === 0) {

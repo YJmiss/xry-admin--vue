@@ -100,6 +100,7 @@
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
+        let status = 3;
         this.$http({
           url: this.$http.adornUrl('/xry/teacher/list'),
           method: 'get',
@@ -107,7 +108,8 @@
             'page': this.pageIndex,
             'limit': this.pageSize,
             'realName': this.dataForm.realName,
-            'recommend': this.dataForm.recommend
+            'recommend': this.dataForm.recommend,
+            'status':status
           })
         }).then(({ data }) => {
           if (data && data.code === 0) {

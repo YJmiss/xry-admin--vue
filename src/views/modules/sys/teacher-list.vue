@@ -87,6 +87,7 @@ import { treeDataTranslate } from '@/utils'
     getDataList () {
     this.dataListLoading = true
     this.visible = true
+    let teacherListStatus = 3;
     this.$http({
       url: this.$http.adornUrl('/xry/teacher/list'),
       method: 'get',
@@ -95,7 +96,7 @@ import { treeDataTranslate } from '@/utils'
         'limit': this.pageSize,
         'realName':this.dataForm.real_name,
         'userPhone':this.dataForm.userPhone,
-        'status':this.dataForm.status
+        'teacherListStatus':teacherListStatus
       })
     }).then(({ data }) => {
       if (data && data.code === 0) {
