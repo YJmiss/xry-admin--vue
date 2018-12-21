@@ -15,7 +15,7 @@
       <el-form-item label="上级菜单" prop="parentName">
           <el-popover
             ref="menuListPopover"
-            placement="bottom-start"
+            placement="top-start"
             trigger="click">
             <el-tree
               :data="menuList"
