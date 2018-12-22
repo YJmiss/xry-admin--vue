@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
+  <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible" @close='closeDialog'>
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
       <el-form-item label="相关类别" prop="parentName"> 
         <el-popover ref="courseCatListPopover" placement="bottom-start" trigger="click">
@@ -15,8 +15,8 @@
       <el-form-item label="文章来源" prop="source">
         <el-input v-model="dataForm.source" type="text" placeholder="文章来源" :disabled="true"></el-input>
       </el-form-item>
-      <el-form-item label="文章图片" prop="coverImg">
-        <el-upload :action="url" ref="upload" :before-upload="beforeUploadHandle" :on-success="successHandle" multiple :file-list="fileList">
+      <el-form-item label="文章图片" prop="coverImg" class="imageList">
+        <el-upload :action="url" ref="upload" :before-upload="beforeUploadHandle" :limit='1' :on-exceed='uploadOverrun' :on-success="successHandle" :file-list="fileList">
           <el-button type="primary" round>选择图片</el-button>
           <div class="el-upload__tip" slot="tip">只支持jpg、png、gif/格式的图片！</div>
         </el-upload>
@@ -35,6 +35,7 @@
 <script>
   import { treeDataTranslate} from '@/utils'
   import Editor from '@/components/quill-editor.vue'
+  import $ from 'jquery'
   export default {
     components: {Editor},
     data () {
@@ -102,6 +103,7 @@
                 this.dataForm.coverImg = data.article.coverImg
                 this.dataForm.detail = data.article.detail
                 this.courseCatListTreeSetCurrentNode()
+                this.showUploadImg2(this.dataForm.coverImg)
               }
             })
           } else {
@@ -165,10 +167,10 @@
         this.fileList = fileList
         this.successNum++
         this.dataForm.coverImg = response.url
-        this.showUploadImg(this.dataForm.coverImg,response.url)
+        this.showUploadImg(this.dataForm.coverImg)
       },
       // 上传后预览图片
-      showUploadImg (img, url) {
+      showUploadImg (img) {
         this.$nextTick(() => {
           let upload_list_li = document.getElementsByClassName('el-upload-list')[0].children;
           for (let i = 0; i < upload_list_li.length; i++) {
@@ -182,6 +184,33 @@
           }
         })
       },
+    //修改文章显示封面
+    showUploadImg2(img){
+      let imgElement = document.createElement("img");
+      imgElement.setAttribute("src", img);
+      imgElement.setAttribute("style", "max-width:50%;height:auto;");
+      let del_icon = document.createElement("i");
+      del_icon.setAttribute("class", "el-icon-close");
+      del_icon.setAttribute("style", "position:absolute;top:4px;right:4px;");
+      imgElement.appendChild(del_icon);
+      let imageControl = document.getElementsByClassName("imageList");
+      imageControl.setAttribute('style')
+      imageControl[0].appendChild(imgElement);
+      del_icon.addEventListener("click",function(){
+        imgElement.setAttribute('style',"display:none")
+      })
+     },
+     //上传超限提示
+      uploadOverrun() {
+      this.$message({
+        type: "error",
+        message: "上传文件个数超出限制!只能上传1张图片!"
+      });
+    },
+    closeDialog() {
+      let upload_list = document.getElementsByClassName("el-upload-list__item");
+      upload_list[0].remove();
+     }
     }
   }
 </script>

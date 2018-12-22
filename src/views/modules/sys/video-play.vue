@@ -1,7 +1,7 @@
 <template>
   <el-dialog :title="!dataForm.id ? '新增' : '视频内容审核'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-      <video width="100%" id="video-play" controls=" controls" src="" type="video/mp4" ></video>
+      <video width="100%" id="video-play" controls="controls" src="" type="video/mp4" ></video>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>

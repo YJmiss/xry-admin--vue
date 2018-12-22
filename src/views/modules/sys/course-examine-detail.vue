@@ -2,14 +2,14 @@
   <el-dialog :title="!dataForm.id ? '新增' : '课程详情'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
       <el-form-item label="课程标题" prop="title">
-        <span>{{dataForm.title}}</span>
+        <span class="info">{{dataForm.title}}</span>
       </el-form-item>
       <el-form-item label="所属类目" prop="parentName"> 
        <el-popover placement="bottom-start" trigger="click">
           <el-tree :data="courseCatList" node-key="id" ref="courseCatListTree" :default-expand-all="true" :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input v-model="dataForm.parentName" :disabled="true" v-popover:courseCatListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
+        <span class="info">{{dataForm.parentName}}</span>
       </el-form-item>
       <el-form-item label="所属讲师" prop="teacherName">
         <el-popover ref="teacherListPopover" placement="bottom-start" trigger="click">
@@ -17,17 +17,13 @@
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input v-model="dataForm.teacherName" :readonly="true" :disabled="true" placeholder="点击选择所属讲师" class="cat-list__input"></el-input>
+        <span class="info">{{dataForm.teacherName}}</span>
       </el-form-item>
       <el-form-item label="是否收费" size="mini" prop="property">
-       <span>{{dataForm.property}}</span>
-        <!-- <el-radio-group v-model="dataForm.property" :disabled="true">
-          <el-radio :label="1">收费</el-radio>
-          <el-radio :label="2">免费</el-radio>
-        </el-radio-group> -->
+       <span class="info blue">{{dataForm.property}}</span>
       </el-form-item>
       <el-form-item label="课程价格" prop="price" v-show="dataForm.property === 1">
-       <span>{{dataForm.price}}元</span>
+       <span class="info">{{dataForm.price}}元</span>
       </el-form-item>
       <el-form-item label="课程图片" class="Image">
         <img :src="dataForm.image" alt="课程封面图">
@@ -165,4 +161,11 @@
 <style>
   .course-price{width:700px}
   .price-tip{display:inline;color:red;padding-left:20px;}
+  .info{ font: 16px 微软雅黑  bolder;
+    color: #333333;
+    margin-left: 10px;
+   }
+   .blue{
+     color: blue;
+   }
 </style>

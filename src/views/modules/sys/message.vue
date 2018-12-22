@@ -32,7 +32,7 @@
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
       <!-- <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column> -->
-      <el-table-column prop="type" header-align="center" align="center" width="150" label="消息类型">
+      <el-table-column prop="type" header-align="center" align="center" width="120" label="消息类型">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.msg_type === 1" size="small" type="success">课程消息</el-tag>
           <el-tag v-else-if="scope.row.msg_type === 2" size="small" type="danger">我关注的</el-tag>
@@ -54,7 +54,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="publish_date" header-align="center" align="center" width="200" label="发布日期"></el-table-column>
-      <el-table-column prop="info" header-align="center" align="center" label="具体信息" width="350">
+      <el-table-column prop="info" header-align="center" align="center" label="具体信息" width="250">
         <template slot-scope="scope">
           <el-popover ref="detailPopover" placement="top-start" trigger="hover">
             <span>点击查看详情</span>

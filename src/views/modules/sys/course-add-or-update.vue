@@ -289,7 +289,6 @@ export default {
       del_icon.addEventListener("click",function(){
         ul_tag.setAttribute('style',"display:none")
       })
-      // this.dataForm.image = ""
     },
     uploadOverrun() {
       this.$message({

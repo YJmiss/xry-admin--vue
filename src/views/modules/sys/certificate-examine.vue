@@ -1,6 +1,6 @@
 <template>
     <div id="dataReceive">
-        <el-tabs type="card" class="card" @tab-click="handleClick">
+        <el-tabs type="card" class="card" @tab-click="handleClick" v-model="activeName">
             <el-tab-pane label="讲师资料认证审核" name="teacher_certificate"></el-tab-pane>
             <el-tab-pane label="机构资料认证审核" name="organ_certificate"></el-tab-pane>
         </el-tabs>
@@ -18,7 +18,8 @@ export default {
     data(){
         return{
             teacherVisible:true,
-            organizatonVisible:false
+            organizatonVisible:false,
+            activeName:'teacher_certificate'
         }
     },
     methods:{

@@ -31,7 +31,8 @@
           </template> 
         </el-table-column>
         <el-table-column prop="created" header-align="center" align="center" width="180" label="认证时间"></el-table-column>
-        <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作" >
+        <el-table-column fixed="right" header-align="center" align="center" 
+         label="操作" >
           <template slot-scope="scope">
           <el-button v-if="isAuth('xry:organization:info')" type="default" size="small"   @click="viewDataHandle(scope.row.id)">详情</el-button>
           <el-button v-if="isAuth('xry:record:examine')" type="primary" size="small" @click="examine(scope.row.id)" :disabled="scope.row.status === 3">认证</el-button>
@@ -46,11 +47,11 @@
       <!-- 弹窗，查看机构认证申请资料详情 -->
       <organiz-certificate-info v-show="infoVisible" ref="OrganizCertificateInfo"></organiz-certificate-info> 
     </div>
-</template>
-<script>
-import { treeDataTranslate } from '@/utils'
-import examineRecordAdd from './examine-record-add'
-import OrganizCertificateInfo from './organization-certificate-info'
+  </template>
+  <script>
+  import { treeDataTranslate } from '@/utils'
+  import examineRecordAdd from './examine-record-add'
+  import OrganizCertificateInfo from './organization-certificate-info'
   export default {
   components:{examineRecordAdd, OrganizCertificateInfo},
     data () {
@@ -70,7 +71,7 @@ import OrganizCertificateInfo from './organization-certificate-info'
           id_card:'',
           contact:'',
           business_license:'',
-          status: '',
+          status: 1,
           created: ''
         }],
         dataList: [],
@@ -97,7 +98,7 @@ import OrganizCertificateInfo from './organization-certificate-info'
             'limit': this.pageSize,
             'orgName':this.dataForm.org_name,
             'corporator':this.dataForm.corporator,
-            'status':status
+            'status':this.dataForm.status
           })
         }).then(({ data }) => {
           if (data && data.code === 0) {

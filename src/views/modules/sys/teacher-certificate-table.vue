@@ -4,10 +4,12 @@
         <el-form-item label="讲师姓名">
           <el-input v-model="dataForm.real_name" placeholder="讲师姓名" clearable></el-input>
         </el-form-item>
-        <el-form-item label="审核状态">
-          <el-select v-model="dataForm.status" placeholder="请选择">
-            <el-option  v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
-          </el-select>
+        <el-form-item label="申请日期">
+        <el-date-picker
+          v-model="dataForm.created"
+          type="date"
+          placeholder="选择日期">
+        </el-date-picker>
         </el-form-item>
         <el-form-item>
         <el-button v-if="isAuth('xry:teacher:list')" type="primary" @click="getDataList()">查询</el-button>
@@ -21,8 +23,9 @@
           </template>    
         </el-table-column>
         <el-table-column prop="real_name" header-align="center" align="center" label="讲师姓名" width="150"></el-table-column>
-        <el-table-column prop="orgName" header-align="center" align="center" label="所属机构" width="250"></el-table-column>
+        <el-table-column prop="orgName" header-align="center" align="center" label="所属机构" width="200"></el-table-column>
         <el-table-column prop="id_card" header-align="center" align="center" label="身份证号" width="250"></el-table-column>
+        <el-table-column prop="introduction" header-align="center" align="center" label="讲师简介" width="200"></el-table-column>
         <el-table-column prop="type" header-align="center" align="center" label="类型" width="100">
           <template slot-scope="scope">
             <el-tag v-if="scope.row.type === 1" size="small" type="success">讲师认证</el-tag>
@@ -36,8 +39,8 @@
             <el-tag v-else size="small" type="success">已通过</el-tag>
           </template>  
         </el-table-column>
-        <el-table-column prop="created" header-align="center" align="center" width="180" label="申请时间"></el-table-column>
-        <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作">
+        <el-table-column prop="created" header-align="center" align="center" width="150" label="申请时间"></el-table-column>
+        <el-table-column fixed="right" header-align="center" align="center"  label="操作">
           <template slot-scope="scope">
             <el-button v-if="isAuth('xry:teacher:info')" type="default" size="small"  @click="viewDataHandle(scope.row.id)">详情</el-button>
             <el-button v-if="isAuth('xry:record:examine')" type="primary" size="small" @click="examine(scope.row.id)" :disabled="scope.row.status === 3">认证</el-button>
@@ -52,12 +55,12 @@
       <!-- 弹窗，讲师认证资料详情查看 -->
       <teacher-certificate-info v-show="infoVisible" ref="TeacherCertificateInfo"></teacher-certificate-info>
     </div>
-</template>
-<script>
- import { treeDataTranslate } from '@/utils'
- import examineRecordAdd from './examine-record-add'
- import TeacherCertificateInfo from './teacher-certificate-info'
-export default {
+  </template>
+  <script>
+  import { treeDataTranslate } from '@/utils'
+  import examineRecordAdd from './examine-record-add'
+  import TeacherCertificateInfo from './teacher-certificate-info'
+  export default {
   components:{examineRecordAdd,TeacherCertificateInfo},
   data(){
     return{
@@ -79,15 +82,10 @@ export default {
         id_card_front:'',
         id_card_back:'',
         type:'',
-        status: '',
-        created: ''
-      },
-      options: [ 
-        { label:'认证中', value:'1' },
-        { label:'未通过', value:'2' },
-        { label:'已通过', value:'3' } 
-      ],
-      value: ''
+        status: '1',
+        created: '',
+        introduction:''
+      }
     }
   },
   activated () {
@@ -111,7 +109,6 @@ export default {
     //获取数据
   getDataList(){
     this.dataListLoading = true
-    // 查找是否有所属机构
     this.visible = true
     this.$http({
       url: this.$http.adornUrl('/xry/teacher/list'),
