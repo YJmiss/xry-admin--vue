@@ -14,11 +14,11 @@
         <el-input v-model="dataForm.buyerPhone" placeholder="输入买家手机号" clearable></el-input>
       </el-form-item>
       <el-form-item label="下单时间">
-        <el-date-picker v-model="dataForm.createTime" type="datetime" placeholder="选择日期时间"></el-date-picker>
+        <el-date-picker v-model="dataForm.createTime" type="date" placeholder="选择日期"></el-date-picker>
       </el-form-item>
       <el-button type="primary" @click="getDataList()">查询</el-button>
       </el-form>
-      <el-table :data="dataList" border style="width: 100%;" >
+      <el-table :data="dataList" border style="width: 100%;">
       <el-table-column prop="order_id" header-align="center" align="center" width="200" label="订单ID"></el-table-column>
       <el-table-column prop="buyer_phone" header-align="center" align="center" width="120" label="买家电话"></el-table-column>
       <el-table-column prop="payment" header-align="center" align="center" width="100" label="实付金额/单位：元">
@@ -32,10 +32,9 @@
       </el-table-column>
       <el-table-column prop="status" header-align="center" align="center" width="120" label="订单状态">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.status === 1" size="small" type="info">待支付</el-tag>
-          <el-tag v-else-if="scope.row.status === 2" size="small" type="danger">已付款</el-tag>
-          <el-tag v-else-if="scope.row.status === 3" size="small" type="danger">交易成功</el-tag>
-          <el-tag v-else-if="scope.row.status === 4" size="small" type="danger">交易关闭</el-tag>
+          <el-tag v-if="scope.row.status === 1" size="small" type="danger">未付款</el-tag>
+          <el-tag v-else-if="scope.row.status === 2" size="small" type="success">交易成功</el-tag>
+          <el-tag v-else-if="scope.row.status === 3" size="small" type="info">交易关闭</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="create_time" header-align="center" align="center" label="下单时间"></el-table-column>
@@ -82,15 +81,12 @@
             },
             options: [{
             value: '1',
-            label: '待支付'
-            }, {
-            value: '2',
-            label: '已付款'
+            label: '未付款'
             },{
-            value: '3',
+            value: '2',
             label: '交易成功'
             },{
-            value: '4',
+            value: '3',
             label: '交易关闭'
             }],
             value:''
