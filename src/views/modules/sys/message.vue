@@ -41,8 +41,9 @@
       </el-table-column>
       <el-table-column prop="course_type" header-align="center" align="center" width="150" label="课程消息类型">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.course_type === 1" size="small" type="info">开课通知</el-tag>
-          <el-tag v-else size="small" type="success">课程章节更新</el-tag>
+          <el-tag v-if="scope.row.msg_type === 1 && scope.row.course_type === 1" size="small" type="info">开课通知</el-tag>
+          <el-tag v-if="scope.row.msg_type === 1 && scope.row.course_type === 2" size="small" type="info">课程章节更新</el-tag>
+          <el-tag v-if="scope.row.msg_type === 1 && scope.row.course_type === 3" size="small" type="info">其它</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="courseTitle" header-align="center" align="center" width="300" label="消息->课程"></el-table-column>

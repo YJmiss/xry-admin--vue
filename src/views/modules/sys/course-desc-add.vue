@@ -54,6 +54,7 @@
     methods: {
       init (courseId) {
         this.dataForm.courseId = courseId || 0
+        this.dataForm.courseDesc = ""
         this.$http({
           url: this.$http.adornUrl('/xry/course/treeCourse'),
           method: 'get',

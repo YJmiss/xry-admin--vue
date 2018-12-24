@@ -5,11 +5,7 @@
           <el-input v-model="dataForm.real_name" placeholder="讲师姓名" clearable></el-input>
         </el-form-item>
         <el-form-item label="申请日期">
-        <el-date-picker
-          v-model="dataForm.created"
-          type="date"
-          placeholder="选择日期">
-        </el-date-picker>
+        <el-date-picker v-model="dataForm.created" type="date" placeholder="选择日期"></el-date-picker>
         </el-form-item>
         <el-form-item>
         <el-button v-if="isAuth('xry:teacher:list')" type="primary" @click="getDataList()">查询</el-button>
@@ -117,7 +113,7 @@
         'page': this.pageIndex,
         'limit': this.pageSize,
         'realName':this.dataForm.real_name,
-        'status':this.dataForm.status
+        'created':this.dataForm.created
       })
     }).then(({ data }) => {
       if (data && data.code === 0) {

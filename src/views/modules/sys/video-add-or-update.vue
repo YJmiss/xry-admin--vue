@@ -6,7 +6,7 @@
       </el-form-item>
       <el-form-item label="所属课程" prop="courseName"> 
         <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
-          <el-tree :data="courseList" :props="courseListTreeProps" node-key="courseId" ref="courseListTree"
+          <el-tree :data="courseList" :props="courseListTreeProps" node-key="id" ref="courseListTree"
             @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
@@ -15,13 +15,12 @@
       </el-form-item>
       <el-form-item label="所属目录" prop="catalogName"> 
         <el-popover ref="courseCatalogListPopover" placement="bottom-start" trigger="click">
-          <el-tree :data="courseCatalogList" :props="courseCatalogListTreeProps" node-key="catalogId" ref="courseCatalogListTree"
+          <el-tree :data="courseCatalogList" :props="courseCatalogListTreeProps" node-key="id" ref="courseCatalogListTree"
             @current-change="courseCatalogListTreeCurrentChangeHandle" :default-expand-all="true"
-            :highlight-current="true" :expand-on-click-node="false" v-show="contentVisible">
+            :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
-          <span v-show="tipVisible" class="red">请先选择所属课程!</span>
         </el-popover>
-        <el-input v-model="dataForm.catalogName" v-popover:courseCatalogListPopover :readonly="true" placeholder="点击选择所属目录" class="cat-list__input" @focus="checkCourseIsSelect()"></el-input>
+        <el-input v-model="dataForm.catalogName" v-popover:courseCatalogListPopover :readonly="true" placeholder="点击选择所属目录" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="是否收费" size="mini" prop="property">
         <el-radio-group v-model="dataForm.property">
@@ -52,20 +51,19 @@
     components: {UE},
     data () {
       return {
-        visible: false,
-        tipVisible:false,
         contentVisible:true,
         roleList: [],
         fileList:[],
         index:0,
         url: '',
+        visible:false,
         uplodProgress:0,
         dataForm: {
           id: 0,
           title: '',
           videoUrl: '',
-          courseId: 0,
-          catalogId: 0,
+          courseId: '',
+          catalogId: '',
           property: 1,
           status: 1,
           paramData: '',
@@ -114,6 +112,7 @@
           params: this.$http.adornParams()
         }).then(({ data }) => {
           this.courseList = treeDataTranslate(data.courseList, 'id')
+
         }).then(() => {
           this.visible = true
           this.$nextTick(() => {
@@ -151,15 +150,17 @@
         this.dataForm.courseId = data.id
         this.dataForm.courseName = data.title
         // 查询目录树，需要根据选中课程的id查询出目录树
-          this.$http({
-            url: this.$http.adornUrl('/xry/course/catalog/treeCourseCatalog'),
-            method: 'get',
-            params: this.$http.adornParams({
-              'courseId':data.id
-            })
-          }).then(({ data }) => {
-            this.courseCatalogList = treeDataTranslate(data.courseCatalogList, 'id')
-          }).then(() => {})
+        this.$http({
+          url: this.$http.adornUrl('/xry/course/catalog/treeCourseCatalog'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'courseId':data.id
+          })
+        }).then(({ data }) => {
+          this.courseCatalogList = treeDataTranslate(data.courseCatalogList, 'id')
+        }).then(() => {
+          
+        })
       },
       // 课程树设置当前选中节点
       courseListTreeSetCurrentNode () {
@@ -174,6 +175,7 @@
       // 课程目录树设置当前选中节点
       courseCatalogListTreeSetCurrentNode () {
         this.$refs.courseCatalogListTree.setCurrentKey(this.dataForm.catalogId)
+        console.log((this.$refs.courseCatalogListTree.getCurrentNode() || {})['title'])
         this.dataForm.catalogName = (this.$refs.courseCatalogListTree.getCurrentNode() || {})['title']
       },
       // 表单提交
@@ -226,16 +228,6 @@
       getVideoURL() {
         let content = this.$refs.ue.getUEContent();
         return $(content).find("video").attr("src");
-      },
-      //判断是否已选择所属课程
-      checkCourseIsSelect(){
-       if(!this.dataForm.courseName){
-       this.tipVisible = true
-       this.contentVisible =false
-       }else{
-       this.tipVisible =false
-       this.contentVisible = true
-       }
       }
     }
   }

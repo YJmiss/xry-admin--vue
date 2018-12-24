@@ -166,14 +166,17 @@
           if (!this.validateTeacher()&&this.dataForm.teacherName) {
             this.dataForm.parentName = ""
             this.dataForm.objId = ""
+            this.dataForm.courseType = ""
             this.dataSubmit() 
           } else {
             this.dataForm.parentName = ""
             this.dataForm.objId = ""
+            this.dataForm.courseType = ""
           }
         } else {
           this.dataForm.parentName = ""
           this.dataForm.objId = ""
+          this.dataForm.courseType = ""
           this.dataForm.teacherName = ""
           this.dataForm.userId = ""
           this.dataSubmit() 
