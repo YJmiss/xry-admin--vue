@@ -70,7 +70,6 @@ components: {Editor},
         file: "",
         courseDesc: '',
       },
-      describe:[],
       url: "",
       num: 0,
       successNum: 0,
@@ -146,7 +145,7 @@ components: {Editor},
                   params: this.$http.adornParams()
                 }).then(({ data }) => {
                   if (data && data.code === 0) {
-                    this.dataForm.id = data.course.id;
+                    course:{ this.dataForm.id = data.course.id;
                     this.dataForm.title = data.course.title;
                     this.dataForm.cid = data.course.cid;
                     this.dataForm.tid = data.course.tid;
@@ -157,19 +156,12 @@ components: {Editor},
                     this.courseCatListTreeSetCurrentNode();
                     this.teacherListTreeSetCurrentNode();
                     this.showUploadImg2(data.course.image);
+                    }
+                   courseDesc:{ 
+                   this.dataForm.courseDesc = data.course.courseDesc
+                    }
                   }
-                }).then(() => {
-               this.$http({
-              url: this.$http.adornUrl(`/xry/course/desc/info/${this.dataForm.courseId}`),
-              method: 'get',
-              params: this.$http.adornParams()
-              }).then(({ data }) => {
-              if (data && data.code === 0) {
-              if(this.dataForm.id  =  data.courseDesc.courseId)
-                this.dataForm.courseDesc = data.courseDesc.courseDesc
-                }
-               })
-              });
+                })
               }
             });
         });
@@ -211,6 +203,7 @@ components: {Editor},
             url: this.$http.adornUrl(`/xry/course/${!this.dataForm.id ? "save" : "update"}`),
             method: "post",
             data: this.$http.adornData({
+              course:{   
               id: this.dataForm.id || undefined,
               title: this.dataForm.title,
               image: this.dataForm.image,
@@ -219,6 +212,10 @@ components: {Editor},
               property: this.dataForm.property,
               price: this.dataForm.price,
               status: this.dataForm.status
+              },
+              courseDesc:{ 
+              courseDesc: this.dataForm.courseDesc 
+             },
             })
           }).then(({ data }) => {
             if (data && data.code === 0) {
