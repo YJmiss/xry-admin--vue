@@ -37,6 +37,9 @@
           <div class="el-upload__tip" slot="tip">只支持jpg、png、gif/格式的图片！</div>
         </el-upload>
       </el-form-item>
+      <el-form-item label="课程描述">
+        <editor :uploadUrl="uploadUrl" v-model="dataForm.courseDesc"></editor>
+      </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -48,10 +51,11 @@
 <script>
 import { treeDataTranslate } from "@/utils";
 import $ from 'jquery'
+import Editor from '@/components/quill-editor.vue'
 export default {
+components: {Editor},
   data() {
     return {
-      imageVisible: false,
       dataForm: {
         id: 0,
         title: "",
@@ -63,8 +67,10 @@ export default {
         property: 1,
         status: 1,
         price: "",
-        file: ""
+        file: "",
+        courseDesc: '',
       },
+      describe:[],
       url: "",
       num: 0,
       successNum: 0,
@@ -72,6 +78,8 @@ export default {
       dataListLoading: false,
       dataListSelections: [],
       visible: false,
+      //测试上传图片的接口，返回结构为{url:''}
+      uploadUrl: this.$http.adornUrl(`/sys/oss/uploadImg?token=${this.$cookie.get('token')}`),
       dataRule: {
         title: [{ required: true, message: "请填写课程标题", trigger: "blur" }],
         parentName: [
@@ -86,6 +94,9 @@ export default {
         ],
         image: [
           { required: true, message: "请上传课程封面图", trigger: "blur" }
+        ],
+        courseDesc: [
+          { required: true, message: '课程描述不能为空', trigger: 'blur' }
         ]
       },
       courseCatList: [],
@@ -147,9 +158,18 @@ export default {
                     this.teacherListTreeSetCurrentNode();
                     this.showUploadImg2(data.course.image);
                   }
-                });
-              } else {
-                // 新增
+                }).then(() => {
+               this.$http({
+              url: this.$http.adornUrl(`/xry/course/desc/info/${this.dataForm.courseId}`),
+              method: 'get',
+              params: this.$http.adornParams()
+              }).then(({ data }) => {
+              if (data && data.code === 0) {
+              if(this.dataForm.id  =  data.courseDesc.courseId)
+                this.dataForm.courseDesc = data.courseDesc.courseDesc
+                }
+               })
+              });
               }
             });
         });

@@ -67,7 +67,7 @@
     <!-- 弹窗, 视频审核记录 -->
     <examine-record-add v-if="examineRecordAddVisible" ref="examineRecordAdd" @refreshDataList="getDataList"></examine-record-add>
   </div>
-</template>
+ </template>
 
 <script>
   import { treeDataTranslate } from '@/utils'

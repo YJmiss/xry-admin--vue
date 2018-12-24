@@ -42,7 +42,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="nickname" header-align="center" align="center" label="评价用户" width="150"></el-table-column>
-      <el-table-column prop="star_level" header-align="center" align="center" label="星级评分" width="100"></el-table-column>
+      <el-table-column prop="star_level" header-align="center" align="center" label="星级评分/满分：10" width="80"></el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="评论状态" width="120">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === 1" size="small" type="success">正常显示</el-tag>

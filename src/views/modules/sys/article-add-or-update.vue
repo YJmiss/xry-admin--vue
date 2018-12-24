@@ -188,13 +188,12 @@
     showUploadImg2(img){
       let imgElement = document.createElement("img");
       imgElement.setAttribute("src", img);
-      imgElement.setAttribute("style", "max-width:50%;height:auto;");
+      imgElement.setAttribute("style", "max-width:50%;display:inline-block;margin-left:8%;margin-top:20px;");
       let del_icon = document.createElement("i");
       del_icon.setAttribute("class", "el-icon-close");
       del_icon.setAttribute("style", "position:absolute;top:4px;right:4px;");
       imgElement.appendChild(del_icon);
       let imageControl = document.getElementsByClassName("imageList");
-      imageControl.setAttribute('style')
       imageControl[0].appendChild(imgElement);
       del_icon.addEventListener("click",function(){
         imgElement.setAttribute('style',"display:none")
@@ -215,6 +214,7 @@
   }
 </script>
 <style scoped>
-  .load{ text-align: center;margin-top: 20px;padding:10px;font-size: 16px;border: none;}
+  .load{ text-align: center;margin-top: 20px;padding:10px;font-size: 16px;border: none;
+  }
 </style>
 

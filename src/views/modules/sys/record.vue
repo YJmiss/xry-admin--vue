@@ -48,18 +48,22 @@
       <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('xry:course:delete')" type="danger" circle size="small" icon="el-icon-delete" @click="deleteHandle(scope.row.id)"></el-button>
+          <el-button type="primary"  round size="small" @click="videoPlay(scope.row.id)">播放</el-button>
+          <el-button v-if="isAuth('xry:course:delete')" round type="danger" size="small" icon="el-icon-delete" @click="deleteHandle(scope.row.id)"></el-button>
         </template>
       </el-table-column>
     </el-table>
     <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex" :page-sizes="[10, 20, 50, 100]" 
           :page-size="pageSize" :total="totalPage" layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
+    <!-- 弹窗, 播放视频内容 -->
+    <video-play v-if="videoPlayVisible" ref="videoPlay" @refreshDataList="getDataList"></video-play>
   </div>
 </template>
 
 <script>
   import { treeDataTranslate } from '@/utils'
+  import videoPlay from './video-play'
   export default {
     data () {
       return {
@@ -79,7 +83,7 @@
           videoId:'',
           detail:''
         },
-        visible: false,
+        videoPlayVisible: false,
         dataList: [],
         pageIndex: 1,
         pageSize: 10,
@@ -94,6 +98,7 @@
       }
     },
     components: {
+      videoPlay
     },
     activated () {
       this.getDataList()
@@ -136,6 +141,13 @@
       // 多选
       selectionChangeHandle (val) {
         this.dataListSelections = val
+      },
+        // 播放视频
+      videoPlay (id) {
+        this.videoPlayVisible = true
+        this.$nextTick(() => {
+          this.$refs.videoPlay.init(id)
+        })
       },
       // 删除
       deleteHandle (id) {
