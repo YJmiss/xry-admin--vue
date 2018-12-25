@@ -158,7 +158,8 @@ components: {Editor},
                     this.showUploadImg2(data.course.image);
                     }
                    courseDesc:{ 
-                   this.dataForm.courseDesc = data.course.courseDesc
+                     console.log('dec:'+data.courseDesc)
+                   //this.dataForm.courseDesc = data.courseDesc
                     }
                   }
                 })

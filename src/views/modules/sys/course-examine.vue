@@ -39,9 +39,6 @@
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === 1" size="small" type="info">未审核</el-tag>
           <el-tag v-else-if="scope.row.status === 2" size="small" type="danger">未通过</el-tag>
-          <el-tag v-else-if="scope.row.status === 3" size="small" type="warning">通过审核</el-tag>
-          <el-tag v-else-if="scope.row.status === 4" size="small" type="success">通过审核已上架</el-tag>
-          <el-tag v-else size="small" type="info">已下架</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
@@ -103,14 +100,7 @@
           value: '1', label: '未审核'
         }, {
           value: '2', label: '未通过'
-        }, {
-          value: '3', label: '通过未上架'
-        }, {
-          value: '4', label: '通过已上架'
-        }, {
-          value: '5', label: '已下架'
-        }
-        ],
+        }],
         value: ''
       }
     },

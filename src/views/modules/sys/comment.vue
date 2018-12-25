@@ -35,13 +35,13 @@
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-      <el-table-column header-align="center" align="left" label="被评论对象" width="260">
+      <el-table-column header-align="center" align="left" label="被评论对象" width="150">
         <template slot-scope="scope">                   
           <p v-if="scope.row.type===0">{{scope.row.courseTitle}}</p>
           <p v-else="scope.row.type===1">{{scope.row.realName}}</p>                    
         </template>
       </el-table-column>
-      <el-table-column prop="nickname" header-align="center" align="center" label="评价用户" width="150"></el-table-column>
+      <el-table-column prop="nickname" header-align="center" align="center" label="评价用户" width="100"></el-table-column>
       <el-table-column prop="star_level" header-align="center" align="center" label="星级评分/满分：10" width="80"></el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="评论状态" width="120">
         <template slot-scope="scope">
@@ -69,7 +69,7 @@
           <el-popover ref="replyPopover" placement="top-start" trigger="hover">
             <span>点击查看回复内容</span>
           </el-popover>
-          <el-button show-overflow-tooltip size="small" type="text" v-popover:replyPopover @click="showReply(scope.row.reply)">{{scope.row.reply}}</el-button>
+          <el-button show-overflow-tooltip size="small" type="text" v-popover:replyPopover @click="showReply(scope.row.reply,scope.row.reply_time)">{{scope.row.reply}}{{scope.row.reply_time}}</el-button>
         </template>
       </el-table-column>
       <el-table-column prop="reply_time" header-align="center" align="center" width="180" label="回复时间"></el-table-column>
@@ -337,12 +337,13 @@
         });
       },
       // 点击->回复内容弹出框
-      showReply (reply) {
-        this.$alert(reply, '回复内容', {
+      showReply (reply,time) {
+        this.$alert(reply,'回复内容',{
           confirmButtonText: '确定',
           callback: action => {}
-        });
-      }
+         } 
+        );
+      }   
     }
   }
 </script>
