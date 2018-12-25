@@ -108,7 +108,6 @@
     },
     methods: {
       init (id) {
-        this.visible = true
         this.url = this.$http.adornUrl(`/sys/oss/upload?token=${this.$cookie.get('token')}`)
         this.dataForm.id = id || 0
         // 查询课程树
@@ -117,7 +116,13 @@
           method: 'get',
           params: this.$http.adornParams()
         }).then(({ data }) => {
-          this.courseList = treeDataTranslate(data.courseList, 'id')
+        this.courseList = treeDataTranslate(data.courseList, 'this.dataForm.courseId')
+        }).then(() => {
+          this.visible = true;
+              this.$nextTick(() => {
+                // 重置form表单（清空form表单的内容）
+                this.$refs["dataForm"].resetFields();
+              });
         }).then(() => {
           if(this.dataForm.id){
            this.$http({
@@ -138,12 +143,24 @@
                 this.courseListTreeSetCurrentNode()
                 this.courseCatalogListTreeSetCurrentNode()
               }
-            })
-          }else{
-          this.$nextTick(() => {
-          this.$refs['dataForm'].resetFields()
-          })
-          } 
+            }).then(() => {
+                //查询目录树
+                this.$http({
+                url: this.$http.adornUrl('/xry/course/catalog/treeCourseCatalog'),
+                method:'get',
+                params: this.$http.adornParams({
+                'courseId':this.dataForm.courseId,
+                })
+                }).then(({data}) =>{
+                this.courseCatalogList = treeDataTranslate(data.courseCatalogList, 'id') 
+                for(let i=0;i<data.courseCatalogList.length;i++){
+                    if(this.dataForm.catalogId == data.courseCatalogList[i].id){
+                     this.dataForm.catalogName = data.courseCatalogList[i].title
+                    }
+                   }
+                })
+                })
+              }
         })
       },
       // 课程树选中
@@ -156,7 +173,7 @@
           url: this.$http.adornUrl('/xry/course/catalog/treeCourseCatalog'),
           method: 'get',
           params: this.$http.adornParams({
-            'courseId':data.id
+            'courseId':this.dataForm.courseId,
           })
         }).then(({ data }) => {
           this.courseCatalogList = treeDataTranslate(data.courseCatalogList, 'id')
