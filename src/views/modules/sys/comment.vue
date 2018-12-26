@@ -43,19 +43,19 @@
       </el-table-column>
       <el-table-column prop="nickname" header-align="center" align="center" label="评价用户" width="100"></el-table-column>
       <el-table-column prop="star_level" header-align="center" align="center" label="星级评分/满分：10" width="80"></el-table-column>
-      <el-table-column prop="status" header-align="center" align="center" label="评论状态" width="120">
+      <el-table-column prop="status" header-align="center" align="center" label="评论状态" width="100">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === 1" size="small" type="success">正常显示</el-tag>
           <el-tag v-else size="small" type="warning">已被删除</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="type" header-align="center" align="center" label="类型" width="150">
+      <el-table-column prop="type" header-align="center" align="center" label="类型" width="100">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.type === 0" size="small" type="success">课程评价</el-tag>
           <el-tag v-else size="small" type="info">讲师评价</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="detail" header-align="center" align="left" label="评论详情" width="360">
+      <el-table-column prop="detail" header-align="center" align="left" label="评论详情" width="280">
         <template slot-scope="scope">
           <el-popover ref="detailPopover" placement="top-start" trigger="hover">
             <span>点击查看评论详情</span>
@@ -64,15 +64,14 @@
         </template>
       </el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="评论时间"></el-table-column>
-      <el-table-column prop="reply" header-align="center" align="left" label="回复内容" width="360">
+      <el-table-column prop="reply" header-align="center" align="left" label="回复详情" width="280">
         <template slot-scope="scope">
           <el-popover ref="replyPopover" placement="top-start" trigger="hover">
             <span>点击查看回复内容</span>
           </el-popover>
-          <el-button show-overflow-tooltip size="small" type="text" v-popover:replyPopover @click="showReply(scope.row.reply,scope.row.reply_time)">{{scope.row.reply}}{{scope.row.reply_time}}</el-button>
+          <el-button show-overflow-tooltip size="small" type="text" v-popover:replyPopover @click="showReply(scope.row.reply,scope.row.reply_time)">{{scope.row.reply}}</el-button>
         </template>
       </el-table-column>
-      <el-table-column prop="reply_time" header-align="center" align="center" width="180" label="回复时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="left" width="260" label="操作" prop="status">
         <template slot-scope="scope">
           <el-button v-if="isAuth('xry:comment:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
@@ -338,11 +337,24 @@
       },
       // 点击->回复内容弹出框
       showReply (reply,time) {
-        this.$alert(reply,'回复内容',{
+       const h = this.$createElement;
+        this.$msgbox({
+          title: '回复详情',
+          message: h('div', null, [
+            h('span', { style: 'font:16px;color:#999;' }, '回复内容'),
+            h('p', { style: 'color:#333333;margin:10px auto;font:14px 微软雅黑;' }, reply),
+            h('span', { style: 'font:14px;color:blue;' }, '回复时间：'),
+            h('span', { style: 'font:14px;color:blue;' }, time)
+          ]),
+          showCancelButton: true,
           confirmButtonText: '确定',
-          callback: action => {}
-         } 
-        );
+          cancelButtonText: '取消',
+        }).then(action => {
+          this.$message({
+            type: 'info',
+            message: 'action: ' + action
+          });
+        });
       }   
     }
   }

@@ -67,12 +67,12 @@
           children: 'children'
         },
         //测试上传图片的接口，返回结构为{url:''}
-        uploadUrl: this.$http.adornUrl(`/sys/oss/uploadImg?token=${this.$cookie.get('token')}`)
+        uploadUrl: this.$http.adornUrl(`/sys/oss/upload?token=${this.$cookie.get('token')}`)
       }
     },
     methods: {
       init (id) {
-        this.url = this.$http.adornUrl(`/sys/oss/uploadImg?token=${this.$cookie.get('token')}`)
+        this.url = this.$http.adornUrl(`/sys/oss/upload?token=${this.$cookie.get('token')}`)
         this.dataForm.id = id || 0
         // 查询所有文章分类，构造成一棵树
         this.$http({

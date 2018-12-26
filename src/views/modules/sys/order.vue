@@ -21,9 +21,16 @@
       <el-table :data="dataList" border style="width: 100%;">
       <el-table-column prop="order_id" header-align="center" align="center" width="200" label="订单ID"></el-table-column>
       <el-table-column prop="buyer_phone" header-align="center" align="center" width="120" label="买家电话"></el-table-column>
-      <el-table-column prop="payment" header-align="center" align="center" width="100" label="实付金额/单位：元">
+      <el-table-column header-align="center" align="center" width="100" label="实付金额/单位：元">
+      <template slot-scope="scope"  prop="payment">
+         <span v-if="scope.row.payment >=0" >{{scope.row.payment / 100}}</span>
+      </template>
       </el-table-column>
-      <el-table-column prop="total_fee" header-align="center" align="center" width="100" label="订单总金额 单位：元"></el-table-column>
+      <el-table-column  header-align="center" align="center" width="100" label="订单总金额 单位：元">
+      <template slot-scope="scope" prop="total_fee">
+         <span v-if="scope.row.total_fee >= 0" >{{scope.row.total_fee / 100}}</span>
+      </template>
+      </el-table-column>
       <el-table-column prop="payment_type" header-align="center" align="center" width="120" label="支付方式">
          <template slot-scope="scope">
           <p v-if="scope.row.payment_type === 0" size="small" type="info">微信支付</p>
@@ -72,7 +79,7 @@
                 buyerPhone:'',  
                 payment:'', //实付总金额
                 totalFee:'', //课程总金额
-               paymentType:0, //支付类型 0微信支付 1支付宝支付
+               paymentType:'', //支付类型 0微信支付 1支付宝支付
                 createTime:'', //订单创建时间
                 updateTime:'',//订单更新时间
                 paymentTime:'', //付款时间
@@ -135,9 +142,11 @@
                 'createTime':this.dataForm.createTime
                })
             }).then(({data}) => {
+              console.log(data)
                 if(data && data.code === 0){
                  this.dataList = data.page.list
                  this.totalPage = data.page.totalCount 
+                 console.log(data.page.list)
                 }else {
                 this.dataList = []
                 this.totalPage = 0

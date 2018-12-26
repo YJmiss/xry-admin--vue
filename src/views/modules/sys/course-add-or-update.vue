@@ -28,7 +28,7 @@
         </el-radio-group>
       </el-form-item>
       <el-form-item label="课程价格" prop="price" v-show="dataForm.property == 1">
-        <el-input class="course-price" v-model="dataForm.price" type="text" placeholder="课程价格"></el-input>
+        <el-input class="course-price"  type="text" v-model="dataForm.price" placeholder="课程价格"></el-input>
         <p class="price-tip">单位：（元）</p>
       </el-form-item>
       <el-form-item label="课程图片" prop="image" class="imageList">
@@ -47,7 +47,6 @@
     </span>
   </el-dialog>
 </template>
-
 <script>
 import { treeDataTranslate } from "@/utils";
 import $ from 'jquery'
@@ -66,7 +65,7 @@ components: {Editor},
         tid: "",
         property: 1,
         status: 1,
-        price: "",
+        price:'',
         file: "",
         courseDesc: '',
       },
@@ -112,7 +111,7 @@ components: {Editor},
   },
   methods: {
     init(id) {
-      this.url = this.$http.adornUrl(`/sys/oss/uploadImg?token=${this.$cookie.get("token")}`);
+      this.url = this.$http.adornUrl(`/sys/oss/upload?token=${this.$cookie.get("token")}`);
       this.dataForm.id = id || 0;
       // 查询所有课程类目，构造成一棵树
       this.$http({
@@ -150,7 +149,7 @@ components: {Editor},
                     this.dataForm.cid = data.course.cid;
                     this.dataForm.tid = data.course.tid;
                     this.dataForm.property = data.course.property;
-                    this.dataForm.price = data.course.price;
+                    this.dataForm.price = data.course.price / 100;
                     this.dataForm.status = data.course.status;
                     this.dataForm.image = data.course.image;
                     this.courseCatListTreeSetCurrentNode();
@@ -211,7 +210,7 @@ components: {Editor},
               cid: this.dataForm.cid,
               tid: this.dataForm.tid,
               property: this.dataForm.property,
-              price: this.dataForm.price,
+              price: this.dataForm.price * 100,
               status: this.dataForm.status
               },
               courseDesc:{ 

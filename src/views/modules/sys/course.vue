@@ -35,7 +35,11 @@
       <el-table-column prop="title" header-align="center" align="center" width="320" label="课程标题"></el-table-column>
       <el-table-column prop="catName" header-align="center" align="center" width="300" label="所属类目"></el-table-column>
       <el-table-column prop="realName" header-align="center" align="center" width="150" label="所属讲师"></el-table-column>
-      <el-table-column prop="price" header-align="center" align="center" label="课程价格（元）"></el-table-column>
+      <el-table-column header-align="center" align="center" label="课程价格（元）">
+        <template slot-scope="scope" prop="price">
+        <span v-if="scope.row.price >= 0">{{scope.row.price / 100}}</span>
+        </template>
+      </el-table-column>
       <el-table-column prop="status" header-align="center" align="center" width="150" label="审核状态">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === 1" size="small" type="info">未审核</el-tag>
