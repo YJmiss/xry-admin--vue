@@ -65,8 +65,9 @@
       init (id) {
         this.dataForm.id = id || 0
         // 查询所有课程类目，构造成一棵树
+        let flag = 1;
         this.$http({
-          url: this.$http.adornUrl('/xry/course/cat/treeCourseCat'),
+          url: this.$http.adornUrl('/xry/course/cat/treeCourseCat?flag=' + flag),
           method: 'get',
           params: this.$http.adornParams()
         }).then(({ data }) => {
@@ -84,7 +85,6 @@
               params: this.$http.adornParams()
             }).then(({ data }) => {
               if (data && data.code === 0) {
-                console.log(data.courseCat)
                 this.dataForm.parentId = data.courseCat.parentId
                 //this.dataForm.flag = data.courseCat.flag
                 this.dataForm.name = data.courseCat.name
