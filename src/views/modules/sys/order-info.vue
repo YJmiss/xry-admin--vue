@@ -11,7 +11,11 @@
           <img class="broadcst-img" v-popover:imgPopover :src="scope.row.picPath" alt="课程图片缩略图">
         </template>
       </el-table-column>
-      <el-table-column prop="price" header-align="center" align="center"  label="课程单价/单位：元"></el-table-column>
+      <el-table-column  header-align="center" align="center"  label="课程单价">
+        <template slot-scope="scope" prop="price">
+        <span>{{scope.row.price / 100}}元</span>
+        </template>  
+      </el-table-column>
      </el-table>
     </el-dialog>
     </template>
@@ -42,15 +46,14 @@
                 'orderId':orderId
                })
             }).then(({data}) => {
-                if(data && data.code === 0){
                 console.log(data)
+                if(data && data.code === 0){
                 this.dataList = data.orderCourses
                 for(let i = 0;i<data.orderCourses.length;i++){
                   this.dataForm.orderId = data.orderCourses[i].orderId
                  }
                 }else {
                 this.dataList = []
-                alert('数据获取失败！')
               }
         }) 
        }

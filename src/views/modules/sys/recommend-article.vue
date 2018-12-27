@@ -19,8 +19,8 @@
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
       <!-- <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column> -->
-      <el-table-column prop="catName" header-align="center" align="left" width="380" label="文章分类"></el-table-column>
-      <el-table-column prop="title" header-align="center" align="left" width="380" label="课程标题"></el-table-column>
+      <el-table-column prop="catName" header-align="center" align="center" width="380" label="文章分类"></el-table-column>
+      <el-table-column prop="title" header-align="center" align="center" width="380" label="课程标题"></el-table-column>
       <el-table-column prop="share_count" header-align="center" align="center" width="100" label="分享次数"></el-table-column>
       <el-table-column prop="thumbs_count" header-align="center" align="center" width="100" label="点赞次数"></el-table-column>
       <el-table-column prop="collect_count" header-align="center" align="center" width="100" label="收藏人数"></el-table-column>

@@ -45,14 +45,14 @@
       <el-table-column prop="star_level" header-align="center" align="center" label="星级评分/满分：10" width="80"></el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="评论状态" width="100">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.status === 1" size="small" type="success">正常显示</el-tag>
-          <el-tag v-else size="small" type="warning">已被删除</el-tag>
+          <el-tag v-if="scope.row.status === 1" size="small" type="primary">正常显示</el-tag>
+          <el-tag v-else size="small" type="info">已被删除</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="type" header-align="center" align="center" label="类型" width="100">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.type === 0" size="small" type="success">课程评价</el-tag>
-          <el-tag v-else size="small" type="info">讲师评价</el-tag>
+          <el-tag v-else size="small" type="warning" >讲师评价</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="detail" header-align="center" align="left" label="评论详情" width="280">

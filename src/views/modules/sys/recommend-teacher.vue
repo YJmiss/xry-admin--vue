@@ -32,19 +32,19 @@
       </el-table-column>
       <el-table-column prop="type" header-align="center" align="center" label="类型" width="120">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.type === 1" size="small" type="warning">讲师认证</el-tag>
+          <el-tag v-if="scope.row.type === 1" size="small" type="primary">讲师认证</el-tag>
           <el-tag v-else size="small" type="success">机构认证</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="orgName" header-align="center" align="center" label="所属机构名称" width="200">
         <template slot-scope="scope">
-         <p v-if="scope.row.orgName === ''">{{dataForm.nullMsg}}</p>
-         <p v-else>{{scope.row.orgName}}</p> 
+         <p v-if="scope.row.orgName">{{scope.row.orgName}}</p>
+         <el-tag v-else type="warning">暂无组织</el-tag> 
         </template>
       </el-table-column>
       <el-table-column prop="recommend" header-align="center" align="center" label="是否推荐" width="100">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.recommend === 0" size="small" type="warning">未推荐</el-tag>
+          <el-tag v-if="scope.row.recommend === 0" size="small" type="info">未推荐</el-tag>
           <el-tag v-else-if="scope.row.recommend === 1" size="small" type="success">已推荐</el-tag>
         </template>
       </el-table-column>
@@ -75,8 +75,7 @@
           orgCode: '',
           status: 0,
           created: '',
-          recommend:'',
-          nullMsg:'该讲师暂无所属机构'
+          recommend:''
         },
         dataList: [],
         pageIndex: 1,

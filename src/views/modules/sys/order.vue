@@ -19,16 +19,16 @@
       <el-button type="primary" @click="getDataList()">查询</el-button>
       </el-form>
       <el-table :data="dataList" border style="width: 100%;">
-      <el-table-column prop="order_id" header-align="center" align="center" width="200" label="订单ID"></el-table-column>
+      <el-table-column prop="order_id" header-align="center" align="center" width="150" label="订单ID"></el-table-column>
       <el-table-column prop="buyer_phone" header-align="center" align="center" width="120" label="买家电话"></el-table-column>
-      <el-table-column header-align="center" align="center" width="100" label="实付金额/单位：元">
+      <el-table-column header-align="center" align="center" width="100" label="实付金额">
       <template slot-scope="scope"  prop="payment">
-         <span v-if="scope.row.payment >=0" >{{scope.row.payment / 100}}</span>
+         <span v-if="scope.row.payment >=0" >{{scope.row.payment / 100}}元</span>
       </template>
       </el-table-column>
-      <el-table-column  header-align="center" align="center" width="100" label="订单总金额 单位：元">
+      <el-table-column  header-align="center" align="center" width="100" label="订单总金额">
       <template slot-scope="scope" prop="total_fee">
-         <span v-if="scope.row.total_fee >= 0" >{{scope.row.total_fee / 100}}</span>
+         <span v-if="scope.row.total_fee >= scope.row.payment" >{{scope.row.total_fee / 100}}元</span>
       </template>
       </el-table-column>
       <el-table-column prop="payment_type" header-align="center" align="center" width="120" label="支付方式">
@@ -142,7 +142,6 @@
                 'createTime':this.dataForm.createTime
                })
             }).then(({data}) => {
-              console.log(data)
                 if(data && data.code === 0){
                  this.dataList = data.page.list
                  this.totalPage = data.page.totalCount 

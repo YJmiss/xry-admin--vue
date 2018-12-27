@@ -1,7 +1,7 @@
 <template>
   <el-dialog :title="!dataForm.id ? '新增' : '视频内容播放'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-      <video width="100%" id="video-play" controls="controls" src="" type="video/mp4" ></video>
+      <video width="100%" id="video-play" controls="controls" :src="dataForm.videoUrl" type="video/mp4" ></video>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -11,7 +11,6 @@
 </template>
 
 <script>
-  import $ from 'jquery'
   import { treeDataTranslate } from '@/utils'
   export default {
     data () {
@@ -28,9 +27,6 @@
     methods: {
       init (id) {
         this.dataForm.id = id || 0
-        if (!this.dataForm.id) {
-          // 新增
-        } else {
           this.$http({
             url: this.$http.adornUrl(`/xry/video/info/${this.dataForm.id}`),
             method: 'get',
@@ -41,10 +37,7 @@
               this.dataForm.id = data.video.id
               this.dataForm.videoUrl = data.video.videoUrl
             }
-            // 把this.dataForm.videoUrl赋值给视频标签的src属性
-            $("#video-play").attr("src",this.dataForm.videoUrl);
           })
-        } 
       },
       // 隐藏视频播放弹框
       dataFormSubmit () {

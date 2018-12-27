@@ -24,14 +24,14 @@
           <el-tag v-else size="small" type="warning">视频审核</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="type" header-align="center" align="left" label="被审核对象标题" width="300">
+      <el-table-column prop="type" header-align="center" align="center" label="被审核对象标题" width="300">
         <template slot-scope="scope">                   
           <p v-if="scope.row.type===1">{{scope.row.courseTitle}}</p>
           <p v-else="scope.row.type===2">{{scope.row.videoTitle}}</p>                    
         </template>
       </el-table-column>
       <el-table-column prop="username" header-align="center" align="center" label="审核人" width="160"></el-table-column>
-      <el-table-column prop="detail" header-align="center" align="left" label="审核详情" width="400">
+      <el-table-column prop="detail" header-align="center" align="center" label="审核详情" width="300">
         <template slot-scope="scope">
           <el-popover ref="detailPopover" placement="top-start" trigger="hover">
             <span>点击查看详情</span>
@@ -46,10 +46,11 @@
         </template>
       </el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
-      <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
+      <el-table-column fixed="right" header-align="center" align="center"  label="操作">
         <template slot-scope="scope">
-          <el-button type="primary"  round size="small" @click="videoPlay(scope.row.id)">播放</el-button>
-          <el-button v-if="isAuth('xry:course:delete')" round type="danger" size="small" icon="el-icon-delete" @click="deleteHandle(scope.row.id)"></el-button>
+          <el-button type="primary" v-if="isAuth('xry:course:detail')" circle size="small" icon="el-icon-info" v-show="scope.row.type === 1" @click="viewDetail(scope.row.courseId)"></el-button>
+          <el-button type="primary" v-if="isAuth('xry:vedio:play')" circle icon="el-icon-caret-right"  size="small" v-show="scope.row.type === 2" @click="videoPlay(scope.row.videoId)"></el-button>
+          <el-button type="danger" v-if="isAuth('xry:course:delete')" circle  size="small" icon="el-icon-delete" @click="deleteHandle(scope.row.id)"></el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -58,13 +59,17 @@
     </el-pagination>
     <!-- 弹窗, 播放视频内容 -->
     <video-play v-if="videoPlayVisible" ref="videoPlay" @refreshDataList="getDataList"></video-play>
+     <!-- 弹窗, 查看详情（审核内容） -->
+    <course-detail v-if="courseDetailVisible" ref="courseDetail" @refreshDataList="getDataList"></course-detail>
   </div>
 </template>
 
 <script>
   import { treeDataTranslate } from '@/utils'
+  import courseDetail from './course-examine-detail'
   import videoPlay from './video-play'
   export default {
+  components: {videoPlay,courseDetail},
     data () {
       return {
         dataForm: {
@@ -84,6 +89,7 @@
           detail:''
         },
         videoPlayVisible: false,
+        courseDetailVisible: false,
         dataList: [],
         pageIndex: 1,
         pageSize: 10,
@@ -96,9 +102,6 @@
         ],
         value: ''
       }
-    },
-    components: {
-      videoPlay
     },
     activated () {
       this.getDataList()
@@ -120,6 +123,7 @@
           if (data && data.code === 0) {
             this.dataList = data.page.list
             this.totalPage = data.page.totalCount
+            console.log(data.page.list)
           } else {
             this.dataList = []
             this.totalPage = 0
@@ -147,6 +151,13 @@
         this.videoPlayVisible = true
         this.$nextTick(() => {
           this.$refs.videoPlay.init(id)
+        })
+      },
+       // 查看课程详情 
+      viewDetail (id) {
+        this.courseDetailVisible = true
+        this.$nextTick(() => {
+          this.$refs.courseDetail.init(id)
         })
       },
       // 删除

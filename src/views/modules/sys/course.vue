@@ -21,13 +21,16 @@
       <el-form-item label="课程标题">
         <el-input v-model="dataForm.title" placeholder="课程标题" clearable></el-input>
       </el-form-item>
-      <el-form-item>
+      <el-form-item label="审核状态">
+       <el-select v-model="dataForm.status" clearable placeholder="请选择">
+        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
+      </el-select>
+      </el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('xry:course:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
         <el-button v-if="isAuth('xry:course:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
         <el-button v-if="isAuth('xry:course:addToCourse')" type="primary" @click="addToCourse()" :disabled="dataListSelections.length <= 0">批量上架</el-button>
         <el-button v-if="isAuth('xry:course:delFromCourse')" type="warning" @click="delFromCourse()" :disabled="dataListSelections.length <= 0">批量下架</el-button>
-      </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
@@ -71,6 +74,9 @@
   import { treeDataTranslate } from '@/utils'
   import AddOrUpdate from './course-add-or-update'
   export default {
+    components: {
+      AddOrUpdate
+    },
     data () {
       return {
         dataForm: {
@@ -97,11 +103,21 @@
         teacherListTreeProps: {
           label: 'realName',
           children: 'children'
-        }
+        },
+         options: [{
+          value: '1',
+          label: '未审核'
+        }, {
+          value: '2',
+          label: '未通过'
+        }, {
+          value: '3',
+          label: '通过审核未上架'
+        }, {
+          value: '4',
+          label: '通过审核已上架'
+        }]
       }
-    },
-    components: {
-      AddOrUpdate
     },
     activated () {
       this.getDataList()
@@ -134,7 +150,8 @@
                 'limit': this.pageSize,
                 'title': this.dataForm.title,
                 'cid': this.dataForm.parentId,
-                'tid': this.dataForm.teacherId
+                'tid': this.dataForm.teacherId,
+                'status':this.dataForm.status
               })
             }).then(({ data }) => {
               if (data && data.code === 0) {
