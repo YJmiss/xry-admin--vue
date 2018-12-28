@@ -16,17 +16,21 @@
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column>
-      <el-table-column prop="nickname" header-align="center" align="center" label="昵称" width="180">
+      <el-table-column prop="nickname" header-align="center" align="center" label="昵称" width="100">
       </el-table-column>
-      <el-table-column prop="real_name" header-align="center" align="center" label="讲师姓名"></el-table-column>
-      <el-table-column prop="userPhone" header-align="center" align="center" label="手机号"></el-table-column>
-       <el-table-column prop="orgName" header-align="center" align="center" label="所属机构" width="200">
+      <el-table-column prop="real_name" header-align="center" align="center" label="讲师姓名" width="100"></el-table-column>
+      <el-table-column prop="userPhone" header-align="center" align="center" label="手机号" width="120"></el-table-column>
+       <el-table-column  header-align="center" align="center" label="所属机构" width="200">
+         <template slot-scope="scope" prop="orgName">
+         <span v-if="scope.row.orgName">{{scope.row.orgName}}</span>
+         <el-tag type="primary" v-else>暂无组织</el-tag>
+         </template>
        </el-table-column>
-      <el-table-column prop="id_card" header-align="center" align="center" label="身份证号"></el-table-column>
-       <el-table-column prop="id_card_front" header-align="center" align="center" label="证件照正面">
+      <el-table-column prop="id_card" header-align="center" align="center" label="身份证号" width="170"></el-table-column>
+       <el-table-column prop="id_card_front" header-align="center" align="center" label="证件照正面" width="150">
            <img :src="dataForm.id_card_front">
        </el-table-column>
-        <el-table-column prop="id_card_back" header-align="center" align="center" label="证件照反面">
+        <el-table-column prop="id_card_back" header-align="center" align="center" label="证件照反面" width="150">
         <img :src="dataForm.id_card_back">
        </el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="认证状态" width="100">
@@ -35,18 +39,29 @@
         </template>
       </el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="认证时间"></el-table-column>
+       <el-table-column fixed="right" header-align="center" align="right"  label="操作">
+         <template slot-scope="scope">
+          <el-button v-if="!scope.row.id_card || !scope.row.id_card_front || !scope.row.id_card_back" round icon="el-icon-edit-outline" type="primary" @click="addInfoHandle(scope.row.id)">补充资料</el-button>
+          <el-button v-if="isAuth('xry:user:updateTeacherRoleToUser')"  type="warning" size="small" round  @click="changeRoleHandle(scope.row.id)">置为普通用户</el-button>
+         </template>
+       </el-table-column>
     </el-table>
     <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex" :page-sizes="[10, 20, 50, 100]" 
           :page-size="pageSize" :total="totalPage" layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
+    <!-- 弹窗，补充讲师资料 -->
+    <add-teacher-info v-if="addTeacherInfoVisible" ref="addTeacherInfo"></add-teacher-info>
   </div>
 </template>
 
 <script>
 import { treeDataTranslate } from '@/utils'
+import addTeacherInfo from './teacher-list-addInfo'
   export default {
+    components:{addTeacherInfo},
     data () {
       return {
+        addTeacherInfoVisible:false,
         dataForm:{
         nickname:'',
         userPhone:'',
@@ -69,16 +84,9 @@ import { treeDataTranslate } from '@/utils'
         { label:'正常', value:'1' },
         { label:'删除', value:'2' },
       ],
-      value: '',
-      teacherList: [],
-        teacherListTreeProps: {
-          label: 'nickname',
-          children: 'children'
-        }
+      value: ''
       }
-       
     },
-    components: {},
      activated () {
       this.getDataList()
     }, 
@@ -123,6 +131,43 @@ import { treeDataTranslate } from '@/utils'
       // 多选
       selectionChangeHandle (val) {
         this.dataListSelections = val
+      },
+      //补充讲师资料
+      addInfoHandle(id){
+      this.addTeacherInfoVisible = true
+      this.$nextTick(() => {
+      this.$refs.addTeacherInfo.init(id)
+      })
+      },
+      //置为普通用户
+      changeRoleHandle(id){
+         var ids = id ? [id] : this.dataListSelections.map(item => {
+          return item.id
+        })
+        this.$confirm(`确定对该用户进行[${id ? '置为普通用户' : '批量置为普通用户'}]操作?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl('/xry/user/updateTeacherRoleToUser'),
+            method: 'post',
+            data: this.$http.adornData(ids, false)
+          }).then(({ data }) => {
+            if (data && data.code === 0){
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }).catch(() => {})
       },
       // 删除
       deleteHandle (id) {
