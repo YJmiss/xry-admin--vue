@@ -258,8 +258,7 @@ components: {Editor},
         file.type !== "image/jpg" &&
         file.type !== "image/jpeg" &&
         file.type !== "image/png" &&
-        file.type !== "image/gif" &&
-        file.type !== "video/mp4"
+        file.type !== "image/gif" 
       ) {
         this.$message.error("只支持jpg、png、gif格式的图片！");
         return false;
@@ -315,12 +314,12 @@ components: {Editor},
     },
     closeDialog() {
       let upload_list = document.getElementsByClassName("el-upload-list__item");
-      upload_list[0].remove();
+      $('upload_list[0]').remove();
     }
   }
 };
 </script>
-<style scoped>
+<style scoped lang="scss">
 .load {
   text-align: center;
   margin-top: 20px;
@@ -343,5 +342,7 @@ components: {Editor},
   border: solid 1px #ff0000;
   padding-left: 200px;
 }
+.quill-editor{height:1000px;}
+.el-dialog__footer{padding-top:50px;}
 </style>
 

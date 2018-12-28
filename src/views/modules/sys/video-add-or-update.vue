@@ -1,5 +1,5 @@
 <template>
-  <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
+  <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible" @close='closeDialog'>
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
       <el-form-item label="视频标题" prop="title">
         <el-input v-model="dataForm.title" type="text" placeholder="视频标题"></el-input>
@@ -35,8 +35,12 @@
       <el-form-item label="视频路径" prop="url">
         <el-input v-model="dataForm.videoUrl" type="text" placeholder="视频路径" readonly="readonly"></el-input>
       </el-form-item>
-    <el-form-item label="上传视频" >
-      <UE id="video-upload" :defaultMsg="defaultMsg" :config="config" ref="ue"></UE>
+    <el-form-item label="上传视频" class="uploadVideo">
+     <!--  <UE id="video-upload" :defaultMsg="defaultMsg" :config="config" ref="ue"></UE> -->
+      <el-upload :action="url" ref="upload" :before-upload="beforeUploadHandle" :limit='1' :on-exceed='uploadOverrun' :on-success="successHandle" :file-list="fileList">
+          <el-button type="primary" round>选择视频</el-button>
+          <div class="el-upload__tip" slot="tip">只支持mp4格式的视频！</div>
+      </el-upload>
     </el-form-item>
      </el-form>
     <span slot="footer" class="dialog-footer">
@@ -108,7 +112,7 @@
     },
     methods: {
       init (id) {
-        this.url = this.$http.adornUrl(`/sys/oss/upload?token=${this.$cookie.get('token')}`)
+        this.url = this.$http.adornUrl(`/sys/oss/uploadVideo?token=${this.$cookie.get('token')}`)
         this.dataForm.id = id || 0
         // 查询课程树
         this.$http({
@@ -142,6 +146,7 @@
                 this.dataForm.paramData = data.video.paramData
                 this.courseListTreeSetCurrentNode()
                 this.courseCatalogListTreeSetCurrentNode()
+                this.showUploadVideo2(this.dataForm.videoUrl)
               }
             }).then(() => {
                 //查询目录树
@@ -204,6 +209,66 @@
          this.msgShow = true
        }
       },
+        // 上传之前
+    beforeUploadHandle(file) {
+     if (file.type != "video/mp4") {
+        this.$message.error("只支持mp4格式的视频！");
+        return false;
+      } 
+      this.num++;
+    },
+    // 视频上传成功
+    successHandle(response, file, fileList) {
+      this.fileList = fileList;
+      this.successNum++;
+      this.dataForm.videoUrl = response.url;
+      this.showUploadVideo(this.dataForm.videoUrl);
+    },
+    // 视频上传预览
+    showUploadVideo(videoUrl) {
+      this.$nextTick(() => {
+        let videoControl = document.getElementsByClassName("el-upload-list")[0].children;
+          for (let i = 0; i < videoControl.length; i++) {
+          let li_a = videoControl[i].children[0];
+          let videoUrlElement = document.createElement("video");
+          videoUrlElement.setAttribute("src",videoUrl);
+          videoUrlElement.setAttribute('controls',true);
+          videoUrlElement.setAttribute("style", "max-width:60%;padding-left:25%");
+         if (li_a.lastElementChild.nodeName !== "MP4"){
+            li_a.appendChild(videoUrlElement);
+          } 
+        }
+      });
+    },
+    //修改视频显示
+     showUploadVideo2(videoUrl) {
+        let videoload = document.getElementsByClassName('uploadVideo');
+        let ul_tag = document.createElement("ul");
+        ul_tag.setAttribute("class", "el-upload-list__item is-success");
+        let videoUrlElement = document.createElement("video");
+        videoUrlElement.setAttribute("src",videoUrl);
+        videoUrlElement.setAttribute('controls',true);
+        videoUrlElement.setAttribute("style", "max-width:60%;padding-left:25%");
+        ul_tag.appendChild(videoUrlElement)
+        let del_icon = document.createElement("i");
+        del_icon.setAttribute("class", "el-icon-close");
+        del_icon.setAttribute("style", "position:absolute;top:4px;right:4px;");
+        ul_tag.appendChild(del_icon);
+        videoload[0].appendChild(ul_tag);
+        del_icon.addEventListener("click",function(){
+        ul_tag.setAttribute('style',"display:none")
+      })
+    },
+    uploadOverrun() {
+      this.$message({
+        type: "error",
+        message: "上传文件个数超出限制!只能上传1个视频!"
+      });
+    },
+    closeDialog() {
+    let upload_list = document.getElementsByClassName("el-upload-list__item");
+    $('upload_list[0]').remove();
+    },
       // 表单提交
       dataFormSubmit () {
         this.dataForm.videoUrl = this.getVideoURL();
