@@ -39,9 +39,9 @@
       </el-table-column>
       <el-table-column prop="role" header-align="center" align="center" label="角色">
         <template slot-scope="scope">
-          <el-tag v-if="scope.row.role === 0" size="small" type="success">普通用户</el-tag>
-          <el-tag v-else-if="scope.row.role === 1" size="small" type="info">讲师</el-tag>
-          <el-tag v-else-if="scope.row.role === 2" size="small" type="info">机构</el-tag>
+          <el-tag v-if="scope.row.role === 0" size="small" type="info">普通用户</el-tag>
+          <el-tag v-else-if="scope.row.role === 1" size="small" type="success">讲师</el-tag>
+          <el-tag v-else-if="scope.row.role === 2" size="small" type="success">机构</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="social_source" header-align="center" align="center" label="第三方登录来源">
@@ -55,9 +55,10 @@
       </el-table-column>
       <el-table-column prop="openuserId" header-align="center" align="center" label="第三方登录用户主键"></el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="注册时间"></el-table-column>
-      <el-table-column fixed="right" header-align="center" align="center" width="300" label="操作" prop="role">
+      <el-table-column fixed="right" header-align="center" align="left" width="300" label="操作" prop="role">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('xry:user:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
+          <el-button v-if="isAuth('xry:user:delete')"  type="danger" size="small" round icon="el-icon-delete" :disabled="scope.row.status === 2"  @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button v-if="isAuth('xry:user:updateUserRoleToTeacher')" v-show="scope.row.role === 0" type="primary" size="small" round  @click="changeRoleHandle(scope.row.id)">置为讲师</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -154,6 +155,66 @@
       // 多选
       selectionChangeHandle (val) {
         this.dataListSelections = val
+      },
+      //置为讲师
+      changeRoleHandle(id){
+         var ids = id ? [id] : this.dataListSelections.map(item => {
+          return item.id
+        })
+         this.$confirm(`确定对该用户进行[${id ? '置为讲师' : '批量置为讲师'}]操作?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl('/xry/user/updateUserRoleToTeacher'),
+            method: 'post',
+            data: this.$http.adornData(ids, false)
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }).catch(() => {})
+      },
+      // 删除
+      deleteHandle (id) {
+        var ids = id ? [id] : this.dataListSelections.map(item => {
+          return item.id
+        })
+        this.$confirm(`确定对该用户进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+          type: 'warning'
+        }).then(() => {
+          this.$http({
+            url: this.$http.adornUrl('/xry/user/delete'),
+            method: 'post',
+            data: this.$http.adornData(ids, false)
+          }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+              this.$message.error(data.msg)
+            }
+          })
+        }).catch(() => {})
       },
       // 删除
       deleteHandle (id) {
