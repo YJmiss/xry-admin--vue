@@ -23,15 +23,14 @@
                 <span type="success">{{scope.row.phone}}</span>
             </template>
         </el-table-column>
-        <el-table-column prop="feedback_info" label="反馈信息" header-align="center" align="center" smax-width="250"></el-table-column>
         <el-table-column prop="create_time" label="反馈时间" header-align="center" align="center" width="200"></el-table-column>
-        <el-table-column prop="replyDetail" label="回复详情" header-align="center" align="center">
-         <template slot-scope="scope">
-          <el-popover ref="replyPopover" placement="top-start" trigger="hover">
-            <span>点击查看回复内容</span>
-          </el-popover>
-          <el-button show-overflow-tooltip size="small" type="text" v-popover:replyPopover @click="showReply(scope.row.reply,scope.row.reply_time)">{{scope.row.reply}}</el-button>
-        </template>
+        <el-table-column prop="replyDetail" label="反馈信息" header-align="center" align="left" width="600">
+            <template slot-scope="scope">
+                <el-popover ref="replyPopover" placement="top-start" trigger="hover">
+                    <span>点击查看反馈信息</span>
+                </el-popover>
+                <el-button show-overflow-tooltip size="small" type="text" v-popover:replyPopover @click="showDetail(scope.row.feedback_info)">{{scope.row.feedback_info}}</el-button>
+            </template>
         </el-table-column>
         <el-table-column label="回复状态" header-align="center" align="center" width="120">
             <template slot-scope="scope" prop="check_status">
@@ -39,20 +38,21 @@
                 <el-tag type="success" v-if="scope.row.check_status == 1">已回复</el-tag>
             </template>
         </el-table-column>
+        <el-table-column prop="reply_time" label="反馈时间" header-align="center" align="center" width="200"></el-table-column>
         <el-table-column fixed="right" label="操作" header-align="center" align="canter">
-            <template slot-scope="scope" prop="check_status"> 
-                <el-button v-if="isAuth('xry:feedback:info')" type="primary" size="small" @click="viewFeedbackInfo(scope.row.id)">反馈详情</el-button>
+            <template slot-scope="scope" prop="check_status">
+                <el-button v-if="isAuth('xry:feedback:detail')" type="primary" size="small" @click="viewFeedbackInfo(scope.row.id)">反馈详情</el-button>
                 <el-button v-if="isAuth('xry:question:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
-                <el-button v-if="isAuth('xry:feedback:replyHandle')" type="primary" size="small" icon="el-icon-edit" @click="replyHandle(scope.row.id,scope.row.userId,scope.row.questionId,scope.row.check_status)" v-show="scope.row.check_status ===0">回复反馈</el-button>
-                <el-button v-if="isAuth('xry:feedback:replyHandle')" type="success" size="small" icon="el-icon-edit" @click="replyHandle(scope.row.id,scope.row.userId,scope.row.questionId,scope.row.check_status)" v-show="scope.row.check_status ===1">已回复</el-button>
+                <el-button v-if="isAuth('xry:feedback:replyHandle')" type="primary" size="small" icon="el-icon-edit" @click="replyHandle(scope.row.id)" v-show="scope.row.check_status ===0">回复反馈</el-button>
+                <el-button v-if="isAuth('xry:feedback:replyHandle')" type="success" size="small" icon="el-icon-edit" @click="replyHandle(scope.row.id)" v-show="scope.row.check_status ===1">已回复</el-button>
             </template>
         </el-table-column>
     </el-table>
     <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex" :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage" layout="total, sizes, prev, pager, next, jumper"></el-pagination>
     <!-- 弹窗, 查看反馈详情 -->
-    <feedback-detail v-show="feedbackDetailVisible" ref="feedbackDetail"></feedback-detail>
+    <feedback-detail v-show="feedbackDetailVisible" ref="feedbackDetail" @refreshDataList="getDataList"></feedback-detail>
     <!-- 弹窗, 填写回复内容 -->
-    <reply-add-or-view v-show="replyAddOrViewVisible" ref="replyAddOrView"></reply-add-or-view>
+    <reply-add-or-view v-show="replyAddOrViewVisible" ref="replyAddOrView" @refreshDataList="getDataList"></reply-add-or-view>
 </div>
 </template>
 
@@ -60,20 +60,23 @@
 import feedbackDetail from './user-feedback-detail'
 import replyAddOrView from './user-feedback-replyAddOrView'
 export default {
-components: {feedbackDetail,replyAddOrView},
+    components: {
+        feedbackDetail,
+        replyAddOrView
+    },
     data() {
         return {
             replyAddOrViewVisible: false,
-            feedbackDetailVisible:false,
+            feedbackDetailVisible: false,
             dataList: [],
             pageIndex: 1,
             pageSize: 10,
             totalPage: 0,
             dataForm: {
                 nickname: '',
-                phone:'',
-                feedback_info:'',
-                check_status:'',
+                phone: '',
+                feedback_info: '',
+                check_status: '',
                 userId: '',
                 create_time: '',
                 reply_status: '',
@@ -137,11 +140,12 @@ components: {feedbackDetail,replyAddOrView},
                     'checkStatus': this.dataForm.check_status,
                     'createTime': this.dataForm.create_time
                 })
-            }).then(({ data }) => {
+            }).then(({
+                data
+            }) => {
                 if (data && data.code === 0) {
                     this.dataList = data.page.list
                     this.totalPage = data.page.totalCount
-                    console.log(this.dataList)
                 } else {
                     this.dataList = []
                     this.totalPage = 0
@@ -149,11 +153,18 @@ components: {feedbackDetail,replyAddOrView},
             })
         },
         //查看反馈详情
-        viewFeedbackInfo(id){
-        this.feedbackDetailVisible = true
-        this.$nextTick(() => {
-        this.$refs.feedbackDetail.init(id)
-        })
+        viewFeedbackInfo(id) {
+            this.feedbackDetailVisible = true
+            this.$nextTick(() => {
+                this.$refs.feedbackDetail.init(id)
+            })
+        },
+        // 点击->详情弹出框
+        showDetail (detail) {
+            this.$alert(detail, '反馈信息', {
+            confirmButtonText: '确定',
+            callback: action => {}
+            });
         },
         // 删除
         deleteHandle(id) {
@@ -187,33 +198,12 @@ components: {feedbackDetail,replyAddOrView},
                 })
             }).catch(() => {})
         },
-         // 查看回复详情
-      showReply (reply,time) {
-       const h = this.$createElement;
-        this.$msgbox({
-          title: '回复详情',
-          message: h('div', null, [
-            h('h3', null, '回复内容'),
-            h('div', { style: 'color:#333333;margin:10px auto;font:14px 微软雅黑;width:80%;height:auto;' }, reply),
-            h('span', { style: 'font:14px;color:blue;' }, '回复时间：'),
-            h('span', { style: 'font:14px;color:blue;' }, time)
-          ]),
-          showCancelButton: true,
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-        }).then(action => {
-          this.$message({
-            type: 'info',
-            message: 'action: ' + action
-          });
-        });
-       },
         //回复反馈
-        replyHandle(id,userId,questionId,check_status) {
-          this.replyAddOrViewVisible = true
-          this.$nextTick(() => {
-           this.$refs.replyAddOrView.init(userId,questionId,check_status)
-          })  
+        replyHandle(id) {
+            this.replyAddOrViewVisible = true
+            this.$nextTick(() => {
+                this.$refs.replyAddOrView.init(id)
+            })
         },
         // 每页数
         sizeChangeHandle(val) {
@@ -229,6 +219,7 @@ components: {feedbackDetail,replyAddOrView},
     }
 }
 </script>
+
 <style scoped>
 .el-form-item {
     margin-right: 30px;
