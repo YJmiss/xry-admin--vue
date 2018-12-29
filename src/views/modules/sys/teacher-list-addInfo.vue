@@ -10,7 +10,7 @@
       </el-radio-group>
       </div>
       <el-form-item label="所属机构名称：" v-show="radio == 2">
-      <el-select v-model="dataForm.orgName" clearable placeholder="请选择所属机构" v-show="radio == 2" @change="currentChangeHandle()">
+      <el-select v-model="dataForm.orgName" clearable placeholder="请选择所属机构"  @change="currentChangeHandle()">
       <el-option
         v-for="item in orgNameList"
         :key="item.id"

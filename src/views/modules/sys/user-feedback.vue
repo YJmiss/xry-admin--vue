@@ -17,56 +17,54 @@
         <el-button @click="getDataList()">查询</el-button>
     </el-form>
     <el-table :data="dataList" border style="width: 100%">
-        <el-table-column prop="userName" label="反馈用户" width="200" header-align="center">
+        <el-table-column prop="userName" label="反馈用户" width="200" header-align="center" align="center">
             <template slot-scope="scope">
-                <el-tag type="info">{{scope.row.nickname}}</el-tag>
-                <el-tag type="success">{{scope.row.phone}}</el-tag>
+                <span v-if="scope.row.nickname" type="info">{{scope.row.nickname}}</span>&nbsp;/
+                <span type="success">{{scope.row.phone}}</span>
             </template>
         </el-table-column>
-        <el-table-column prop="feedback_info" label="反馈详情" header-align="center" align="left" smax-width="250"></el-table-column>
+        <el-table-column prop="feedback_info" label="反馈信息" header-align="center" align="center" smax-width="250"></el-table-column>
         <el-table-column prop="create_time" label="反馈时间" header-align="center" align="center" width="200"></el-table-column>
-        <el-table-column prop="replyDetail" label="回复详情" header-align="center" align="left"></el-table-column>
+        <el-table-column prop="replyDetail" label="回复详情" header-align="center" align="center">
+         <template slot-scope="scope">
+          <el-popover ref="replyPopover" placement="top-start" trigger="hover">
+            <span>点击查看回复内容</span>
+          </el-popover>
+          <el-button show-overflow-tooltip size="small" type="text" v-popover:replyPopover @click="showReply(scope.row.reply,scope.row.reply_time)">{{scope.row.reply}}</el-button>
+        </template>
+        </el-table-column>
         <el-table-column label="回复状态" header-align="center" align="center" width="120">
             <template slot-scope="scope" prop="check_status">
                 <el-tag type="danger" v-if="scope.row.check_status == 0">未回复</el-tag>
                 <el-tag type="success" v-if="scope.row.check_status == 1">已回复</el-tag>
             </template>
         </el-table-column>
-        <el-table-column prop="reply_time" label="回复时间" header-align="center" align="center" width="200"></el-table-column>
-        <el-table-column fixed="right" label="操作" header-align="center">
+        <el-table-column fixed="right" label="操作" header-align="center" align="canter">
             <template slot-scope="scope" prop="check_status"> 
-                <el-button v-if="isAuth('xry:feedback:info')" type="primary" size="small" @click="replyHandle(scope.row.id)">详情</el-button>
+                <el-button v-if="isAuth('xry:feedback:info')" type="primary" size="small" @click="viewFeedbackInfo(scope.row.id)">反馈详情</el-button>
                 <el-button v-if="isAuth('xry:question:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
-                <el-button v-if="isAuth('xry:feedback:replyHandle')" type="info" size="small" icon="el-icon-edit" @click="replyHandle(scope.row.id)" v-show="scope.row.check_status ===0">回复</el-button>
-                <el-button v-if="isAuth('xry:feedback:replyHandle')" type="info" size="small" icon="el-icon-edit" @click="replyHandle(scope.row.id)" v-show="scope.row.check_status ===1">已回复</el-button>
+                <el-button v-if="isAuth('xry:feedback:replyHandle')" type="primary" size="small" icon="el-icon-edit" @click="replyHandle(scope.row.id,scope.row.userId,scope.row.questionId,scope.row.check_status)" v-show="scope.row.check_status ===0">回复反馈</el-button>
+                <el-button v-if="isAuth('xry:feedback:replyHandle')" type="success" size="small" icon="el-icon-edit" @click="replyHandle(scope.row.id,scope.row.userId,scope.row.questionId,scope.row.check_status)" v-show="scope.row.check_status ===1">已回复</el-button>
             </template>
         </el-table-column>
     </el-table>
     <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex" :page-sizes="[10, 20, 50, 100]" :page-size="pageSize" :total="totalPage" layout="total, sizes, prev, pager, next, jumper"></el-pagination>
+    <!-- 弹窗, 查看反馈详情 -->
+    <feedback-detail v-show="feedbackDetailVisible" ref="feedbackDetail"></feedback-detail>
     <!-- 弹窗, 填写回复内容 -->
-    <el-dialog :visible="visible">
-        <el-form :inline="true" :model="dataForm" :rules="dataRule">
-            <el-form-item label="回复内容">
-                <editor v-model="dataForm.replyContent" max-height="450px"></editor>
-            </el-form-item>
-        </el-form>
-        <span slot="footer" class="dialog-footer">
-            <el-button @click="visible = false">取消</el-button>
-            <el-button type="primary" @click="replySubmit()">确定</el-button>
-        </span>
-    </el-dialog>
+    <reply-add-or-view v-show="replyAddOrViewVisible" ref="replyAddOrView"></reply-add-or-view>
 </div>
 </template>
 
 <script>
-import Editor from '@/components/quill-editor.vue'
+import feedbackDetail from './user-feedback-detail'
+import replyAddOrView from './user-feedback-replyAddOrView'
 export default {
-    components: {
-        Editor
-    },
+components: {feedbackDetail,replyAddOrView},
     data() {
         return {
-            visible: false,
+            replyAddOrViewVisible: false,
+            feedbackDetailVisible:false,
             dataList: [],
             pageIndex: 1,
             pageSize: 10,
@@ -143,11 +141,19 @@ export default {
                 if (data && data.code === 0) {
                     this.dataList = data.page.list
                     this.totalPage = data.page.totalCount
+                    console.log(this.dataList)
                 } else {
                     this.dataList = []
                     this.totalPage = 0
                 }
             })
+        },
+        //查看反馈详情
+        viewFeedbackInfo(id){
+        this.feedbackDetailVisible = true
+        this.$nextTick(() => {
+        this.$refs.feedbackDetail.init(id)
+        })
         },
         // 删除
         deleteHandle(id) {
@@ -181,11 +187,33 @@ export default {
                 })
             }).catch(() => {})
         },
+         // 查看回复详情
+      showReply (reply,time) {
+       const h = this.$createElement;
+        this.$msgbox({
+          title: '回复详情',
+          message: h('div', null, [
+            h('h3', null, '回复内容'),
+            h('div', { style: 'color:#333333;margin:10px auto;font:14px 微软雅黑;width:80%;height:auto;' }, reply),
+            h('span', { style: 'font:14px;color:blue;' }, '回复时间：'),
+            h('span', { style: 'font:14px;color:blue;' }, time)
+          ]),
+          showCancelButton: true,
+          confirmButtonText: '确定',
+          cancelButtonText: '取消',
+        }).then(action => {
+          this.$message({
+            type: 'info',
+            message: 'action: ' + action
+          });
+        });
+       },
         //回复反馈
-        replyHandle(id) {
-            this.visible = true
-            this.dataForm.currentUserId = id
-            this.replySubmit()
+        replyHandle(id,userId,questionId,check_status) {
+          this.replyAddOrViewVisible = true
+          this.$nextTick(() => {
+           this.$refs.replyAddOrView.init(userId,questionId,check_status)
+          })  
         },
         // 每页数
         sizeChangeHandle(val) {
@@ -197,38 +225,10 @@ export default {
         currentChangeHandle(val) {
             this.pageIndex = val
             this.getDataList()
-        },
-        //提交表单
-        replySubmit() {
-            this.$http({
-                url: this.$http.adornUrl(''),
-                method: 'post',
-                data: this.$http.adornData({
-                    'userId': this.dataForm.currentUserId || undefined,
-                    'content': this.dataForm.replyContent
-                }).then(({
-                    data
-                }) => {
-                    if (data && data.code === 0) {
-                        this.$message({
-                            message: '操作成功',
-                            type: 'success',
-                            duration: 1500,
-                            onClose: () => {
-                                this.visible = false
-                                this.$emit('refreshDataList')
-                            }
-                        })
-                    } else {
-                        this.$message.error(data.msg)
-                    }
-                })
-            })
         }
     }
 }
 </script>
-
 <style scoped>
 .el-form-item {
     margin-right: 30px;

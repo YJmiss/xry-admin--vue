@@ -2,25 +2,10 @@
 <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible" @close='closeDialog'>
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
         <el-form-item label="问题标题" prop="title">
-            <el-input v-model="dataForm.title" type="text" placeholder="问题标题"></el-input>
-        </el-form-item>
-        <el-form-item label="问题图片" prop="questionImg" class="imageList">
-            <el-upload :action="url" ref="upload" :before-upload="beforeUploadHandle" :limit='1' :on-exceed='uploadOverrun' :on-success="successHandle" :file-list="fileList">
-                <el-button type="primary" round>选择图片</el-button>
-                <div class="el-upload__tip" slot="tip">只支持jpg、png、gif/格式的图片！</div>
-            </el-upload>
-        </el-form-item>
-        <el-form-item label="问题描述">
-            <textarea class="question-desc" v-model="dataForm.questionInfo"></textarea>
-        </el-form-item>
-        <el-form-item label="解答图片" prop="replyImg" class="imageList">
-            <el-upload :action="url" ref="upload" :before-upload="beforeUploadHandle" :limit='1' :on-exceed='uploadOverrun' :on-success="successHandle2" :file-list="fileList2">
-                <el-button type="primary" round>选择图片</el-button>
-                <div class="el-upload__tip" slot="tip">只支持jpg、png、gif/格式的图片！</div>
-            </el-upload>
+        <el-input v-model="dataForm.title" type="textarea" rows="3" placeholder="问题标题"></el-input>
         </el-form-item>
         <el-form-item label="解答内容">
-            <textarea class="question-desc" v-model="dataForm.replyInfo"></textarea>
+        <editor :uploadUrl="uploadUrl" v-model="dataForm.replyContent"></editor>
         </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -33,19 +18,15 @@
 <script>
 import { treeDataTranslate} from "@/utils";
 import $ from 'jquery'
+import Editor from '@/components/quill-editor.vue'
 export default {
-    components: {
-
-    },
+components: {Editor},
     data() {
         return {
             dataForm: {
-                id: 0,
+                id: '',
                 title: "",
-                questionImg: "",
-                questionInfo: '',
-                replyImg: "",
-                replyInfo: ''
+                replyContent:''
             },
             url: "",
             num: 0,
@@ -53,15 +34,12 @@ export default {
             successNum2: 0,
             fileList: [],
             fileList2: [],
-            dataListLoading: false,
-            dataListSelections: [],
             visible: false,
+            uploadUrl: this.$http.adornUrl(`/sys/oss/uploadImg?token=${this.$cookie.get('token')}`),
             dataRule: {
                 title: [{ required: true, message: "请填写问题标题", trigger: "blur"
                 }],
-                questionInfo: [{ required: true, message: '问题描述不能为空', trigger: 'blur'
-                }],
-                replyInfo: [{ required: true, message: '解答内容不能为空', trigger: 'blur'
+                replyContent: [{ required: true, message: '解答内容不能为空', trigger: 'blur'
                 }]
             }
         };
@@ -84,10 +62,7 @@ export default {
                         if (data && data.code === 0) {
                             this.dataForm.id = data.commentQuestion.id
                             this.dataForm.title = data.commentQuestion.title
-                            this.dataForm.questionImg = data.commentQuestion.questionImg
-                            this.dataForm.questionInfo = data.commentQuestion.questionInfo
-                            this.dataForm.replyImg = data.commentQuestion.replyImg
-                            this.dataForm.replyInfo = data.commentQuestion.replyInfo
+                            this.dataForm.replyContent = data.commentQuestion.replyInfo
                         }
                     })
                 }
@@ -103,10 +78,7 @@ export default {
                         data: this.$http.adornData({
                             id: this.dataForm.id || undefined,
                             title: this.dataForm.title,
-                            questionImg: this.dataForm.questionImg,
-                            questionInfo: this.dataForm.questionInfo,
-                            replyImg: this.dataForm.replyImg,
-                            replyInfo: this.dataForm.replyInfo,
+                            replyInfo: this.dataForm.replyContent,
                         })
                     }).then(({ data }) => {
                         if (data && data.code === 0) {
@@ -191,7 +163,7 @@ export default {
         },
         closeDialog() {
             let upload_list = document.getElementsByClassName("el-upload-list__item");
-            upload_list[0].remove();
+            $('upload_list[0]').remove();
         }
     }
 };
@@ -223,6 +195,6 @@ export default {
     border: solid 1px #ff0000;
     padding-left: 200px;
 }
-.ql-editor{height:200px;}
-.question-desc{width:830px;height:100px;}
+.quill-editor{height:1000px;}
+.el-dialog__footer{padding-top:50px;}
 </style>

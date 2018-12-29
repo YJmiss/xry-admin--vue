@@ -17,36 +17,22 @@
         <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
     </el-form>
     <el-table :data="dataList" border style="width: 100%">
-        <el-table-column prop="title" header-align="center" label="问题标题" width="350"></el-table-column>
-        <el-table-column prop="question_info" header-align="center" label="问题信息">
-            <template slot-scope="scope">
-                <el-popover ref="questionPopover" placement="top-start" trigger="hover">
-                    <span>点击查看问题信息</span>
-                </el-popover>
-                <el-button show-overflow-tooltip size="small" type="text" v-popover:questionPopover @click="showQuestionInfo(scope.row.question_info)">{{scope.row.question_info}}</el-button>
-            </template>
+        <el-table-column prop="title" header-align="center" align="center"  label="问题标题" width="350"></el-table-column>
+        <el-table-column prop="reply_info" header-align="center" align="center" label="问题解答内容">
         </el-table-column>
-        <el-table-column prop="reply_info" header-align="center" label="问题解答内容">
-            <template slot-scope="scope">
-                <el-popover ref="replyPopover" placement="top-start" trigger="hover">
-                    <span>点击查看问题解答内容</span>
-                </el-popover>
-                <el-button show-overflow-tooltip size="small" type="text" v-popover:replyPopover @click="showReplyInfo(scope.row.reply_info)">{{scope.row.reply_info}}</el-button>
-            </template>
-        </el-table-column>
-        <el-table-column header-align="center" label="状态" width="100">
+        <el-table-column header-align="center" align="center" label="状态" width="100">
             <template slot-scope="scope" porp="question_status">
-                <el-tag type="success" v-if="scope.row.question_status ===0">未发布</el-tag>
-                <el-tag type="info" v-if="scope.row.question_status ===1">已发布</el-tag>
+                <el-tag type="info" v-if="scope.row.question_status ===0">未发布</el-tag>
+                <el-tag type="success" v-if="scope.row.question_status ===1">已发布</el-tag>
             </template>
         </el-table-column>
-        <el-table-column prop="create_time" header-align="center" label="创建时间" width="200"></el-table-column>
-        <el-table-column fixed="right" header-align="center" align="left" label="操作">
+        <el-table-column prop="create_time" header-align="center" align="center" label="创建时间" width="200"></el-table-column>
+        <el-table-column fixed="right" header-align="center" align="center" label="操作">
             <template slot-scope="scope" porp="question_status">
-                <el-button v-if="isAuth('xry:question:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
-                <el-button v-if="isAuth('xry:question:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
+                <el-button v-if="isAuth('xry:question:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)" :disabled="scope.row.question_status === 1"></el-button>
+                <el-button v-if="isAuth('xry:question:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)" :disabled="scope.row.question_status === 1"></el-button>
                 <el-button v-if="isAuth('xry:question:cancelPublish')" type="danger" size="small" @click="cancelPublish(scope.row.id)" v-show="scope.row.question_status ===1">撤回</el-button>
-                <el-button v-if="isAuth('xry:question:publishQuestion')" type="success" size="small" @click="publishQuestion(scope.row.id)" v-show="scope.row.question_status ===0">发布</el-button>
+                <el-button v-if="isAuth('xry:question:publishQuestion')" type="success" size="small"  @click="publishQuestion(scope.row.id)" v-show="scope.row.question_status ===0">发布</el-button>
             </template>
         </el-table-column>
     </el-table>
@@ -118,19 +104,6 @@ export default {
         this.getDataList()
     },
     methods: {
-        //显示问题信息
-        showQuestionInfo(question_info) {
-            this.$alert(question_info, '问题信息', {
-                confirmButtonText: '确定',
-                callback: action => {}
-            });
-        },
-        showReplyInfo(replay_info) {
-            this.$alert(replay_info, '问题解答内容', {
-                confirmButtonText: '确定',
-                callback: action => {}
-            });
-        },
         //获取数据表
         getDataList() {
             this.$http({

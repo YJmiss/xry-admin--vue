@@ -51,7 +51,7 @@
       <el-table-column prop="close_time" header-align="center" align="center" label="关闭时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" label="操作" width="100">
         <template slot-scope="scope">
-        <el-button v-if="isAuth('xry:order:info')" type="primary" @click="viewOrderInfo(scope.row.orderId)">详情</el-button>
+        <el-button v-if="isAuth('xry:order:info')" type="primary" @click="viewOrderInfo(scope.row.order_id)">详情</el-button>
         </template>
       </el-table-column>
      </el-table>
