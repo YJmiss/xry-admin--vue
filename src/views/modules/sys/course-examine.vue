@@ -10,14 +10,8 @@
         </el-popover>
         <el-input v-model="dataForm.courseCatName" v-popover:courseCatListPopover :readonly="true" placeholder="点击选择课程类目" class="cat-list__input"></el-input>
       </el-form-item>
-      <el-form-item label="课程标题" prop="parentName"> 
-        <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
-          <el-tree :data="courseList" :props="courseListTreeProps" node-key="id" ref="courseListTree"
-            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
-            :highlight-current="true" :expand-on-click-node="false">
-          </el-tree>
-        </el-popover>
-        <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择课程标题" class="cat-list__input"></el-input>
+      <el-form-item label="课程标题"> 
+        <el-input v-model="dataForm.title" placeholder="课程标题" clearable></el-input>
       </el-form-item>
       <el-form-item label="审核状态">
         <el-select v-model="dataForm.status" placeholder="请选择审核状态" @change="currentSel">
@@ -31,7 +25,7 @@
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-      <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
+      
       <el-table-column prop="title" header-align="center" align="center" label="课程标题" width="380"></el-table-column>
       <el-table-column prop="realName" header-align="center" align="center" label="所属讲师" width="160"></el-table-column>
       <el-table-column prop="price" header-align="center" align="center" label="课程价格（元）" width="160">
@@ -78,6 +72,7 @@
           parentName: '',
           courseCatName: '',
           realName: '',
+          courseId:"",
           examinePassBtnStatus: false,
           examineRejectBtnStatus: false
         },
@@ -124,32 +119,24 @@
           this.courseCatList = treeDataTranslate(data.courseCatList, 'id')
         }).then(() => {
           this.$http({
-            url: this.$http.adornUrl('/xry/course/treeCourse'),
-            method: 'get',
-            params: this.$http.adornParams()
+              url: this.$http.adornUrl('/xry/course/examineList'),
+              method: 'get',
+              params: this.$http.adornParams({
+              'page': this.pageIndex,
+              'limit': this.pageSize,
+              'catalogId': this.dataForm.courseCatId,
+              'title': this.dataForm.title,
+              'examineStatus': this.dataForm.status
+              })
           }).then(({ data }) => {
-            this.courseList = treeDataTranslate(data.courseList, 'id')
-          }).then(() => {
-            this.$http({
-                url: this.$http.adornUrl('/xry/course/examineList'),
-                method: 'get',
-                params: this.$http.adornParams({
-                'page': this.pageIndex,
-                'limit': this.pageSize,
-                'catalogId': this.dataForm.courseCatId,
-                'courseId': this.dataForm.courseId,
-                'examineStatus': this.dataForm.status
-                })
-            }).then(({ data }) => {
-                if (data && data.code === 0) {
-                this.dataList = data.page.list
-                this.totalPage = data.page.totalCount
-                } else {
-                this.dataList = []
-                this.totalPage = 0
-                }
-                this.dataListLoading = false
-            })
+            if (data && data.code === 0) {
+            this.dataList = data.page.list
+            this.totalPage = data.page.totalCount
+            } else {
+            this.dataList = []
+            this.totalPage = 0
+            }
+            this.dataListLoading = false
           })
         })
       },
@@ -162,16 +149,6 @@
       courseCatListTreeSetCurrentNode () {
         this.$refs.courseCatListTree.setCurrentKey(this.dataForm.courseCatId)
         this.dataForm.courseCatName = (this.$refs.courseCatListTree.getCurrentNode() || {})['name']
-      },
-      // 课程树选中
-      courseListTreeCurrentChangeHandle (data, node) {
-        this.dataForm.courseId = data.id
-        this.dataForm.parentName = data.title
-      },
-      // 课程树设置当前选中节点
-      courseListTreeSetCurrentNode () {
-        this.$refs.courseListTree.setCurrentKey(this.dataForm.courseId)
-        this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
       },
       // 每页数
       sizeChangeHandle (val){
