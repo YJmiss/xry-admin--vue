@@ -43,12 +43,6 @@ Vue.prototype.isAuth = isAuth // 权限方法
 // 保存整站vuex本地储存初始状态
 window.SITE_CONFIG['storeState'] = cloneDeep(store.state)
 
-//富文本编辑器
-import '../static/UE/ueditor.config.js'
-import '../static/UE/ueditor.all.js'
-import '../static/UE/lang/zh-cn/zh-cn.js'
-import '../static/UE/ueditor.parse.js'
-
 /* eslint-disable no-new */
 new Vue({
   el: '#app',
