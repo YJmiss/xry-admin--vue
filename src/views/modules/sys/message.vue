@@ -81,7 +81,6 @@
 </template>
 
 <script>
-  import SockJS from  'sockjs-client';
   import  Stomp from 'stompjs';
   import { treeDataTranslate } from '@/utils'
   import AddOrUpdate from './message-add-or-update'
@@ -322,8 +321,8 @@
       // WebSocket连接初始化
       initWebSocket() {
         // 测试使用的用户id
-        let userId = '1';
-        const wsuri = "ws://localhost:9001/xry/messageWebSocket?userId=" + userId;
+        let token = 'c64410ea11440c490ddbace52025568d';
+        const wsuri = "ws://192.168.1.27:9001/xry/messageWebSocket?token=" + token;
         this.websock = new WebSocket(wsuri);
         this.websock.onopen = this.websocketOnOpen;
         this.websock.onmessage = this.websocketOnMessage;
