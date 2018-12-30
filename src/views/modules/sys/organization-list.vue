@@ -82,9 +82,8 @@ import { treeDataTranslate } from '@/utils'
           params: this.$http.adornParams({
             'page': this.pageIndex,
             'limit': this.pageSize,
-            'orgName':this.dataForm.org_name,
-            'corporator':this.dataForm.corporator,
-            'status':this.dataForm.status
+            'corporateName':this.dataForm.corporateName,
+            'organizationName':this.dataForm.organizationName
           })
         }).then(({ data }) => {
           if (data && data.code === 0) {
