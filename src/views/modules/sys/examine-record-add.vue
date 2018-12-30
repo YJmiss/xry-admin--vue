@@ -6,7 +6,7 @@
         <el-radio  :label="2">申请驳回</el-radio>
       </el-radio-group>
       <el-form-item label="记录详情" prop="detail">
-        <textarea rows="15" cols="110" v-model="dataForm.detail"></textarea>
+        <textarea rows="15" cols="110"  v-model="dataForm.detail" placeholder="请填写驳回原因！"></textarea>
       </el-form-item>
       <el-form-item v-model="dataForm.type" :visible="false"></el-form-item>
     </el-form>

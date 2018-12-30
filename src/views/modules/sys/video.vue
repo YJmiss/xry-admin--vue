@@ -46,18 +46,19 @@
       <el-table-column prop="status" header-align="center" align="center" label="审核状态" width="100">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === 1" size="small" type="warning">未审核</el-tag>
-          <el-tag v-else-if="scope.row.status === 2" size="small" type="danger">审核中</el-tag>
+          <el-tooltip v-else-if="scope.row.status === 2" class="item" effect="dark" content="点击查看原因" placement="top">
+          <el-button @click="getExamineData(scope.row.id)" style="padding:0;width:auto;height:auto;border:none;">
+          <el-tag  size="small" type="warning">未通过</el-tag>
+          </el-button>
+          </el-tooltip>
           <el-tag v-else-if="scope.row.status === 3" size="small" type="success">已通过</el-tag>
-          <el-tag v-else-if="scope.row.status === 4" size="small" type="warning">未通过</el-tag>
-          <el-tag v-else-if="scope.row.status === 5" size="small" type="warning">通过审核未上架</el-tag>
-          <el-tag v-else-if="scope.row.status === 6" size="small" type="success">通过审核已上架</el-tag>
-          <el-tag v-else size="small" type="warning">未审核</el-tag>
+          <el-tag v-else size="small" type="warning">审核中</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="150" label="操作">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('xry:video:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)"></el-button>
+          <el-button v-if="isAuth('xry:video:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id,scope.row.status)"></el-button>
           <el-button v-if="isAuth('xry:video:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
         </template>
       </el-table-column>
@@ -67,6 +68,10 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+    <!-- 显示审核详情 -->
+    <el-dialog title="审核结果："  :close-on-click-modal="false" :visible.sync="examineDetailvisible">
+      <p >{{dataForm.examineDetail}}</p>
+    </el-dialog>
   </div>
 </template>
 
@@ -76,12 +81,15 @@
   export default {
     data () {
       return {
+        examineDetailvisible:false,
         dataForm: {
           title: '',
           courseName: '',
           catalogName: '',
           courseTitle: '',
-          catalogTitle: ''
+          catalogTitle: '',
+          examineDetail:'',
+          recordList:[]
         },
         dataList: [],
         pageIndex: 1,
@@ -109,6 +117,19 @@
       this.getDataList()
     },
     methods: {
+      //获取审核结果
+      getExamineData(id){
+        this.examineDetailvisible = true
+        this.$http({
+          url: this.$http.adornUrl('/xry/record/detail'),
+          method: 'get',
+          params: this.$http.adornParams({
+          'recordId' : id
+          })
+        }).then(({ data }) => {
+          this.dataForm.examineDetail = data.detailBatch
+        })
+      },
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
@@ -189,11 +210,18 @@
         this.dataListSelections = val
       },
       // 新增 / 修改
-      addOrUpdateHandle (id) {
+      addOrUpdateHandle (id,status) {
+        if(id !=0 && status == 3){
+        this.$message.error({
+         showClose: true,
+         message: '该视频已通过审核不能修改！ '
+        });  
+        }else{
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
+        this.$refs.addOrUpdate.init(id)
         })
+        }
       },
       // 删除
       deleteHandle (id) {
@@ -228,3 +256,14 @@
     }
   }
 </script>
+<style scoped>
+ .item {
+      margin: 4px;
+    }
+    p{
+font:14px 微软雅黑;
+color:#ff0000;
+letter-spacing:2px;
+}
+</style>
+

@@ -46,7 +46,11 @@
       <el-table-column prop="status" header-align="center" align="center" width="150" label="审核状态">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === 1" size="small" type="info">未审核</el-tag>
-          <el-tag v-else-if="scope.row.status === 2" size="small" type="danger">未通过</el-tag>
+          <el-tooltip v-else-if="scope.row.status === 2" class="item" effect="dark" content="点击查看原因" placement="top">
+          <el-button v-if="isAuth('xry:record:detail')"  @click="getExamineData(scope.row.id)" round style="padding:0;width:auto;height:auto;border:none;">
+            <el-tag size="small" type="danger">未通过</el-tag>
+            </el-button>
+          </el-tooltip>
           <el-tag v-else-if="scope.row.status === 3" size="small" type="warning">通过审核未上架</el-tag>
           <el-tag v-else-if="scope.row.status === 4" size="small" type="success">通过审核已上架</el-tag>
           <el-tag v-else size="small" type="info">已下架</el-tag>
@@ -56,7 +60,7 @@
       <el-table-column fixed="right" header-align="center" align="left" width="250" label="操作">
         <template slot-scope="scope" porp="status">
           <el-button v-if="isAuth('xry:course:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)" :disabled="scope.row.status ===4 || scope.row.status === 3"></el-button>
-          <el-button v-if="isAuth('xry:course:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)" :disabled="scope.row.status ===4 || scope.row.status === 3"></el-button>
+          <el-button v-if="isAuth('xry:course:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id,scope.row.status)" :disabled="scope.row.status ===4 || scope.row.status === 3"></el-button>
           <el-button v-if="isAuth('xry:course:addToCourse')" type="primary" round size="small" @click="addToCourse(scope.row.id)" v-show="scope.row.status ===3 || scope.row.status ===5">上架</el-button>
           <el-button v-if="isAuth('xry:course:delFromCourse')" type="warning" round size="small" @click="delFromCourse(scope.row.id)" v-show="scope.row.status ===4 ">下架</el-button>
         </template>
@@ -67,6 +71,10 @@
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
     <add-or-update v-if="addOrUpdateVisible" ref="addOrUpdate" @refreshDataList="getDataList"></add-or-update>
+     <!-- 显示审核详情 -->
+    <el-dialog title="审核结果："  :close-on-click-modal="false" :visible.sync="examineDetailvisible">
+      <p>{{dataForm.examineDetail}}</p>
+    </el-dialog>
   </div>
   </template>
 
@@ -79,13 +87,16 @@
     },
     data () {
       return {
+        examineDetailvisible:false,
         dataForm: {
           parentName: '',
           title: '',
           name: '',
           teacherName:'',
           catName:'',
-          realName:''
+          realName:'',
+          examineDetail:'',
+          recordList:[]
         },
         dataList: [],
         pageIndex: 1,
@@ -123,6 +134,21 @@
       this.getDataList()
     },
     methods: {
+      //获取审核结果
+      getExamineData(id){
+        this.examineDetailvisible = true
+        this.$http({
+          url: this.$http.adornUrl('/xry/record/detail'),
+          method: 'get',
+          params:this.$http.adornParams({
+          'recordId' : id
+          })
+          }).then(({ data }) => {
+          if (data && data.code === 0) {
+          this.dataForm.examineDetail = data.detailBatch
+          } 
+        })
+      },
       // 获取数据列表
       getDataList () {
         this.dataListLoading = true
@@ -209,7 +235,14 @@
         })
       },
       // 删除
-      deleteHandle (id) {
+      deleteHandle (id,status) {
+        if(status === 3 || status === 4){
+        this.$message.error({
+        showClose: true,
+         message: '该课程正处于“审核通过”或“上架”状态不能删除，如果一定要删除，请先下架！ '
+        });
+        }
+        else{
         var ids = id ? [id] : this.dataListSelections.map(item => {
           return item.id
         })
@@ -237,6 +270,7 @@
             }
           })
         }).catch(() => {})
+        }
       },
       // 课程上架操作
       addToCourse(id) {
@@ -301,3 +335,10 @@
     }
   }
 </script>
+<style scoped>
+p{
+font:14px 微软雅黑;
+color:#ff0000;
+letter-spacing:2px;
+}
+</style>

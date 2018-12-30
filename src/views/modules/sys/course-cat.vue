@@ -26,7 +26,7 @@
     <el-table :data="dataList" border @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
       <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column>
-      <table-tree-column prop="name" header-align="center" align="left" label="类目名称" treeKey="id" width="400"></table-tree-column>
+      <table-tree-column prop="name" header-align="center" align="center" label="类目名称" treeKey="id" width="400"></table-tree-column>
        <el-table-column prop="status" header-align="center" align="center" label="状态" width="200">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.status === 1" size="small" type="success">已启用</el-tag>
@@ -44,7 +44,7 @@
         </template>
       </el-table-column>
     </el-table>
-    <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex" :page-sizes="[10, 20, 50, 100]" 
+    <el-pagination @size-change="sizeChangeHandle" @current-change="currentChangeHandle" :current-page="pageIndex" :page-sizes="[100]" 
           :page-size="pageSize" :total="totalPage" layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗, 新增 / 修改 -->
@@ -71,7 +71,7 @@
         },
         dataList: [],
         pageIndex: 1,
-        pageSize: 10,
+        pageSize: 100,
         totalPage: 0,
         dataListLoading: false,
         dataListSelections: [],

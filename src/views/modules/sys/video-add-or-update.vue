@@ -35,8 +35,10 @@
       <el-form-item label="视频路径" prop="url">
         <el-input v-model="dataForm.videoUrl" type="text" placeholder="视频路径" readonly="readonly"></el-input>
       </el-form-item>
+       <el-form-item label="视频时长">
+        <el-input v-model="dataForm.videoTime" type="text" placeholder="视频时长" readonly="readonly"></el-input>
+      </el-form-item>
     <el-form-item label="上传视频" class="uploadVideo">
-     <!--  <UE id="video-upload" :defaultMsg="defaultMsg" :config="config" ref="ue"></UE> -->
       <el-upload :action="url" ref="upload" :before-upload="beforeUploadHandle" :limit='1' :on-exceed='uploadOverrun' :on-success="successHandle" :file-list="fileList">
           <el-button type="primary" round>选择视频</el-button>
           <div class="el-upload__tip" slot="tip">只支持mp4格式的视频！</div>
@@ -45,15 +47,13 @@
      </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" @click="submitConform()">确定</el-button>
     </span>
   </el-dialog>
 </template>
 <script>
   import $ from 'jquery'
-  import UE from '@/components/ue/ue.vue'
   import { treeDataTranslate } from '@/utils'
-  const COMPONENT_NAME = 'uploader-file'
   export default {
     components: {UE},
     data () {
@@ -70,6 +70,7 @@
           id: 0,
           title: '',
           videoUrl: '',
+          videoTime:'',
           courseId: '',
           catalogId: '',
           property: 0,
@@ -102,11 +103,6 @@
         courseCatalogListTreeProps: {
           label: 'title',
           children: 'children'
-        },
-        defaultMsg: '',
-        config: {
-          initialFrameWidth: null,
-          initialFrameHeight: 350
         }
       }
     },
@@ -143,7 +139,7 @@
                 this.dataForm.catalogId = data.video.catalogId
                 this.dataForm.property = data.video.property
                 this.dataForm.status = data.video.status
-                this.dataForm.paramData = data.video.paramData
+                this.dataForm.videoTime = data.video.paramData
                 this.courseListTreeSetCurrentNode()
                 this.courseCatalogListTreeSetCurrentNode()
                 this.showUploadVideo2(this.dataForm.videoUrl)
@@ -165,6 +161,10 @@
                    }
                 })
                 })
+              }else{
+                 this.dataForm.videoUrl = ''
+                 this.dataForm.videoTime =''
+                 
               }
         })
       },
@@ -211,8 +211,8 @@
       },
         // 上传之前
     beforeUploadHandle(file) {
-     if (file.type != "video/mp4") {
-        this.$message.error("只支持mp4格式的视频！");
+     if (file.type != "video/mp4" || file.size > 1048576000) {
+        this.$message.error("请检查视频格式（只支持mp4格式的视频！大小超过1000M)");
         return false;
       } 
       this.num++;
@@ -222,6 +222,7 @@
       this.fileList = fileList;
       this.successNum++;
       this.dataForm.videoUrl = response.url;
+      this.dataForm.videoTime = response.paramData;
       this.showUploadVideo(this.dataForm.videoUrl);
     },
     // 视频上传预览
@@ -267,21 +268,20 @@
     },
     closeDialog() {
     let upload_list = document.getElementsByClassName("el-upload-list__item");
-    $('upload_list[0]').remove();
+    upload_list[0].remove();
     },
       // 表单提交
       dataFormSubmit () {
-        this.dataForm.videoUrl = this.getVideoURL();
-        if (!this.dataForm.videoUrl) {
+         if (!this.dataForm.videoUrl){
           this.$confirm(`请上传视频再次提交`, '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
             type: 'warning'
           }).then(() => {
-            return;
+            return; 
           })
-        } else {
-          this.$refs['dataForm'].validate((valid) => {
+          }
+           this.$refs['dataForm'].validate((valid) => {
             if (valid) {
               this.$http({
                 url: this.$http.adornUrl(`/xry/video/${!this.dataForm.id ? 'save' : 'update'}`),
@@ -294,7 +294,7 @@
                   'catalogId': this.dataForm.catalogId,
                   'property': this.dataForm.property,
                   'status': this.dataForm.status,
-                  'paramData': this.dataForm.paramData
+                  'paramData': this.dataForm.videoTime
                 })
               }).then(({ data }) => {
                 if (data && data.code === 0) {
@@ -313,12 +313,20 @@
               })
             }
           })
-        }
       },
-      // 获取富文本编辑器的内容
-      getVideoURL() {
-        let content = this.$refs.ue.getUEContent();
-        return $(content).find("video").attr("src");
+      //表单提交确认
+      submitConform(){
+      if (this.dataForm.id) {
+      this.$confirm(`如果进行修改操作，系统将重新提交平台审核，您确定要继续修改操作吗？`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(() => {
+      this.dataFormSubmit()
+      })
+     }else{
+     this.dataFormSubmit()  
+      }
       }
     }
   }

@@ -5,12 +5,12 @@
         <el-input v-model="dataForm.name" placeholder="类目名称"></el-input>
       </el-form-item>
       <el-form-item label="选父类目" size="mini" prop="flag" v-show="checkShow">
-        <el-radio-group v-model="dataForm.flag" @change="changeHandler">
+        <el-radio-group v-model="dataForm.flag">
           <el-radio :label="0">否</el-radio>
           <el-radio :label="1">是</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="父类目" prop="parentName" v-show="parentShow"> 
+      <el-form-item label="父类目" prop="parentName" v-show="dataForm.flag === 1"> 
         <el-popover ref="courseCatListPopover" placement="bottom-start" trigger="click">
           <el-tree :data="courseCatList" :props="courseCatListTreeProps" node-key="id" ref="courseCatListTree" @current-change="courseCatListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">
@@ -35,7 +35,6 @@
     data () {
       return {
         visible: false,
-        parentShow:false,
         checkShow:true,
         dataForm: {
           id: 0,
@@ -64,6 +63,10 @@
     methods: {
       init (id) {
         this.dataForm.id = id || 0
+        //如果是修改操作，则不显示 “是否选择父类目”的入口
+        if(this.dataForm.id){
+          this.checkShow = false
+        }else{ this.checkShow = true} 
         // 查询所有课程类目，构造成一棵树
         let flag = 1;
         this.$http({
@@ -86,7 +89,6 @@
             }).then(({ data }) => {
               if (data && data.code === 0) {
                 this.dataForm.parentId = data.courseCat.parentId
-                //this.dataForm.flag = data.courseCat.flag
                 this.dataForm.name = data.courseCat.name
                 this.dataForm.status = data.courseCat.status
                 this.dataForm.sortOrder = data.courseCat.sortOrder
@@ -142,13 +144,6 @@
             })
           }
         })
-      },
-      changeHandler(value) {
-        if (1 == value) {
-        this.parentShow = true
-        } else {
-        this.parentShow = false
-        }
       }
     }
   }
@@ -162,11 +157,7 @@
         cursor: pointer;
       }
     }
-    &__icon-popover {
-      /*max-width: 370px;*/
-    }
     &__icon-list {
-      /*max-height: 180px;*/
       padding: 0;
       margin: -8px 0 0 -8px;
       > .el-button {

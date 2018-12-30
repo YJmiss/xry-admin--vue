@@ -25,7 +25,7 @@
       },
       sidebarLayoutSkin: {
         get () { return this.$store.state.common.sidebarLayoutSkin },
-        set (val) { this.$store.commit('common/updateSidebarLayoutSkin', val) }
+        set (val) {this.$store.commit('common/updateSidebarLayoutSkin', val) }
       }
     }
   }

@@ -5,7 +5,12 @@
         <div>{{dataForm.detail}}</div>
       </el-form-item>
       <el-form-item label="回复内容" prop="reply">
-        <textarea rows="15" cols="110" v-model="dataForm.reply"></textarea>
+      <el-tooltip class="item" effect="dark" content="已经恢复过一次，不能再修改内容啦！" placement="top" v-if="dataForm.reply">
+      <textarea  rows="15" cols="110" v-model="dataForm.reply" readonly="readonly"></textarea>
+      </el-tooltip>
+      <el-tooltip class="item" effect="dark" content="请仔细认真填写，一旦回复之后无法撤回！" placement="top"  v-else>
+      <textarea rows="15" cols="110" v-model="dataForm.reply"></textarea>
+      </el-tooltip>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">

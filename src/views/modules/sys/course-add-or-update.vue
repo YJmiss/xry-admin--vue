@@ -157,11 +157,12 @@ components: {Editor},
                     this.showUploadImg2(data.course.image);
                     }
                    courseDesc:{ 
-                     console.log('dec:'+data.courseDesc)
-                   //this.dataForm.courseDesc = data.courseDesc
+                    this.dataForm.courseDesc = data.courseDesc.courseDesc
                     }
                   }
                 })
+              }else{
+              this.dataForm.courseDesc = ''
               }
             });
         });
@@ -187,12 +188,28 @@ components: {Editor},
       this.dataForm.teacherName = (this.$refs.teacherListTree.getCurrentNode() || {})["realName"];
     },
     dataFormSubmit () {
+      if (this.dataForm.id) {
+      this.$confirm(`如果进行修改操作，系统将重新提交平台审核，您确定要继续修改操作吗？`, '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+        }).then(() => {
+        if (1 == this.dataForm.property) {
+        if (!this.validatePrice()&&this.dataForm.price) {
+          this.dataSubmit()  
+        }  
+      } else {
+        this.dataSubmit()  
+      }
+        })
+      }else{
       if (1 == this.dataForm.property) {
         if (!this.validatePrice()&&this.dataForm.price) {
           this.dataSubmit()  
         }  
       } else {
         this.dataSubmit()  
+      }
       }
     },
     // 表单提交
@@ -226,6 +243,7 @@ components: {Editor},
                 onClose: () => {
                   this.visible = false;
                   this.$emit("refreshDataList");
+                  
                 }
               });
             } else {
@@ -314,7 +332,7 @@ components: {Editor},
     },
     closeDialog() {
       let upload_list = document.getElementsByClassName("el-upload-list__item");
-      $('upload_list[0]').remove();
+      upload_list[0].remove();
     }
   }
 };
