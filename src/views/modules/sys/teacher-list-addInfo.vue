@@ -2,7 +2,7 @@
   <el-dialog :visible.sync="visible" :close-on-click-modal="false" :rules="dataRule">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="dataFormSubmit()" >
       <p v-if="dataForm.orgName">所属机构名称：{{dataForm.orgName}}</p>
-      <div v-else style="margin-left:300px;">
+      <div v-else>
        是否添加所属机构：
       <el-radio-group v-model="radio" @change="selectHandle(radio)">
       <el-radio :label="1">否</el-radio>
@@ -31,6 +31,10 @@
       <el-form-item label="身份证反面照：" v-else>
       <el-button  type="primary">上传图片</el-button>
       </el-form-item>
+      <p v-if="dataForm.teacherIntro">讲师简介：{{dataForm.teacherIntro}}</p>
+      <el-form-item v-else label="讲师简介：">
+       <el-input type="textarea" minlength="10" resize="vertical" rows="5"></el-input>
+      </el-form-item>
     </el-form>
    <span slot="footer" class="dialog-footer">
     <el-button @click="visible = false">取消</el-button>
@@ -52,7 +56,8 @@ import { treeDataTranslate } from '@/utils'
         teacherId:'',
         id_card:'',
         id_card_front:'',
-        id_card_back:''
+        id_card_back:'',
+        teacherIntro:''
         },
        orgNameList:[],
        organizationList:[],
@@ -94,17 +99,18 @@ import { treeDataTranslate } from '@/utils'
     this.visible = true
     this.dataForm.teacherId = id
     this.$http({
-      url: this.$http.adornUrl(''),
+      url: this.$http.adornUrl('/xry/teacher/detail'),
       method: 'get',
       params: this.$http.adornParams({
-        'id': id
+        'id': this.dataForm.teacherId
       })
     }).then(({ data }) => {
       if (data && data.code === 0) {
-        this.dataForm.orgName = '',
-        this.dataForm.id_card = '',
-        this.dataForm.id_card_front = '',
-        this.dataForm.id_card_back = '' 
+        this.dataForm.organizationId = data.teacher.org_id,
+        this.dataForm.id_card = data.teacher.id_card,
+        this.dataForm.id_card_front = data.teacher.id_card_front,
+        this.dataForm.id_card_back = data.teacher.id_card_back,
+        this.dataForm.teacherIntro = data.teacher.brief_intro
       } 
     })
     },
@@ -152,7 +158,5 @@ import { treeDataTranslate } from '@/utils'
   }
 </script>
 <style scoped>
-.el-form-item{
-margin: 10px 300px;
-}
+
 </style>

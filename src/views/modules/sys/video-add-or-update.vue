@@ -55,7 +55,6 @@
   import $ from 'jquery'
   import { treeDataTranslate } from '@/utils'
   export default {
-    components: {UE},
     data () {
       return {
         contentVisible:true,
@@ -211,7 +210,7 @@
       },
         // 上传之前
     beforeUploadHandle(file) {
-     if (file.type != "video/mp4" || file.size > 1048576000) {
+     if (file.type != "video/mp4" && file.type != "video/flv" || file.size > 1048576000) {
         this.$message.error("请检查视频格式（只支持mp4格式的视频！大小超过1000M)");
         return false;
       } 

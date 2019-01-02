@@ -43,10 +43,8 @@
 </template>
 <script>
   import $ from 'jquery'
-  import UE from "@/components/ue/ue.vue";
   import { treeDataTranslate} from '@/utils'
   export default {
-    components: { UE },
     data () {
       return {
         visible: false,

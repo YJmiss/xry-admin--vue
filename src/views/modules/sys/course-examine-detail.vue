@@ -26,7 +26,7 @@
        <span class="info">{{dataForm.price}}元</span>
       </el-form-item>
       <el-form-item label="课程图片" class="Image">
-        <img :src="dataForm.image" alt="课程封面图">
+        <img :src="dataForm.image" alt="课程封面图" width="auto" height="auto">
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -94,12 +94,6 @@
             this.teacherList = treeDataTranslate(data.teacherList, 'id')
           }).then(() => { 
             this.visible = true
-            this.$nextTick(() => {
-              // 重置form表单（清空form表单的内容）
-              this.$refs['dataForm'].resetFields()
-              // 清除el-upload上次操作数据
-              // this.$refs.upload.clearFiles()
-            })
           }).then(() => {
             if (this.dataForm.id) {
               this.$http({
@@ -113,7 +107,6 @@
                   this.dataForm.title = data.course.title
                   this.dataForm.cid = data.course.cid
                   this.dataForm.tid = data.course.tid
-                  //this.dataForm.property = data.course.property
                   this.dataForm.price = data.course.price
                   this.dataForm.status = data.course.status
                   this.dataForm.image = data.course.image
@@ -126,7 +119,9 @@
                   }
                 }
               })
-            } 
+            } else{
+               this.dataForm.image = ''
+            }
           })
         })
       },

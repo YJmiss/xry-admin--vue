@@ -8,7 +8,7 @@
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input v-model="dataForm.parentName" v-popover:courseCatListPopover :readonly="true" placeholder="点击选择课程类目" class="cat-list__input"></el-input>
+        <el-input clearable v-model="dataForm.parentName" v-popover:courseCatListPopover  placeholder="点击选择课程类目" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="所属讲师" prop="teacherName">
         <el-popover ref="teacherListPopover" placement="bottom-start" trigger="click">
@@ -16,7 +16,7 @@
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input v-model="dataForm.teacherName" v-popover:teacherListPopover :readonly="true" placeholder="点击选择所属讲师" class="cat-list__input"></el-input>
+        <el-input clearable v-model="dataForm.teacherName" v-popover:teacherListPopover  placeholder="点击选择所属讲师" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="课程标题">
         <el-input v-model="dataForm.title" placeholder="课程标题" clearable></el-input>
@@ -27,10 +27,10 @@
       </el-select>
       </el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('xry:course:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('xry:course:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-        <el-button v-if="isAuth('xry:course:addToCourse')" type="primary" @click="addToCourse()" :disabled="dataListSelections.length <= 0">批量上架</el-button>
-        <el-button v-if="isAuth('xry:course:delFromCourse')" type="warning" @click="delFromCourse()" :disabled="dataListSelections.length <= 0">批量下架</el-button>
+        <el-button  class="button" v-if="isAuth('xry:course:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
+        <el-button  class="button" v-if="isAuth('xry:course:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button  class="button" v-if="isAuth('xry:course:addToCourse')" type="primary" @click="addToCourse()" :disabled="dataListSelections.length <= 0">批量上架</el-button>
+        <el-button class="button" v-if="isAuth('xry:course:delFromCourse')" type="warning" @click="delFromCourse()" :disabled="dataListSelections.length <= 0">批量下架</el-button>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
@@ -59,10 +59,10 @@
       <el-table-column prop="created" header-align="center" align="center" width="220" label="创建时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="left" width="250" label="操作">
         <template slot-scope="scope" porp="status">
-          <el-button v-if="isAuth('xry:course:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)" :disabled="scope.row.status ===4 || scope.row.status === 3"></el-button>
-          <el-button v-if="isAuth('xry:course:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id,scope.row.status)" :disabled="scope.row.status ===4 || scope.row.status === 3"></el-button>
-          <el-button v-if="isAuth('xry:course:addToCourse')" type="primary" round size="small" @click="addToCourse(scope.row.id)" v-show="scope.row.status ===3 || scope.row.status ===5">上架</el-button>
-          <el-button v-if="isAuth('xry:course:delFromCourse')" type="warning" round size="small" @click="delFromCourse(scope.row.id)" v-show="scope.row.status ===4 ">下架</el-button>
+          <el-button  v-if="isAuth('xry:course:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)" :disabled="scope.row.status ===4 || scope.row.status === 3"></el-button>
+          <el-button  v-if="isAuth('xry:course:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id,scope.row.status)" :disabled="scope.row.status ===4 || scope.row.status === 3"></el-button>
+          <el-button  v-if="isAuth('xry:course:addToCourse')" type="primary" round size="small" @click="addToCourse(scope.row.id)" v-show="scope.row.status ===3 || scope.row.status ===5">上架</el-button>
+          <el-button  v-if="isAuth('xry:course:delFromCourse')" type="warning" round size="small" @click="delFromCourse(scope.row.id)" v-show="scope.row.status ===4 ">下架</el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -340,5 +340,9 @@ p{
 font:14px 微软雅黑;
 color:#ff0000;
 letter-spacing:2px;
+}
+.button{
+padding-left:16px;
+padding-right:16px;
 }
 </style>

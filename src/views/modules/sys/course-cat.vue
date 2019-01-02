@@ -8,10 +8,10 @@
             :highlight-current="true" :expand-on-click-node="false">
           </el-tree>
         </el-popover>
-        <el-input v-model="dataForm.parentName" v-popover:courseCatListPopover :readonly="true" placeholder="点击选择课程类目" class="cat-list__input"></el-input>
+        <el-input v-model="dataForm.parentName" v-popover:courseCatListPopover placeholder="点击选择课程类目" class="cat-list__input" clearable></el-input>
       </el-form-item>
       <el-form-item label="状态">
-        <el-select v-model="dataForm.status" placeholder="请选择状态" @change="currentSel">
+        <el-select v-model="dataForm.status" placeholder="请选择状态" @change="currentSel" clearable>
           <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
         </el-select>
       </el-form-item>

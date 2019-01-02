@@ -28,10 +28,22 @@
        </el-table-column>
       <el-table-column prop="id_card" header-align="center" align="center" label="身份证号" width="170"></el-table-column>
        <el-table-column prop="id_card_front" header-align="center" align="center" label="证件照正面" width="150">
-           <img :src="dataForm.id_card_front">
+         <template slot-scope="scope">
+           <img :src="scope.id_card_front">
+         </template>
        </el-table-column>
         <el-table-column prop="id_card_back" header-align="center" align="center" label="证件照反面" width="150">
-        <img :src="dataForm.id_card_back">
+          <template slot-scope="scope">
+            <img :src="scope.id_card_back">
+          </template>
+       </el-table-column>
+        <el-table-column header-align="center" align="center" label="讲师简介" max-height='100'>
+          <template slot-scope="scope"  prop="brief_intro">
+          <el-popover ref="introPopover" placement="top-start" trigger="hover">
+            <span>点击查看全部简介</span>
+          </el-popover>
+           <el-button show-overflow-tooltip size="small" type="text" v-popover:introPopover @click="showAllIntro(scope.brief_intro)">{{scope.brief_intro}}</el-button>
+          </template>
        </el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="认证状态" width="100">
          <template slot-scope="scope">
@@ -39,9 +51,10 @@
         </template>
       </el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="认证时间"></el-table-column>
-       <el-table-column fixed="right" header-align="center" align="right"  label="操作">
+       <el-table-column fixed="right" header-align="center" align="center"  label="操作">
          <template slot-scope="scope">
-          <el-button v-if="!scope.row.id_card || !scope.row.id_card_front || !scope.row.id_card_back" round icon="el-icon-edit-outline" type="primary" @click="addInfoHandle(scope.row.id)">补充资料</el-button>
+          <el-button v-show="!scope.row.orgName || !scope.row.id_card || !scope.row.id_card_front || !scope.row.id_card_back || !scope.row.id_card_back " 
+          v-if="isAuth('xry:user:addTeacherInfo')" round icon="el-icon-edit-outline" type="primary" @click="addInfoHandle(scope.row.id)">补充资料</el-button>
           <el-button v-if="isAuth('xry:user:updateTeacherRoleToUser')"  type="warning" size="small" round  @click="changeRoleHandle(scope.row.id)">置为普通用户</el-button>
          </template>
        </el-table-column>
@@ -199,7 +212,13 @@ import addTeacherInfo from './teacher-list-addInfo'
           })
         }).catch(() => {})
       },
-     
+      //显示全部简介
+     showAllIntro(intro){
+     this.$alert(intro, '讲师简介', {
+          confirmButtonText: '确定',
+          callback: action => {}
+        });
+     },
       // 用户状态下拉选中事件
       statusCurrentSel(selVal){
         this.status = selVal;
