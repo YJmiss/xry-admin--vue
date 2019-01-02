@@ -1,7 +1,6 @@
 <template>
   <div class="mod-xryuser">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-
       <el-form-item label="手机号">
       <el-input v-model="dataForm.userPhone" placeholder="请填写手机号" clearable></el-input>
       </el-form-item>
@@ -27,22 +26,28 @@
          </template>
        </el-table-column>
       <el-table-column prop="id_card" header-align="center" align="center" label="身份证号" width="170"></el-table-column>
-       <el-table-column prop="id_card_front" header-align="center" align="center" label="证件照正面" width="150">
+       <el-table-column  header-align="center" align="center" label="证件照正面" width="150">
          <template slot-scope="scope">
-           <img :src="scope.id_card_front">
+           <el-popover ref="imgPopover" placement="left" trigger="click">
+            <img class="big-img" :src="scope.row.id_card_front"/>
+          </el-popover>
+          <img class="broadcst-img" v-popover:imgPopover :src="scope.row.id_card_front">
          </template>
        </el-table-column>
-        <el-table-column prop="id_card_back" header-align="center" align="center" label="证件照反面" width="150">
+        <el-table-column  header-align="center" align="center" label="证件照反面" width="150">
           <template slot-scope="scope">
-            <img :src="scope.id_card_back">
+           <el-popover ref="imgPopover" placement="left" trigger="click">
+            <img class="big-img" :src="scope.row.id_card_back"/>
+          </el-popover>
+          <img class="broadcst-img" v-popover:imgPopover :src="scope.row.id_card_back">
           </template>
        </el-table-column>
-        <el-table-column header-align="center" align="center" label="讲师简介" max-height='100'>
-          <template slot-scope="scope"  prop="brief_intro">
+        <el-table-column prop="brief_intro" header-align="center" align="center" label="讲师简介" max-height='100'>
+          <template slot-scope="scope">
           <el-popover ref="introPopover" placement="top-start" trigger="hover">
             <span>点击查看全部简介</span>
           </el-popover>
-           <el-button show-overflow-tooltip size="small" type="text" v-popover:introPopover @click="showAllIntro(scope.brief_intro)">{{scope.brief_intro}}</el-button>
+           <el-button show-overflow-tooltip size="small" type="text" v-popover:introPopover @click="showAllIntro(scope.row.brief_intro)">{{scope.row.brief_intro}}</el-button>
           </template>
        </el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="认证状态" width="100">
@@ -53,8 +58,7 @@
       <el-table-column prop="created" header-align="center" align="center" width="180" label="认证时间"></el-table-column>
        <el-table-column fixed="right" header-align="center" align="center"  label="操作">
          <template slot-scope="scope">
-          <el-button v-show="!scope.row.orgName || !scope.row.id_card || !scope.row.id_card_front || !scope.row.id_card_back || !scope.row.id_card_back " 
-          v-if="isAuth('xry:user:addTeacherInfo')" round icon="el-icon-edit-outline" type="primary" @click="addInfoHandle(scope.row.id)">补充资料</el-button>
+          <el-button v-if="isAuth('xry:teacher:addTeacherInfo')" round icon="el-icon-edit-outline" type="primary" @click="addInfoHandle(scope.row.id)">补充资料</el-button>
           <el-button v-if="isAuth('xry:user:updateTeacherRoleToUser')"  type="warning" size="small" round  @click="changeRoleHandle(scope.row.id)">置为普通用户</el-button>
          </template>
        </el-table-column>
@@ -63,7 +67,7 @@
           :page-size="pageSize" :total="totalPage" layout="total, sizes, prev, pager, next, jumper">
     </el-pagination>
     <!-- 弹窗，补充讲师资料 -->
-    <add-teacher-info v-if="addTeacherInfoVisible" ref="addTeacherInfo"></add-teacher-info>
+    <add-teacher-info v-if="addTeacherInfoVisible" ref="addTeacherInfo" @refreshDataList="getDataList"></add-teacher-info>
   </div>
 </template>
 
@@ -226,3 +230,8 @@ import addTeacherInfo from './teacher-list-addInfo'
     }
   }
 </script>
+<style scope>
+.broadcst-img{width: 50px;height: 50px;}
+.broadcst-img:hover{cursor:pointer}
+.big-img{height:250px;width:500px;}
+</style>
