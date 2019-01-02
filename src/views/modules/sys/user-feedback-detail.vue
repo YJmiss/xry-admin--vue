@@ -1,15 +1,10 @@
 <template>
 <el-dialog :visible.sync="visible" :close-on-click-modal="false">
     <el-form :model="dataForm">
-        <p>反馈用户:<span>{{nickname}}{{phone}}</span></p>
+        <p>反馈用户:&nbsp;<span style="color:red;">{{nickname}}{{phone}}</span></p>
         <h3>反馈信息:</h3>
         <div>{{feedbackInfo}}</div>
-        <p>反馈时间:{{feedbackTime}}</p>
-        <h3>回复信息:</h3>
-        <div>
-            <editor v-model="dataForm.replyInfo" :disabled="false"></editor>
-        </div>
-        <p>回复时间:{{replyTime}}</p>
+        <p>反馈时间:&nbsp;{{feedbackTime}}</p>
     </el-form>
 </el-dialog>
 </template>
@@ -21,14 +16,10 @@ export default {
     data() {
         return {
             visible: false,
-             dataForm: {
-                replyInfo:''  
-             },
             nickname:'',
             phone:'',
             feedbackInfo: '',
             feedbackTime: '',
-            replyTime:''
         }
     },
     methods: {
@@ -44,9 +35,7 @@ export default {
                     this.feedbackInfo = data.userFeedback.feedback_info,
                     this.feedbackTime = data.userFeedback.create_time,
                     this.nickname = data.userFeedback.nickname,
-                    this.phone = data.userFeedback.phone,
-                    this.dataForm.replyInfo = data.userFeedback.reply_info,
-                    this.replyTime = data.userFeedback.reply_time            
+                    this.phone = data.userFeedback.phone         
                 }
             })
         }
@@ -66,9 +55,5 @@ export default {
 p {
     font: 16px 微软雅黑;
     color: #333;
-}
-
-p span {
-    color: beige;
 }
 </style>

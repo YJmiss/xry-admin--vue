@@ -38,7 +38,7 @@
                 <el-tag type="success" v-if="scope.row.check_status == 1">已回复</el-tag>
             </template>
         </el-table-column>
-        <el-table-column prop="reply_time" label="反馈时间" header-align="center" align="center" width="200"></el-table-column>
+        <el-table-column prop="reply_time" label="回复时间" header-align="center" align="center" width="200"></el-table-column>
         <el-table-column fixed="right" label="操作" header-align="center" align="canter">
             <template slot-scope="scope" prop="check_status">
                 <el-button v-if="isAuth('xry:feedback:detail')" type="primary" size="small" @click="viewFeedbackInfo(scope.row.id)">反馈详情</el-button>
@@ -202,7 +202,7 @@ export default {
         replyHandle(id) {
             this.replyAddOrViewVisible = true
             this.$nextTick(() => {
-                this.$refs.replyAddOrView.init(id)
+            this.$refs.replyAddOrView.init(id)
             })
         },
         // 每页数

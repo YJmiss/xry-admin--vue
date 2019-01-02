@@ -37,7 +37,7 @@ export default {
                     trigger: "blur"
                 }],
             },
-            uploadUrl: this.$http.adornUrl(`/sys/oss/uploadImg?token=${this.$cookie.get('token')}`),
+        uploadUrl: this.$http.adornUrl(`/sys/oss/uploadImg?token=${this.$cookie.get('token')}`),
         }
     },
     methods: {
@@ -45,6 +45,7 @@ export default {
         init(id) {
             this.dataForm.id = id || 0
             this.visible = true
+            if(this.dataForm.id){
             this.$nextTick(() => {
                 this.$refs['dataForm'].resetFields()
                 this.$http({
@@ -63,6 +64,10 @@ export default {
                     }
                 })
             });
+            }else{
+               this.dataForm.reply_info = ''  
+            }
+           
         },
         replySubmit() {
             this.$refs["dataForm"].validate(valid => {

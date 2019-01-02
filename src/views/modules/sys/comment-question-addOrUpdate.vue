@@ -1,6 +1,6 @@
 <template>
 <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible" @close='closeDialog'>
-    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
+    <el-form :model="dataForm" :rules="dataRule" ref="dataForm" label-width="80px">
         <el-form-item label="问题标题" prop="title">
         <el-input v-model="dataForm.title" type="textarea" rows="3" placeholder="问题标题"></el-input>
         </el-form-item>

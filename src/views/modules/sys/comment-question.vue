@@ -17,20 +17,18 @@
         <el-button type="primary" @click="addOrUpdateHandle()">新增</el-button>
     </el-form>
     <el-table :data="dataList" border style="width: 100%">
-        <el-table-column prop="title" header-align="center" align="center"  label="问题标题" width="350"></el-table-column>
-        <el-table-column prop="reply_info" header-align="center" align="center" label="问题解答内容">
-        </el-table-column>
-        <el-table-column header-align="center" align="center" label="状态" width="100">
+        <el-table-column prop="title" header-align="center" align="center"  label="问题标题" ></el-table-column>
+        <el-table-column header-align="center" align="center" label="状态" width="200">
             <template slot-scope="scope" porp="question_status">
                 <el-tag type="info" v-if="scope.row.question_status ===0">未发布</el-tag>
                 <el-tag type="success" v-if="scope.row.question_status ===1">已发布</el-tag>
             </template>
         </el-table-column>
-        <el-table-column prop="create_time" header-align="center" align="center" label="创建时间" width="200"></el-table-column>
+        <el-table-column prop="create_time" header-align="center" align="center" label="创建时间" ></el-table-column>
         <el-table-column fixed="right" header-align="center" align="center" label="操作">
             <template slot-scope="scope" porp="question_status">
-                <el-button v-if="isAuth('xry:question:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)" :disabled="scope.row.question_status === 1"></el-button>
-                <el-button v-if="isAuth('xry:question:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)" :disabled="scope.row.question_status === 1"></el-button>
+                <el-button v-if="isAuth('xry:question:update')" type="primary" size="small" icon="el-icon-edit" round @click="addOrUpdateHandle(scope.row.id)" :disabled="scope.row.question_status === 1">详情</el-button>
+                <el-button v-if="isAuth('xry:question:delete')" type="danger" size="small" icon="el-icon-delete" round @click="deleteHandle(scope.row.id)" :disabled="scope.row.question_status === 1">删除</el-button>
                 <el-button v-if="isAuth('xry:question:cancelPublish')" type="danger" size="small" @click="cancelPublish(scope.row.id)" v-show="scope.row.question_status ===1">撤回</el-button>
                 <el-button v-if="isAuth('xry:question:publishQuestion')" type="success" size="small"  @click="publishQuestion(scope.row.id)" v-show="scope.row.question_status ===0">发布</el-button>
             </template>
@@ -246,6 +244,7 @@ export default {
             this.pageIndex = val
             this.getDataList()
         }
+
     }
 }
 </script>
