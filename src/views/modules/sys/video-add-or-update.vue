@@ -31,15 +31,15 @@
         <el-form-item label="视频路径" prop="url">
             <el-input v-model="dataForm.videoUrl" type="text" placeholder="视频路径" readonly="readonly"></el-input>
         </el-form-item>
-        <el-form-item label="视频时长">
+       <!--  <el-form-item label="视频时长">
             <el-input v-model="dataForm.videoTime" type="text" placeholder="视频时长" readonly="readonly"></el-input>
-        </el-form-item>
+        </el-form-item> -->
         <el-form-item label="上传视频" class="uploadVideo">
             <el-upload :action="url" ref="upload" :before-upload="beforeUploadHandle" :on-success="successHandle" :file-list="fileList">
                 <el-button type="primary" round>选择视频</el-button>
                 <div class="el-upload__tip" slot="tip">只支持mp4格式的视频！</div>
             </el-upload>
-            <video v-show="dataForm.videoUrl" :src="dataForm.videoUrl"/>
+            <video v-show="dataForm.videoUrl" :src="dataForm.videoUrl" controls="true"/>
     </el-form-item>
      </el-form>
     <span slot="footer" class="dialog-footer">
@@ -150,7 +150,7 @@ export default {
                             this.dataForm.catalogId = data.video.catalogId
                             this.dataForm.property = data.video.property
                             this.dataForm.status = data.video.status
-                            this.dataForm.videoTime = data.video.paramData
+                           // this.dataForm.videoTime = data.video.paramData
                             this.courseListTreeSetCurrentNode()
                             this.courseCatalogListTreeSetCurrentNode()
                         }
@@ -236,7 +236,7 @@ export default {
             this.fileList = fileList;
             this.successNum++;
             this.dataForm.videoUrl = response.url;
-            this.dataForm.videoTime = response.paramData;
+            //this.dataForm.videoTime = response.paramData;
         },
         // 表单提交
         dataFormSubmit() {
@@ -262,7 +262,7 @@ export default {
                             'catalogId': this.dataForm.catalogId,
                             'property': this.dataForm.property,
                             'status': this.dataForm.status,
-                            'paramData': this.dataForm.videoTime
+                            //'paramData': this.dataForm.videoTime
                         })
                     }).then(({
                         data
