@@ -1,12 +1,11 @@
 <template>
-  <el-dialog title="视频内容播放" :close-on-click-modal="false" :visible.sync="visible">
+  <el-dialog title="视频内容播放" :close-on-click-modal="false" :visible.sync="visible" @close='dataFormSubmit'>
     <el-form :model="dataForm"  ref="dataForm" label-width="80px">
-     <!--  <video width="100%" id="video-play" controls="controls" :src="dataForm.videoUrl" type="video/mp4" ></video> -->
-    <ali-player  :source="dataForm.videoUrl" :vid="dataForm.id" ref="player" @play="getDuration"></ali-player>
+    <ali-player  :source="dataForm.videoUrl" :vid="dataForm.id + ''" ref="player" :autoplay="true" ></ali-player>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" @click="dataFormSubmit()" v-if="isAuth('xry:record:getDuration')">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -30,13 +29,6 @@
         }
       }
     },
-     computed: {
-      // 高度自适应
-      height () {
-        let width = document.documentElement.clientWidth
-        return `${width / 1.7777778}px`
-      }
-    },
     methods: {
       init (id) {
         this.dataForm.id = id.toString() 
@@ -54,13 +46,39 @@
       },
       // 获取视频时长并提交后台
       dataFormSubmit () {
-     
+        this.getDuration()
+        if(this.dataForm.videoTime){
+         this.$http({
+          url: this.$http.adornUrl('/xry/record/getDuration'),
+          method: 'get',
+          params: this.$http.adornParams({
+            'videoId': this.dataForm.id,
+            'videoTime':Math.ceil(this.dataForm.videoTime),
+          })
+         }).then(({ data }) => {
+            if (data && data.code === 0) {
+              this.visible = false
+              this.$message({
+                message: '操作成功',
+                type: 'success',
+                duration: 1500,
+                onClose: () => {
+                  this.getDataList()
+                }
+              })
+            } else {
+            this.$message.error(data.msg)
+            }
+           })
+         }
+        else{
+        this.$message.warning('离开前请先看视频，以审核视频内容是否合格！')  
+       }
       },
       //获取总时长
       getDuration(){
       const player = this.$refs.player.instance;
-      player && player.getDuration();
-      console.log(player)
+      this.dataForm.videoTime = player.getDuration();
       }
     }
   }
