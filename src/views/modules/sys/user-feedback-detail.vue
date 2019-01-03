@@ -20,6 +20,7 @@ export default {
             phone:'',
             feedbackInfo: '',
             feedbackTime: '',
+            dataForm:{}
         }
     },
     methods: {

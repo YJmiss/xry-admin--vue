@@ -130,7 +130,7 @@
     },
     activated () {
       this.getDataList()
-      this.initWebSocket()
+      // this.initWebSocket()
     },
     methods: {
       // 获取数据列表

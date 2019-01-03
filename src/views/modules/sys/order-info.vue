@@ -46,7 +46,6 @@
                 'orderId':orderId
                })
             }).then(({data}) => {
-                console.log(data)
                 if(data && data.code === 0){
                 this.dataList = data.orderCourses
                 for(let i = 0;i<data.orderCourses.length;i++){
