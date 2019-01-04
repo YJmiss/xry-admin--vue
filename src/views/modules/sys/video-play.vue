@@ -13,9 +13,8 @@
 <script>
   import { treeDataTranslate } from '@/utils';
   import aliPlayer from "@/components/VueAliplayer.vue";
-  import GitHubBadge from "vue-github-badge";
   export default {
-    components:{aliPlayer,GitHubBadge},
+    components:{aliPlayer},
     data () {
       return {
         visible: false,
