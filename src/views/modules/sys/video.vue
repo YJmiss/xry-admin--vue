@@ -5,7 +5,7 @@
         <el-input v-model="dataForm.title" placeholder="视频标题" clearable></el-input>
       </el-form-item>
       <el-form-item label="所属课程" prop="courseName"> 
-        <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
+        <el-popover ref="courseListPopover" placement="top-start" trigger="click">
           <el-tree :data="courseList" :props="courseListTreeProps" node-key="courseId" ref="courseListTree"
             @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">
@@ -14,7 +14,7 @@
         <el-input v-model="dataForm.courseName" v-popover:courseListPopover :readonly="true" placeholder="点击选择所属课程" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="所属目录" prop="catalogName"> 
-        <el-popover ref="courseCatalogListPopover" placement="bottom-start" trigger="click">
+        <el-popover ref="courseCatalogListPopover" placement="top-start" trigger="click">
           <el-tree :data="courseCatalogList" :props="courseCatalogListTreeProps" node-key="catalogId" ref="courseCatalogListTree"
             @current-change="courseCatalogListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">

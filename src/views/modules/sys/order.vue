@@ -98,9 +98,6 @@
             }],
             value:'',
           pickerOptions: {
-          disabledDate(time) {
-          return time.getTime() > Date.now();
-          },
           shortcuts: [{
             text: '今天',
             onClick(picker) {

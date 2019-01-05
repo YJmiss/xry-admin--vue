@@ -34,11 +34,11 @@
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-      <!-- <el-table-column prop="id" header-align="center" align="center" width="80" label="ID"></el-table-column> -->
-      <el-table-column prop="title" header-align="center" align="center" width="320" label="课程标题"></el-table-column>
-      <el-table-column prop="catName" header-align="center" align="center" width="300" label="所属类目"></el-table-column>
-      <el-table-column prop="realName" header-align="center" align="center" width="150" label="所属讲师"></el-table-column>
-      <el-table-column header-align="center" align="center" label="课程价格（元）">
+      <el-table-column prop="id" header-align="center" align="center" label="ID"></el-table-column>
+      <el-table-column prop="title" header-align="center" align="center" width="350" label="课程标题"></el-table-column>
+      <el-table-column prop="catName" header-align="center" align="center" width="180" label="所属类目"></el-table-column>
+      <el-table-column prop="realName" header-align="center" align="center" width="100" label="所属讲师"></el-table-column>
+      <el-table-column header-align="center" align="center" width="100" label="课程价格（元）">
         <template slot-scope="scope" prop="price">
         <span v-if="scope.row.price >= 0">{{scope.row.price / 100}}</span>
         </template>
@@ -57,7 +57,7 @@
         </template>
       </el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="220" label="创建时间"></el-table-column>
-      <el-table-column fixed="right" header-align="center" align="left" width="250" label="操作">
+      <el-table-column fixed="right" header-align="center" align="center" width="250" label="操作">
         <template slot-scope="scope" porp="status">
           <el-button  v-if="isAuth('xry:course:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)" :disabled="scope.row.status ===4 || scope.row.status === 3"></el-button>
           <el-button  v-if="isAuth('xry:course:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id,scope.row.status)" :disabled="scope.row.status ===4 || scope.row.status === 3"></el-button>
@@ -127,6 +127,9 @@
         }, {
           value: '4',
           label: '通过审核已上架'
+        }, {
+          value: '5',
+          label: '已下架'
         }]
       }
     },

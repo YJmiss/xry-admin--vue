@@ -272,7 +272,8 @@ export default {
                                 onClose: () => {
                                     this.visible = false;
                                     this.$emit("refreshDataList");
-
+                                    // 清除el-upload操作缓存
+                                    this.$refs.upload.clearFiles();
                                 }
                             });
                         } else {

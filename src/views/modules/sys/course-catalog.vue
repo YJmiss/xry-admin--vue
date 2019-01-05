@@ -5,7 +5,7 @@
         <el-input v-model="dataForm.title" placeholder="目录名称" clearable></el-input>
       </el-form-item>
       <el-form-item label="所属课程" prop="parentName"> 
-        <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
+        <el-popover ref="courseListPopover" placement="top-start" trigger="click">
           <el-tree :data="courseList" :props="courseListTreeProps" node-key="id" ref="courseListTree"
             @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">

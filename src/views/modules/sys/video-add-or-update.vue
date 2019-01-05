@@ -10,8 +10,8 @@
                 </el-tree>
             </el-popover>
             <el-input v-model="dataForm.courseName" v-popover:courseListPopover :readonly="true" placeholder="点击选择所属课程" class="cat-list__input"></el-input>
-            <span class="red" v-show="dataForm.fee === 1">付费课程</span>
-            <span class="red" v-show="dataForm.fee === 2">免费课程</span>
+            <span class="red" v-if="dataForm.fee === 1" v-show="dataForm.courseName">付费课程</span>
+            <span class="red" v-else-if="dataForm.fee === 2" v-show="dataForm.courseName">免费课程</span>
         </el-form-item>
         <el-form-item label="所属目录" prop="catalogName">
             <el-popover ref="courseCatalogListPopover" placement="bottom-start" trigger="click">
@@ -125,7 +125,7 @@ export default {
             }).then(({
                 data
             }) => {
-                this.courseList = treeDataTranslate(data.courseList, 'this.dataForm.courseId')
+                this.courseList = treeDataTranslate(data.courseList, 'id')
             }).then(() => {
                 this.visible = true;
                 this.$nextTick(() => {
@@ -150,7 +150,6 @@ export default {
                             this.dataForm.catalogId = data.video.catalogId
                             this.dataForm.property = data.video.property
                             this.dataForm.status = data.video.status
-                           // this.dataForm.videoTime = data.video.paramData
                             this.courseListTreeSetCurrentNode()
                             this.courseCatalogListTreeSetCurrentNode()
                         }
@@ -176,7 +175,7 @@ export default {
                 } else {
                     this.dataForm.videoUrl = ''
                     this.dataForm.videoTime = ''
-
+                    this.$refs["dataForm"].resetFields();
                 }
             })
         },
@@ -262,7 +261,6 @@ export default {
                             'catalogId': this.dataForm.catalogId,
                             'property': this.dataForm.property,
                             'status': this.dataForm.status,
-                            //'paramData': this.dataForm.videoTime
                         })
                     }).then(({
                         data
@@ -275,6 +273,7 @@ export default {
                                 onClose: () => {
                                     this.visible = false
                                     this.$emit('refreshDataList')
+                                    this.$refs["dataForm"].resetFields();
                                 }
                             })
                         } else {
