@@ -1,10 +1,14 @@
 <template>
 <el-dialog :title="!dataForm.id ? '新增' : '修改'" :close-on-click-modal="false" :visible.sync="visible">
     <el-form :model="dataForm" :rules="dataRule" ref="dataForm" @keyup.enter.native="dataFormSubmit()" label-width="80px">
-        <el-form-item label="视频标题" prop="title">
-            <el-input v-model="dataForm.title" type="text" placeholder="视频标题"></el-input>
+        <el-form-item label="上传视频" class="uploadVideo">
+            <el-upload :action="url" ref="upload" :before-upload="beforeUploadHandle" :on-success="successHandle" :file-list="fileList">
+                <el-button type="primary" round>选择视频</el-button>
+                <div class="el-upload__tip" slot="tip">只支持mp4格式的视频！</div>
+            </el-upload>
+            <video  id="video-active" v-show="dataForm.videoUrl" :src="dataForm.videoUrl" controls="true"/>
         </el-form-item>
-        <el-form-item label="所属课程" prop="courseName">
+         <el-form-item label="所属课程" prop="courseName">
             <el-popover ref="courseListPopover" placement="top-start" trigger="click">
                 <el-tree :data="courseList" :props="courseListTreeProps" node-key="id" ref="courseListTree" @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true" :highlight-current="true" :expand-on-click-node="false">
                 </el-tree>
@@ -13,7 +17,14 @@
             <span class="red" v-if="dataForm.fee === 1" v-show="dataForm.courseName">付费课程</span>
             <span class="red" v-else-if="dataForm.fee === 2" v-show="dataForm.courseName">免费课程</span>
         </el-form-item>
-        <el-form-item label="所属目录" prop="catalogName">
+          <el-form-item label="是否收费" size="mini" prop="property" v-show="dataForm.courseName">
+            <el-radio-group v-model="dataForm.property">
+                <el-radio :label="1" :disabled="dataForm.fee === 2">试学</el-radio>
+                <el-radio :label="2" :disabled="dataForm.fee === 2">收费</el-radio>
+                <el-radio :label="3" :disabled="dataForm.fee === 1">免费</el-radio>
+            </el-radio-group>
+        </el-form-item>
+         <el-form-item label="所属目录" prop="catalogName">
             <el-popover ref="courseCatalogListPopover" placement="top-start" trigger="click">
                 <el-tree v-show="contentVisible" :data="courseCatalogList" :props="courseCatalogListTreeProps" node-key="id" ref="courseCatalogListTree" @current-change="courseCatalogListTreeCurrentChangeHandle" :default-expand-all="true" :highlight-current="true" :expand-on-click-node="false">
                 </el-tree>
@@ -21,23 +32,12 @@
             </el-popover>
             <el-input v-model="dataForm.catalogName" v-popover:courseCatalogListPopover placeholder="点击选择所属目录" class="cat-list__input" @focus="catalogueFocus()"></el-input>
         </el-form-item>
-        <el-form-item label="是否收费" size="mini" prop="property">
-            <el-radio-group v-model="dataForm.property">
-                <el-radio :label="1" :disabled="dataForm.fee === 2">试学</el-radio>
-                <el-radio :label="2" :disabled="dataForm.fee === 2">收费</el-radio>
-                <el-radio :label="3" :disabled="dataForm.fee === 1">免费</el-radio>
-            </el-radio-group>
+        <el-form-item label="视频标题" prop="title">
+            <el-input v-model="dataForm.title" type="text" placeholder="视频标题"></el-input>
         </el-form-item>
-        <el-form-item label="视频路径" prop="url">
-            <el-input v-model="dataForm.videoUrl" type="text" placeholder="视频路径" readonly="readonly"></el-input>
+         <el-form-item label="视频路径" prop="url">
+            <el-input v-model="dataForm.videoUrl" type="text" placeholder="服务器返回的视频路径，用户不用输入" readonly="readonly"></el-input>
         </el-form-item>
-        <el-form-item label="上传视频" class="uploadVideo">
-            <el-upload :action="url" ref="upload" :before-upload="beforeUploadHandle" :on-success="successHandle" :file-list="fileList">
-                <el-button type="primary" round>选择视频</el-button>
-                <div class="el-upload__tip" slot="tip">只支持mp4格式的视频！</div>
-            </el-upload>
-            <video  id="video-active" v-show="dataForm.videoUrl" :src="dataForm.videoUrl" controls="true"/>
-    </el-form-item>
      </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
@@ -304,5 +304,9 @@ video {
 
 .red {
     color: red;
+}
+#video-active{
+max-height: 200px;
+max-width:400px;
 }
 </style>
