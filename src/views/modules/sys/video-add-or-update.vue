@@ -5,7 +5,7 @@
             <el-input v-model="dataForm.title" type="text" placeholder="视频标题"></el-input>
         </el-form-item>
         <el-form-item label="所属课程" prop="courseName">
-            <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
+            <el-popover ref="courseListPopover" placement="top-start" trigger="click">
                 <el-tree :data="courseList" :props="courseListTreeProps" node-key="id" ref="courseListTree" @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true" :highlight-current="true" :expand-on-click-node="false">
                 </el-tree>
             </el-popover>
@@ -14,7 +14,7 @@
             <span class="red" v-else-if="dataForm.fee === 2" v-show="dataForm.courseName">免费课程</span>
         </el-form-item>
         <el-form-item label="所属目录" prop="catalogName">
-            <el-popover ref="courseCatalogListPopover" placement="bottom-start" trigger="click">
+            <el-popover ref="courseCatalogListPopover" placement="top-start" trigger="click">
                 <el-tree v-show="contentVisible" :data="courseCatalogList" :props="courseCatalogListTreeProps" node-key="id" ref="courseCatalogListTree" @current-change="courseCatalogListTreeCurrentChangeHandle" :default-expand-all="true" :highlight-current="true" :expand-on-click-node="false">
                 </el-tree>
                 <span class="red" v-show="msgShow">请先选择课程！</span>
@@ -31,15 +31,12 @@
         <el-form-item label="视频路径" prop="url">
             <el-input v-model="dataForm.videoUrl" type="text" placeholder="视频路径" readonly="readonly"></el-input>
         </el-form-item>
-       <!--  <el-form-item label="视频时长">
-            <el-input v-model="dataForm.videoTime" type="text" placeholder="视频时长" readonly="readonly"></el-input>
-        </el-form-item> -->
         <el-form-item label="上传视频" class="uploadVideo">
             <el-upload :action="url" ref="upload" :before-upload="beforeUploadHandle" :on-success="successHandle" :file-list="fileList">
                 <el-button type="primary" round>选择视频</el-button>
                 <div class="el-upload__tip" slot="tip">只支持mp4格式的视频！</div>
             </el-upload>
-            <video v-show="dataForm.videoUrl" :src="dataForm.videoUrl" controls="true"/>
+            <video  id="video-active" v-show="dataForm.videoUrl" :src="dataForm.videoUrl" controls="true"/>
     </el-form-item>
      </el-form>
     <span slot="footer" class="dialog-footer">
@@ -235,7 +232,6 @@ export default {
             this.fileList = fileList;
             this.successNum++;
             this.dataForm.videoUrl = response.url;
-            //this.dataForm.videoTime = response.paramData;
         },
         // 表单提交
         dataFormSubmit() {

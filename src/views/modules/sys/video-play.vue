@@ -1,26 +1,23 @@
 <template>
   <el-dialog title="视频内容播放" :close-on-click-modal="false" :visible.sync="visible" @close='dataFormSubmit'>
     <el-form :model="dataForm"  ref="dataForm" label-width="80px">
-    <ali-player  :source="dataForm.videoUrl" :vid="dataForm.id + ''" ref="player" :autoplay="true" ></ali-player>
+    <video v-if="isAuth('xry:record:getDuration')" id="video-active" :src="dataForm.videoUrl" controls='true' width="90%" height="70%" 
+    @canplaythrough="getDuration()" style=" margin-left:5%;">
+    </video>
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()" v-if="isAuth('xry:record:getDuration')">确定</el-button>
+      <el-button type="primary" @click="dataFormSubmit()" >确定</el-button>
     </span>
   </el-dialog>
 </template>
 
 <script>
   import { treeDataTranslate } from '@/utils';
-  import aliPlayer from "@/components/VueAliplayer.vue";
   export default {
-    components:{aliPlayer},
     data () {
       return {
         visible: false,
-        playAuth: '',
-        player: null,
-        source:'',
         dataForm: {
           id:'',
           videoUrl: '',
@@ -30,16 +27,16 @@
     },
     methods: {
       init (id) {
-        this.dataForm.id = id.toString() 
+         this.dataForm.id = id
           this.$http({
             url: this.$http.adornUrl(`/xry/video/info/${this.dataForm.id}`),
             method: 'get',
             params: this.$http.adornParams()
           }).then(({ data }) => {
-            this.visible = true
-            if (data && data.code === 0) {
-              this.dataForm.id = data.video.id
-              this.dataForm.videoUrl = data.video.videoUrl 
+             this.visible = true
+             if (data && data.code === 0) {
+             this.dataForm.id = data.video.id
+             this.dataForm.videoUrl = data.video.videoUrl 
             }
           })
       },
@@ -68,8 +65,9 @@
       },
       //获取总时长
       getDuration(){
-      const player = this.$refs.player.instance;
-      this.dataForm.videoTime = player.getDuration();
+      setTimeout(() =>{
+      this.dataForm.videoTime = document.getElementById('video-active').duration
+      },100);
       }
     }
   }

@@ -212,16 +212,16 @@
       // 新增 / 修改
       addOrUpdateHandle (id,status) {
         if(id !=0 && status == 3){
-        this.$message.error({
+         this.$message.error({
          showClose: true,
          message: '该视频已通过审核不能修改！ '
-        });  
+        });   
         }else{
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
         this.$refs.addOrUpdate.init(id)
         })
-        }
+        } 
       },
       // 删除
       deleteHandle (id) {
