@@ -93,7 +93,7 @@ export default {
   },
   data() {
     return {
-      playerId:'aliplayer_',
+      playerId:"aliplayer_" + Math.random().toString(36).substr(2),
       scriptTagStatus: 0,
       isReload: false,
       instance: null

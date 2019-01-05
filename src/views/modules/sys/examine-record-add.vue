@@ -88,6 +88,7 @@
                   onClose: () => {
                     this.visible = false
                     this.$emit('refreshDataList')
+                    this.dataForm.detail = ''
                   }
                 })
               } else {
