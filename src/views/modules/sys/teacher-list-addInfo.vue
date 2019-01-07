@@ -1,12 +1,12 @@
 <template>
 <el-dialog :visible.sync="visible" :close-on-click-modal="false" :rules="dataRule">
     <el-form :inline="true" :model="dataForm" ref="dataForm" @keyup.enter.native="dataFormSubmit()">
-        <el-form-item label="所属机构名称：">
+        <!-- <el-form-item label="所属机构名称：">
             <el-select v-model="dataForm.organizationId" clearable placeholder="请选择所属机构" @change="currentChangeHandle">
                 <el-option v-for="item in organizationList" :key="item.id" :label="item.org_name" :value="item.id">
                 </el-option>
             </el-select>
-        </el-form-item><br>
+        </el-form-item><br> -->
         <el-form-item label="身份证号：">
             <el-input v-model="dataForm.id_card" type="text"></el-input>
         </el-form-item><br>
