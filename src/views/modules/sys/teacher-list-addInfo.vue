@@ -1,16 +1,8 @@
 <template>
 <el-dialog :visible.sync="visible" :close-on-click-modal="false" :rules="dataRule">
     <el-form :inline="true" :model="dataForm" ref="dataForm" @keyup.enter.native="dataFormSubmit()">
-        <p v-if="dataForm.orgName">所属机构名称：{{dataForm.orgName}}</p>
-        <div v-else>
-            是否添加所属机构：
-            <el-radio-group v-model="radio" @change="selectHandle(radio)">
-                <el-radio :label="1">否</el-radio>
-                <el-radio :label="2">是</el-radio>
-            </el-radio-group>
-        </div>
-        <el-form-item label="所属机构名称：" v-show="radio == 2">
-            <el-select v-model="dataForm.orgName" clearable placeholder="请选择所属机构" @change="currentChangeHandle">
+        <el-form-item label="所属机构名称：">
+            <el-select v-model="dataForm.organizationId" clearable placeholder="请选择所属机构" @change="currentChangeHandle">
                 <el-option v-for="item in organizationList" :key="item.id" :label="item.org_name" :value="item.id">
                 </el-option>
             </el-select>
@@ -31,10 +23,9 @@
                 <div class="el-upload__tip" slot="tip">只支持jpg、png、gif/格式的图片！</div>
             </el-upload>
             <img v-show="dataForm.id_card_back" :src="dataForm.id_card_back">
-        </el-form-item>
-        <p v-if="dataForm.teacherIntro">讲师简介：{{dataForm.teacherIntro}}</p>
-        <el-form-item v-else label="讲师简介：">
-            <el-input type="textarea" minlength="10" resize="vertical" rows="5"></el-input>
+        </el-form-item><br>
+        <el-form-item label="讲师简介：">
+        <textarea v-model="dataForm.teacherIntro"  rows="5" style="width:600px;min-height:300px;"></textarea>
         </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -84,12 +75,6 @@ export default {
 
     },
     methods: {
-        //是否添加所属机构处理
-        selectHandle(radio) {
-            if (2 == radio) {
-                this.getOrganizationList()
-            }
-        },
         //获取机构列表
         getOrganizationList() {
             this.$http({
@@ -100,7 +85,7 @@ export default {
                 data
             }) => {
                 if (data && data.code === 0) {
-                    this.organizationList = data.page.list
+                this.organizationList = data.page.list
                 }
             })
         },
@@ -122,17 +107,17 @@ export default {
                 }) => {
                     if (data && data.code === 0) {
                         this.dataForm.organizationId = data.teacher.org_id,
-                            this.dataForm.id_card = data.teacher.id_card,
-                            this.dataForm.id_card_front = data.teacher.id_card_front,
-                            this.dataForm.id_card_back = data.teacher.id_card_back,
-                            this.dataForm.teacherIntro = data.teacher.brief_intro
+                        this.dataForm.id_card = data.teacher.id_card,
+                        this.dataForm.id_card_front = data.teacher.id_card_front,
+                        this.dataForm.id_card_back = data.teacher.id_card_back,
+                        this.dataForm.teacherIntro = data.teacher.brief_intro
                     }
                 })
             });
         },
         //机构选中处理
-        currentChangeHandle(selVal) {
-            this.dataForm.organizationId = selVal;
+        currentChangeHandle() {
+            console.log(this.dataForm.organizationId)
         },
         //提交表单
         dataFormSubmit() {

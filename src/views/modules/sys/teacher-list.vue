@@ -59,7 +59,6 @@
        <el-table-column fixed="right" header-align="center" align="center"  label="操作">
          <template slot-scope="scope">
           <el-button v-if="isAuth('xry:teacher:addTeacherInfo')" round icon="el-icon-edit-outline" type="primary" @click="addInfoHandle(scope.row.id)">补充资料</el-button>
-          <el-button v-if="isAuth('xry:user:updateTeacherRoleToUser')"  type="warning" size="small" round  @click="changeRoleHandle(scope.row.id)">置为普通用户</el-button>
          </template>
        </el-table-column>
     </el-table>
