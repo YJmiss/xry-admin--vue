@@ -5,22 +5,26 @@
         <el-input v-model="dataForm.title" placeholder="视频标题" clearable></el-input>
       </el-form-item>
       <el-form-item label="所属课程" prop="courseName"> 
-        <el-popover ref="courseListPopover" placement="top-start" trigger="click">
-          <el-tree :data="courseList" :props="courseListTreeProps" node-key="courseId" ref="courseListTree"
-            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
-            :highlight-current="true" :expand-on-click-node="false">
-          </el-tree>
-        </el-popover>
-        <el-input v-model="dataForm.courseName" v-popover:courseListPopover :readonly="true" placeholder="点击选择所属课程" class="cat-list__input"></el-input>
+      <el-select v-model="dataForm.courseId" clearable placeholder="请选择所属课程" popper-class="optionStyle">
+      <el-option
+        v-for="item in courseList"
+        :key="item.id"
+        :label="item.title"
+        :value="item.id"
+        >
+      </el-option>
+      </el-select>
       </el-form-item>
-      <el-form-item label="所属目录" prop="catalogName"> 
-        <el-popover ref="courseCatalogListPopover" placement="top-start" trigger="click">
-          <el-tree :data="courseCatalogList" :props="courseCatalogListTreeProps" node-key="catalogId" ref="courseCatalogListTree"
-            @current-change="courseCatalogListTreeCurrentChangeHandle" :default-expand-all="true"
-            :highlight-current="true" :expand-on-click-node="false">
-          </el-tree>
-        </el-popover>
-        <el-input v-model="dataForm.catalogName" v-popover:courseCatalogListPopover :readonly="true" placeholder="点击选择所属目录" class="cat-list__input"></el-input>
+      <el-form-item label="所属目录" prop="catalogName">
+      <el-select v-model="dataForm.catalogId" clearable placeholder="请选择所属课程" popper-class="optionStyle">
+      <el-option
+        v-for="item in courseCatalogList"
+        :key="item.id"
+        :label="item.title"
+        :value="item.id"
+        >
+      </el-option>
+      </el-select>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
@@ -84,10 +88,8 @@
         examineDetailvisible:false,
         dataForm: {
           title: '',
-          courseName: '',
-          catalogName: '',
-          courseTitle: '',
-          catalogTitle: '',
+          courseId: '',
+          catalogId: '',
           examineDetail:'',
           recordList:[]
         },
@@ -174,26 +176,6 @@
           })
         })
       },
-      // 课程树选中
-      courseListTreeCurrentChangeHandle (data, node) {
-        this.dataForm.courseId = data.id
-        this.dataForm.courseName = data.title
-      },
-      // 课程树设置当前选中节点
-      courseListTreeSetCurrentNode () {
-        this.$refs.courseListTree.setCurrentKey(this.dataForm.courseId)
-        this.dataForm.courseName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
-      },
-      // 课程目录树选中
-      courseCatalogListTreeCurrentChangeHandle (data, node) {
-        this.dataForm.catalogId = data.id
-        this.dataForm.catalogName = data.title
-      },
-      // 课程目录树设置当前选中节点
-      courseCatalogListTreeSetCurrentNode () {
-        this.$refs.courseCatalogListTree.setCurrentKey(this.dataForm.catalogId)
-        this.dataForm.catalogName = (this.$refs.courseCatalogListTree.getCurrentNode() || {})['title']
-      },
       // 每页数
       sizeChangeHandle (val) {
         this.pageSize = val
@@ -248,7 +230,10 @@
                 }
               })
             } else {
-              this.$message.error(data.msg)
+              this.$message.error({
+                 showClose: true,
+                 message:data.msg
+              })
             }
           })
         }).catch(() => {})

@@ -7,14 +7,16 @@
       <el-form-item label="目录名称" prop="title">
         <el-input v-model="dataForm.title" placeholder="目录名称"></el-input>
       </el-form-item>
-      <el-form-item label="所属课程" prop="parentName"> 
-        <el-popover ref="courseListPopover" placement="top-start" trigger="click">
-          <el-tree :data="courseList" :props="courseListTreeProps" node-key="id" ref="courseListTree"
-            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
-            :highlight-current="true" :expand-on-click-node="false">
-          </el-tree>
-        </el-popover>
-        <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
+      <el-form-item label="所属课程"> 
+         <el-select v-model="dataForm.courseid" clearable placeholder="请选择所属课程">
+          <el-option
+            v-for="item in courseList"
+            :key="item.id"
+            :label="item.title"
+            :value="item.id"
+            >
+          </el-option>
+         </el-select>
       </el-form-item>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -33,22 +35,17 @@
         dataForm: {
           id: 0,
           title: '',
-          courseid: 0,
-          parentName: ''
+          courseid: 0
         },
         dataRule: {
           name: [
             { required: true, message: '目录名称不能为空', trigger: 'blur' }
           ],
-          parentName: [
+         courseid: [
             { required: true, message: '所属课程不能为空', trigger: 'change' }
           ]
         },
         courseList: [],
-        courseListTreeProps: {
-          label: 'title',
-          children: 'children'
-        }
       }
     },
     methods: {
@@ -67,11 +64,8 @@
             this.$refs['dataForm'].resetFields()
           })
         }).then(() => {
-          if (!this.dataForm.id) {
-            // 新增
-            
-          } else {
-            // 修改
+          if (this.dataForm.id) {
+               // 修改
             this.$http({
               url: this.$http.adornUrl(`/xry/course/catalog/info/${this.dataForm.id}`),
               method: 'get',
@@ -81,21 +75,13 @@
               this.dataForm.id = data.courseCatalog.id
               this.dataForm.title = data.courseCatalog.title
               this.dataForm.courseid = data.courseCatalog.courseid
-              this.courseListTreeSetCurrentNode()
-            })
+            })  
+          } else {
+          // 新增
+           this.dataForm.courseid = ''
           }
 
         })
-      },
-      // 课程类目树选中
-      courseListTreeCurrentChangeHandle (data, node) {
-        this.dataForm.courseid = data.id
-        this.dataForm.parentName = data.title
-      },
-      // 课程类目树设置当前选中节点
-      courseListTreeSetCurrentNode () {
-        this.$refs.courseListTree.setCurrentKey(this.dataForm.courseid)
-        this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
       },
       // 表单提交
       dataFormSubmit () {
@@ -163,6 +149,9 @@
       text-align: center;
       color: #e6a23c;
       cursor: pointer;
+    }
+    .el-select{
+    min-width:300px;
     }
   }
 </style>

@@ -59,8 +59,8 @@
       <el-table-column prop="created" header-align="center" align="center" width="220" label="创建时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="center" width="250" label="操作">
         <template slot-scope="scope" porp="status">
-          <el-button  v-if="isAuth('xry:course:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id)" :disabled="scope.row.status ===4 || scope.row.status === 3"></el-button>
-          <el-button  v-if="isAuth('xry:course:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id,scope.row.status)" :disabled="scope.row.status ===4 || scope.row.status === 3"></el-button>
+          <el-button  v-if="isAuth('xry:course:update')" type="primary" size="small" icon="el-icon-edit" circle @click="addOrUpdateHandle(scope.row.id,scope.row.status)"></el-button>
+          <el-button  v-if="isAuth('xry:course:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id,scope.row.status)"></el-button>
           <el-button  v-if="isAuth('xry:course:addToCourse')" type="primary" round size="small" @click="addToCourse(scope.row.id)" v-show="scope.row.status ===3 || scope.row.status ===5">上架</el-button>
           <el-button  v-if="isAuth('xry:course:delFromCourse')" type="warning" round size="small" @click="delFromCourse(scope.row.id)" v-show="scope.row.status ===4 ">下架</el-button>
         </template>
@@ -231,18 +231,30 @@
         this.dataListSelections = val
       },
       // 新增 / 修改
-      addOrUpdateHandle (id) {
+      addOrUpdateHandle (id,status) {
+        if(id !=0 && 3 == status){
+          this.$message.error({
+         showClose: true,
+         message: '该课程已通过审核不能修改！ '
+        }); 
+        }else if(id !=0 && 4 == status){
+         this.$message.error({
+         showClose: true,
+         message: '该课程“已上架”！，请下架课程后再修改! '
+        });
+        }else{
         this.addOrUpdateVisible = true
         this.$nextTick(() => {
-          this.$refs.addOrUpdate.init(id)
+        this.$refs.addOrUpdate.init(id)
         })
+        }
       },
       // 删除
       deleteHandle (id,status) {
-        if(status === 3 || status === 4){
+        if(4 == status){
         this.$message.error({
         showClose: true,
-         message: '该课程正处于“审核通过”或“上架”状态不能删除，如果一定要删除，请先下架！ '
+         message: '该课程“已上架”！，请下架课程后再删除！ '
         });
         }
         else{

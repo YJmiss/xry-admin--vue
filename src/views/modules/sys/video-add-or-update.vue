@@ -8,29 +8,37 @@
             </el-upload>
             <video  id="video-active" v-show="dataForm.videoUrl" :src="dataForm.videoUrl" controls="true"/>
         </el-form-item>
-         <el-form-item label="所属课程" prop="courseName">
-            <el-popover ref="courseListPopover" placement="top-start" trigger="click">
-                <el-tree :data="courseList" :props="courseListTreeProps" node-key="id" ref="courseListTree" @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true" :highlight-current="true" :expand-on-click-node="false">
-                </el-tree>
-            </el-popover>
-            <el-input v-model="dataForm.courseName" v-popover:courseListPopover :readonly="true" placeholder="点击选择所属课程" class="cat-list__input"></el-input>
-            <span class="red" v-if="dataForm.fee === 1" v-show="dataForm.courseName">付费课程</span>
-            <span class="red" v-else-if="dataForm.fee === 2" v-show="dataForm.courseName">免费课程</span>
+         <el-form-item label="所属课程">
+        <el-select v-model="dataForm.courseId"  placeholder="请选择所属课程" popper-class="optionStyle" @change=" courseListTreeCurrentChangeHandle">
+        <el-option
+            v-for="item in courseList"
+            :key="item.id"
+            :label="item.title"
+            :value="item.id"
+            >
+        </el-option>
+        </el-select>
+        <span class="red" v-if="dataForm.fee === 1" v-show="dataForm.courseId">付费课程</span>
+        <span class="red" v-else-if="dataForm.fee === 2" v-show="dataForm.courseId">免费课程</span>
         </el-form-item>
-          <el-form-item label="是否收费" size="mini" prop="property" v-show="dataForm.courseName">
+          <el-form-item label="是否收费" size="mini" prop="property" v-show="dataForm.courseId">
             <el-radio-group v-model="dataForm.property">
                 <el-radio :label="1" :disabled="dataForm.fee === 2">试学</el-radio>
                 <el-radio :label="2" :disabled="dataForm.fee === 2">收费</el-radio>
                 <el-radio :label="3" :disabled="dataForm.fee === 1">免费</el-radio>
             </el-radio-group>
         </el-form-item>
-         <el-form-item label="所属目录" prop="catalogName">
-            <el-popover ref="courseCatalogListPopover" placement="top-start" trigger="click">
-                <el-tree v-show="contentVisible" :data="courseCatalogList" :props="courseCatalogListTreeProps" node-key="id" ref="courseCatalogListTree" @current-change="courseCatalogListTreeCurrentChangeHandle" :default-expand-all="true" :highlight-current="true" :expand-on-click-node="false">
-                </el-tree>
-                <span class="red" v-show="msgShow">请先选择课程！</span>
-            </el-popover>
-            <el-input v-model="dataForm.catalogName" v-popover:courseCatalogListPopover placeholder="点击选择所属目录" class="cat-list__input" @focus="catalogueFocus()"></el-input>
+        <el-form-item label="所属目录">
+        <span class="red" v-if="!dataForm.courseId">请先选择所属课程！</span>
+        <el-select v-model="dataForm.catalogId"  placeholder="请选择所属目录" popper-class="optionStyle"  v-else>
+        <el-option
+            v-for="item in courseCatalogList"
+            :key="item.id"
+            :label="item.title"
+            :value="item.id"
+            >
+        </el-option>
+        </el-select>
         </el-form-item>
         <el-form-item label="视频标题" prop="title">
             <el-input v-model="dataForm.title" type="text" placeholder="视频标题"></el-input>
@@ -54,8 +62,6 @@ import {
 export default {
     data() {
         return {
-            contentVisible: true,
-            msgShow: false,
             roleList: [],
             fileList: [],
             index: 0,
@@ -71,9 +77,6 @@ export default {
                 catalogId: '',
                 property: 0,
                 status: '',
-                paramData: '',
-                courseName: '',
-                catalogName: '',
                 fee: ''
             },
             dataRule: {
@@ -82,12 +85,12 @@ export default {
                     message: '请填写视频标题',
                     trigger: 'blur'
                 }],
-                courseName: [{
+                courseId: [{
                     required: true,
                     message: '请选择视频所属课程',
                     trigger: 'blur'
                 }],
-                catalogName: [{
+                catalogId: [{
                     required: true,
                     message: '请选择视频所属目录',
                     trigger: 'blur'
@@ -99,15 +102,7 @@ export default {
                 }]
             },
             courseList: [],
-            courseCatalogList: [],
-            courseListTreeProps: {
-                label: 'title',
-                children: 'children'
-            },
-            courseCatalogListTreeProps: {
-                label: 'title',
-                children: 'children'
-            }
+            courseCatalogList: []
         }
     },
     methods: {
@@ -124,13 +119,14 @@ export default {
             }) => {
                 this.courseList = treeDataTranslate(data.courseList, 'id')
             }).then(() => {
-                this.visible = true;
-                this.$nextTick(() => {
-                    // 重置form表单（清空form表单的内容）
-                    this.$refs["dataForm"].resetFields();
-                });
+           this.visible = true
+            this.$nextTick(() => {
+              // 重置form表单（清空form表单的内容）
+              this.$refs['dataForm'].resetFields()
+            })
             }).then(() => {
                 if (this.dataForm.id) {
+                   //可进行修改操作
                     this.$http({
                         url: this.$http.adornUrl(`/xry/video/info/${this.dataForm.id}`),
                         method: 'get',
@@ -147,41 +143,38 @@ export default {
                             this.dataForm.catalogId = data.video.catalogId
                             this.dataForm.property = data.video.property
                             this.dataForm.status = data.video.status
-                            this.courseListTreeSetCurrentNode()
-                            this.courseCatalogListTreeSetCurrentNode()
                         }
-                    }).then(() => {
-                        //查询目录树
-                        this.$http({
-                            url: this.$http.adornUrl('/xry/course/catalog/treeCourseCatalog'),
-                            method: 'get',
-                            params: this.$http.adornParams({
-                                'courseId': this.dataForm.courseId,
+                    }) .then(() => {
+                            // 查询目录树，需要根据选中课程的id查询出目录树
+                            this.$http({
+                                url: this.$http.adornUrl('/xry/course/catalog/treeCourseCatalog'),
+                                method: 'get',
+                                params: this.$http.adornParams({
+                                    'courseId': this.dataForm.courseId,
+                                })
+                            }).then(({
+                                data
+                            }) => {
+                                this.courseCatalogList = treeDataTranslate(data.courseCatalogList,'id') 
                             })
-                        }).then(({
-                            data
-                        }) => {
-                            this.courseCatalogList = treeDataTranslate(data.courseCatalogList, 'id')
-                            for (let i = 0; i < data.courseCatalogList.length; i++) {
-                                if (this.dataForm.catalogId == data.courseCatalogList[i].id) {
-                                    this.dataForm.catalogName = data.courseCatalogList[i].title
-                                }
-                            }
-                        })
-                    })
+                            }) 
                 } else {
+                    //新增操作
                     this.dataForm.videoUrl = ''
-                    this.dataForm.videoTime = ''
-                    this.$refs["dataForm"].resetFields();
+                    this.dataForm.title = ''
                 }
             })
         },
         // 课程树选中
-        courseListTreeCurrentChangeHandle(data, node) {
-            this.dataForm.courseId = data.id
-            this.dataForm.courseName = data.title
-            this.dataForm.fee = data.property
-            // 查询目录树，需要根据选中课程的id查询出目录树
+        courseListTreeCurrentChangeHandle() {
+            //判断课程是否付费
+            for(let i=0;i<this.courseList.length;i++){
+                if(this.dataForm.courseId == this.courseList[i].id){
+                 this.dataForm.fee = this.courseList[i].property
+                }
+            }
+            // 根据选中课程id查询出目录
+            this.dataForm.catalogId =''
             this.$http({
                 url: this.$http.adornUrl('/xry/course/catalog/treeCourseCatalog'),
                 method: 'get',
@@ -191,33 +184,8 @@ export default {
             }).then(({
                 data
             }) => {
-                this.courseCatalogList = treeDataTranslate(data.courseCatalogList, 'id')
+               this.courseCatalogList = treeDataTranslate(data.courseCatalogList,'id') 
             })
-        },
-        // 课程树设置当前选中节点
-        courseListTreeSetCurrentNode() {
-            this.$refs.courseListTree.setCurrentKey(this.dataForm.courseId)
-            this.dataForm.courseName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
-        },
-        // 课程目录树选中
-        courseCatalogListTreeCurrentChangeHandle(data, node) {
-            this.dataForm.catalogId = data.id
-            this.dataForm.catalogName = data.title
-        },
-        // 课程目录树设置当前选中节点
-        courseCatalogListTreeSetCurrentNode() {
-            this.$refs.courseCatalogListTree.setCurrentKey(this.dataForm.catalogId)
-            this.dataForm.catalogName = (this.$refs.courseCatalogListTree.getCurrentNode() || {})['title']
-        },
-        //目录输入框获取焦点
-        catalogueFocus() {
-            if (this.dataForm.courseName) {
-                this.contentVisible = true
-                this.msgShow = false
-            } else {
-                this.contentVisible = false
-                this.msgShow = true
-            }
         },
         // 上传之前
         beforeUploadHandle(file) {
@@ -262,6 +230,8 @@ export default {
                         data
                     }) => {
                         if (data && data.code === 0) {
+                          // 重置form表单（清空form表单的内容）
+                           this.$refs["dataForm"].resetFields();
                             this.$message({
                                 message: '操作成功',
                                 type: 'success',

@@ -4,14 +4,16 @@
       <el-form-item label="目录名称">
         <el-input v-model="dataForm.title" placeholder="目录名称" clearable></el-input>
       </el-form-item>
-      <el-form-item label="所属课程" prop="parentName"> 
-        <el-popover ref="courseListPopover" placement="top-start" trigger="click">
-          <el-tree :data="courseList" :props="courseListTreeProps" node-key="id" ref="courseListTree"
-            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
-            :highlight-current="true" :expand-on-click-node="false">
-          </el-tree>
-        </el-popover>
-        <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择上级课程类目" class="cat-list__input"></el-input>
+      <el-form-item label="所属课程"> 
+      <el-select v-model="dataForm.courseid" clearable placeholder="请选择所属课程" popper-class="optionStyle">
+      <el-option
+        v-for="item in courseList"
+        :key="item.id"
+        :label="item.title"
+        :value="item.id"
+        >
+      </el-option>
+      </el-select>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
@@ -49,7 +51,6 @@
       return {
         dataForm: {
           title: '',
-          parentName: '',
           courseTitle:''
         },
         dataList: [],
@@ -59,11 +60,7 @@
         dataListLoading: false,
         dataListSelections: [],
         addOrUpdateVisible: false,
-        courseList: [],
-        courseListTreeProps: {
-          label: 'title',
-          children: 'children'
-        }
+        courseList: []
       }
     },
     components: {
@@ -97,6 +94,7 @@
             if (data && data.code === 0) {
               this.dataList = data.page.list
               this.totalPage = data.page.totalCount
+              console.log(this.dataList)
             } else {
               this.dataList = []
               this.totalPage = 0
@@ -104,16 +102,6 @@
             this.dataListLoading = false
           })
         })
-      },
-      // 课程类目树选中
-      courseListTreeCurrentChangeHandle (data, node) {
-        this.dataForm.courseid = data.id
-        this.dataForm.parentName = data.title
-      },
-      // 课程类目树设置当前选中节点
-      courseListTreeSetCurrentNode () {
-        this.$refs.courseListTree.setCurrentKey(this.dataForm.courseid)
-        this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
       },
       // 每页数
       sizeChangeHandle (val) {
@@ -170,3 +158,8 @@
     }
   }
 </script>
+<style>
+.optionStyle{
+  height:auto;
+}
+</style>
