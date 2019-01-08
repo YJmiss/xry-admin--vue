@@ -2,29 +2,34 @@
   <div>
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
      <el-form-item label="课程" prop="parentName"> 
-        <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
-          <el-tree :data="courseList" :props="courseListTreeProps" node-key="id" ref="courseListTree"
-            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
-            :highlight-current="true" :expand-on-click-node="false">
-          </el-tree>
-        </el-popover>
-        <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择课程" class="cat-list__input"></el-input>
+      <el-select v-model="dataForm.courseId" clearable placeholder="请选择所属课程" popper-class="optionStyle">
+      <el-option
+        v-for="item in courseList"
+        :key="item.id"
+        :label="item.title"
+        :value="item.id"
+        >
+      </el-option>
+      </el-select>
       </el-form-item>
-      <el-form-item label="讲师" prop="teacherName">
-        <el-popover ref="teacherListPopover" placement="bottom-start" trigger="click">
-          <el-tree :data="teacherList" :props="teacherListTreeProps" node-key="id" ref="teacherListTree" @current-change="teacherListTreeCurrentChangeHandle" :default-expand-all="true"
-            :highlight-current="true" :expand-on-click-node="false">
-          </el-tree>
-        </el-popover>
-        <el-input v-model="dataForm.teacherName" v-popover:teacherListPopover :readonly="true" placeholder="点击选择讲师" class="cat-list__input"></el-input>
+      <el-form-item label="讲师">
+       <el-select v-model="dataForm.userId" clearable placeholder="请选择讲师">
+      <el-option
+        v-for="item in teacherList"
+        :key="item.userId"
+        :label="item.realName"
+        :value="item.userId"
+        >
+      </el-option>
+      </el-select>
       </el-form-item>
        <el-form-item label="类型">
-         <el-select v-model="dataForm.type" placeholder="请选择类型" @change="typeCurrentSel">
+         <el-select clearable v-model="dataForm.type" placeholder="请选择类型" @change="typeCurrentSel">
             <el-option v-for="item in typeValues" :key="item.typeValue" :label="item.label" :value="item.typeValue"></el-option>
           </el-select>
       </el-form-item>
       <el-form-item label="评论状态">
-          <el-select v-model="dataForm.status" placeholder="请选择评论状态" @change="statusCurrentSel">
+          <el-select clearable v-model="dataForm.status" placeholder="请选择评论状态" @change="statusCurrentSel">
             <el-option v-for="item in statusValues" :key="item.statusValue" :label="item.label" :value="item.statusValue"></el-option>
           </el-select>
       </el-form-item>
@@ -55,7 +60,7 @@
           <el-tag v-else size="small" type="warning" >讲师评价</el-tag>
         </template>
       </el-table-column>
-      <el-table-column prop="detail" header-align="center" align="left" label="评论详情" width="280">
+      <el-table-column prop="detail" header-align="center" align="center" label="评论详情" width="280">
         <template slot-scope="scope">
           <el-popover ref="detailPopover" placement="top-start" trigger="hover">
             <span>点击查看评论详情</span>
@@ -129,10 +134,6 @@
           { typeValue: '1', label: '讲师评价' } 
         ],
         courseList: [],
-        courseListTreeProps: {
-          label: 'title',
-          children: 'children'
-        },
         teacherList: [],
         teacherListTreeProps: {
           label: 'realName',

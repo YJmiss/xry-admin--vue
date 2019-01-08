@@ -2,7 +2,7 @@
   <div class="mod-course">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
       <el-form-item label="被审核对象类型">
-        <el-select v-model="dataForm.examineType" placeholder="请选择被审核对象类型" @change="currentSel">
+        <el-select  clearable v-model="dataForm.examineType" placeholder="请选择被审核对象类型" @change="currentSel">
           <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
         </el-select>
       </el-form-item>

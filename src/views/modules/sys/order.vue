@@ -5,13 +5,13 @@
         <el-input v-model="dataForm.orderId" placeholder="请输入订单编号" clearable></el-input>
       </el-form-item>
       <el-form-item label="订单状态">
-       <el-select v-model="value" placeholder="请选择" @change="statusChangeHandle(value)">
+       <el-select clearable v-model="value" placeholder="请选择" @change="statusChangeHandle(value)">
        <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value">
       </el-option>
       </el-select>
       </el-form-item>
        <el-form-item label="用户电话">
-        <el-input v-model="dataForm.buyerPhone" placeholder="输入买家手机号" clearable></el-input>
+        <el-input clearable v-model="dataForm.buyerPhone" placeholder="输入买家手机号" clearable></el-input>
       </el-form-item>
       <el-form-item label="下单时间">
       <el-date-picker v-model="dataForm.createTime" type="date" :picker-options="pickerOptions" placeholder="选择日期" format="yyyy 年 MM 月 dd 日" value-format="yyyy 年 MM 月 dd 日"></el-date-picker>

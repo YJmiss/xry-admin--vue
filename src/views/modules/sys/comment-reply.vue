@@ -5,11 +5,11 @@
         <div>{{dataForm.detail}}</div>
       </el-form-item>
       <el-form-item label="回复内容" prop="reply">
-      <el-tooltip class="item" effect="dark" content="已经恢复过一次，不能再修改内容啦！" placement="top" v-if="dataForm.reply">
-      <textarea  rows="15" cols="110" v-model="dataForm.reply" readonly="readonly"></textarea>
+      <el-tooltip v-if="dataForm.reply"  content="已经回复过一次了，不能修改回复内容！" placement="top" effect="light">
+        <textarea rows="15" cols="110" v-model="dataForm.reply" readonly='readonly'></textarea>
       </el-tooltip>
-      <el-tooltip class="item" effect="dark" content="请仔细认真填写，一旦回复之后无法撤回！" placement="top"  v-else>
-      <textarea rows="15" cols="110" v-model="dataForm.reply"></textarea>
+       <el-tooltip v-else content="请认真填写回复内容，回复之后不能更改内容！" placement="top"  effect="light">
+      <textarea rows="15" cols="110" v-model="dataForm.replyAdd" ></textarea>
       </el-tooltip>
       </el-form-item>
     </el-form>
@@ -28,7 +28,8 @@
         dataForm: {
           id: 0,
           detail:'',
-          reply:''
+          reply:'',
+          replyAdd:''
         },
         dataRule: {
           record:[{ required: true, message: '请填写回复信息！', trigger: 'blur' }] 
@@ -63,7 +64,7 @@
               method: 'post',
               data: this.$http.adornData({
                 'id': this.dataForm.id || undefined,
-                'reply': this.dataForm.reply
+                'reply': this.dataForm.replyAdd
               })
             }).then(({ data }) => {
               if (data && data.code === 0) {

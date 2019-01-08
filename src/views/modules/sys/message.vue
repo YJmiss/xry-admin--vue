@@ -1,14 +1,16 @@
 <template>
   <div class="mod-course">
     <el-form :inline="true" :model="dataForm" @keyup.enter.native="getDataList()">
-      <el-form-item label="选择课程" prop="parentName"> 
-        <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
-          <el-tree :data="courseList" :props="courseListTreeProps" node-key="id" ref="courseListTree"
-            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
-            :highlight-current="true" :expand-on-click-node="false">
-          </el-tree>
-        </el-popover>
-        <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择课程" class="cat-list__input"></el-input>
+      <el-form-item label="选择课程"> 
+      <el-select v-model="dataForm.objId" clearable placeholder="请选择所属课程" popper-class="optionStyle">
+      <el-option
+        v-for="item in courseList"
+        :key="item.id"
+        :label="item.title"
+        :value="item.id"
+        >
+      </el-option>
+      </el-select>
       </el-form-item>
       <el-form-item label="所属讲师" prop="teacherName">
         <el-popover ref="teacherListPopover" placement="bottom-start" trigger="click">
@@ -19,7 +21,7 @@
         <el-input v-model="dataForm.teacherName" v-popover:teacherListPopover :readonly="true" placeholder="点击选择讲师" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="消息类型">
-        <el-select v-model="dataForm.msg_type" placeholder="请选择消息类型" @change="currentSel">
+        <el-select v-model="dataForm.msg_type" placeholder="请选择消息类型" @change="currentSel" clearable>
           <el-option v-for="item in options" :key="item.value" :label="item.label" :value="item.value"></el-option>
         </el-select>
       </el-form-item>
@@ -95,7 +97,6 @@
           info:'',
           courseTitle:'',
           realName:'',
-          parentName:'',
           teacherName:'',
         },
         dataList: [],
@@ -106,10 +107,6 @@
         dataListSelections: [],
         addOrUpdateVisible: false,
         courseList: [],
-        courseListTreeProps: {
-          label: 'title',
-          children: 'children'
-        },
         teacherList: [],
         teacherListTreeProps: {
           label: 'realName',
@@ -174,16 +171,6 @@
             })
           })
         })
-      },
-      // 课程树选中
-      courseListTreeCurrentChangeHandle (data, node) {
-        this.dataForm.objId = data.id
-        this.dataForm.parentName = data.title
-      },
-      // 课程树设置当前选中节点
-      courseListTreeSetCurrentNode () {
-        this.$refs.courseListTree.setCurrentKey(this.dataForm.objId)
-        this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
       },
       // 讲师树选中
       teacherListTreeCurrentChangeHandle (data, node) {

@@ -34,7 +34,8 @@
         </template>
       </el-table-column>
       <el-table-column prop="title" header-align="center" align="center" label="广告标题"></el-table-column>
-      <el-table-column prop="url" header-align="center" align="center" label="跳转链接" width="300"></el-table-column>
+      <el-table-column prop="url" header-align="center" align="center" label="跳转链接" width="300">
+      </el-table-column>
       <el-table-column prop="courseTitle" header-align="center" align="center" label="所属课程" width="300"></el-table-column>
       <el-table-column prop="pic" header-align="center" align="center" label="广告缩略图" width="100">
         <template slot-scope="scope">

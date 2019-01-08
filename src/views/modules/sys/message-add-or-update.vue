@@ -15,22 +15,27 @@
           <el-radio :label="3">其它</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="选择课程" prop="parentName" v-show="dataForm.msgType ==1"> 
-        <el-popover ref="courseListPopover" placement="bottom-start" trigger="click">
-          <el-tree :data="courseList" :props="courseListTreeProps" node-key="id" ref="courseListTree"
-            @current-change="courseListTreeCurrentChangeHandle" :default-expand-all="true"
-            :highlight-current="true" :expand-on-click-node="false">
-          </el-tree>
-        </el-popover>
-        <el-input v-model="dataForm.parentName" v-popover:courseListPopover :readonly="true" placeholder="点击选择所属课程" class="cat-list__input"></el-input>
+      <el-form-item label="选择课程"  v-show="dataForm.msgType ==1"> 
+      <el-select v-model="dataForm.objId" placeholder="请选择所属课程">
+      <el-option
+        v-for="item in courseList"
+        :key="item.id"
+        :label="item.title"
+        :value="item.id"
+        >
+      </el-option>
+      </el-select>
       </el-form-item>
-      <el-form-item label="选择讲师" prop="teacherName" v-show="dataForm.msgType ==2">
-        <el-popover ref="teacherListPopover" placement="bottom-start" trigger="click">
-          <el-tree :data="teacherList" :props="teacherListTreeProps" node-key="id" ref="teacherListTree" @current-change="teacherListTreeCurrentChangeHandle" :default-expand-all="true"
-            :highlight-current="true" :expand-on-click-node="false">
-          </el-tree>
-        </el-popover>
-        <el-input v-model="dataForm.teacherName" v-popover:teacherListPopover :readonly="true" placeholder="点击选择所属讲师" class="cat-list__input"></el-input>
+      <el-form-item label="选择讲师"  v-show="dataForm.msgType ==2">
+      <el-select v-model="dataForm.userId" placeholder="请选择讲师">
+      <el-option
+        v-for="item in teacherList"
+        :key="item.userId"
+        :label="item.realName"
+        :value="item.userId"
+        >
+      </el-option>
+      </el-select>
       </el-form-item>
       <el-form-item label="具体消息" prop="info">
         <el-input v-model="dataForm.info" type="textarea" :rows="6"></el-input>
@@ -52,8 +57,6 @@
           id: 0,
           msgType:1,
           courseType:1,
-          parentName: '',
-          teacherName:'',
           realName:'',
           status:0,
           info:''
@@ -68,21 +71,13 @@
           info: [{ required: true, message: "请填写具体消息", trigger: "blur" }]
         },
         courseList: [],
-        courseListTreeProps: {
-          label: 'title',
-          children: 'children'
-        },
-        teacherList: [],
-        teacherListTreeProps: {
-          label: 'realName',
-          children: 'children'
-        }
+        teacherList: []
       }
     },
     methods: {
       init (id) {
         this.dataForm.id = id || 0
-        // 查询所有课程类目，构造成一棵树
+        // 查询所有课程，构造成一棵树
         this.$http({
           url: this.$http.adornUrl('/xry/course/treeCourse'),
           method: 'get',
@@ -118,8 +113,6 @@
                   this.dataForm.userId = data.message.userId
                   this.dataForm.publishDate = data.message.publishDate
                   this.dataForm.info = data.message.info
-                  this.courseListTreeSetCurrentNode()
-                  this.teacherListTreeSetCurrentNode()
                 }
               })
             } else {
@@ -129,55 +122,29 @@
           })
         })
       },
-      // 课程类目树选中
-      courseListTreeCurrentChangeHandle (data, node) {
-        this.dataForm.objId = data.id
-        this.dataForm.parentName = data.title
-      },
-      // 课程类目树设置当前选中节点
-      courseListTreeSetCurrentNode () {
-        this.$refs.courseListTree.setCurrentKey(this.dataForm.objId)
-        this.dataForm.parentName = (this.$refs.courseListTree.getCurrentNode() || {})['title']
-      },
-      // 讲师树选中
-      teacherListTreeCurrentChangeHandle (data, node) {
-        this.dataForm.userId = data.id
-        this.dataForm.teacherName = data.realName
-      },
-      // 讲师树设置当前选中节点
-      teacherListTreeSetCurrentNode () {
-        this.$refs.teacherListTree.setCurrentKey(this.dataForm.userId)
-        this.dataForm.teacherName = (this.$refs.teacherListTree.getCurrentNode() || {})['realName']
-      },
       // 表单提交
       dataFormSubmit () {
         if (this.dataForm.msgType == 1) {
           // 课程校验
-          if (!this.validateCourse()&&this.dataForm.parentName) {
-            this.dataForm.teacherName = ""
+          if (!this.validateCourse()&&this.dataForm.objId) {
             this.dataForm.userId = ""
             this.dataSubmit() 
           } else {
-            this.dataForm.teacherName = ""
             this.dataForm.userId = ""
           }
         } else if (this.dataForm.msgType == 2) {
           // 讲师校验
-          if (!this.validateTeacher()&&this.dataForm.teacherName) {
-            this.dataForm.parentName = ""
+          if (!this.validateTeacher()&&this.dataForm.userId) {
             this.dataForm.objId = ""
             this.dataForm.courseType = ""
             this.dataSubmit() 
           } else {
-            this.dataForm.parentName = ""
             this.dataForm.objId = ""
             this.dataForm.courseType = ""
           }
         } else {
-          this.dataForm.parentName = ""
           this.dataForm.objId = ""
           this.dataForm.courseType = ""
-          this.dataForm.teacherName = ""
           this.dataForm.userId = ""
           this.dataSubmit() 
         }
@@ -219,7 +186,7 @@
       // 校验form表单
       validateCourse () {
         let isPass = false;
-        if (!this.dataForm.parentName) {
+        if (!this.dataForm.objId) {
           this.$confirm(`请选择课程`, '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
@@ -235,7 +202,7 @@
       // 校验form表单
       validateTeacher () {
         let isPass = false;
-        if (!this.dataForm.teacherName) {
+        if (!this.dataForm.userId) {
           this.$confirm(`请选择讲师`, '提示', {
             confirmButtonText: '确定',
             cancelButtonText: '取消',
