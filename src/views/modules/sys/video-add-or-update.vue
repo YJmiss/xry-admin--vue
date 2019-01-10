@@ -6,7 +6,8 @@
                 <el-button type="primary" round>选择视频</el-button>
                 <div class="el-upload__tip" slot="tip">只支持mp4格式的视频！</div>
             </el-upload>
-            <video  id="video-active" v-show="dataForm.videoUrl" :src="dataForm.videoUrl" controls="true"/>
+            <video @canplaythrough="getDuration()" id="video-active" v-show="dataForm.videoUrl" :src="dataForm.videoUrl" controls="true"/>
+            <span style="padding-left:20px;color:#1f48cf;" v-show="dataForm.videoUrl">视频总时长：{{dataForm.videoTime}}</span>
         </el-form-item>
          <el-form-item label="所属课程">
         <el-select v-model="dataForm.courseId"  placeholder="请选择所属课程" popper-class="optionStyle" @change=" courseListTreeCurrentChangeHandle">
@@ -179,7 +180,7 @@ export default {
                 url: this.$http.adornUrl('/xry/course/catalog/treeCourseCatalog'),
                 method: 'get',
                 params: this.$http.adornParams({
-                    'courseId': this.dataForm.courseId,
+                'courseId': this.dataForm.courseId,
                 })
             }).then(({
                 data
@@ -190,7 +191,7 @@ export default {
         // 上传之前
         beforeUploadHandle(file) {
             if (file.type != "video/mp4" && file.type != "video/flv" || file.size > 1048576000) {
-                this.$message.error("请检查视频格式（只支持mp4格式的视频！大小超过1000M)");
+                this.$message.error("请检查视频格式（只支持mp4、flv格式的视频！大小超过1000M)");
                 return false;
             }
             this.num++;
@@ -201,9 +202,15 @@ export default {
             this.successNum++;
             this.dataForm.videoUrl = response.url;
         },
+      //获取视频总时长
+        getDuration(){
+        setTimeout(() =>{
+        this.dataForm.videoTime = document.getElementById('video-active').duration
+            },100);
+        },
         // 表单提交
         dataFormSubmit() {
-            if (!this.dataForm.videoUrl) {
+            if (!this.dataForm.videoUrl && !this.dataForm.videoTime) {
                 this.$confirm(`请上传视频再次提交`, '提示', {
                     confirmButtonText: '确定',
                     cancelButtonText: '取消',
@@ -225,6 +232,7 @@ export default {
                             'catalogId': this.dataForm.catalogId,
                             'property': this.dataForm.property,
                             'status': this.dataForm.status,
+                            'paramData':Math.ceil(this.dataForm.videoTime),
                         })
                     }).then(({
                         data
@@ -269,9 +277,8 @@ export default {
 
 <style scoped>
 video {
-    width: 830px;
+width: 830px;
 }
-
 .red {
     color: red;
 }

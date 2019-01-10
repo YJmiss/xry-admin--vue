@@ -1,8 +1,7 @@
 <template>
   <el-dialog title="视频内容播放" :close-on-click-modal="false" :visible.sync="visible" @close='dataFormSubmit'>
     <el-form :model="dataForm"  ref="dataForm" label-width="80px">
-    <video v-if="isAuth('xry:record:getDuration')" id="video-active" :src="dataForm.videoUrl" controls='true' width="90%" height="70%" 
-    @canplaythrough="getDuration()" style=" margin-left:5%;">
+    <video id="video-active" :src="dataForm.videoUrl" controls='true' width="90%" height="70%"  style=" margin-left:5%;">
     </video>
     </el-form>
     <span slot="footer" class="dialog-footer">
@@ -20,8 +19,7 @@
         visible: false,
         dataForm: {
           id:'',
-          videoUrl: '',
-          videoTime:''
+          videoUrl: ''
         }
       }
     },
@@ -40,34 +38,8 @@
             }
           })
       },
-      // 获取视频时长并提交后台
-      dataFormSubmit () {
-        this.getDuration()
-        if(this.dataForm.videoTime){
-         this.$http({
-          url: this.$http.adornUrl('/xry/record/getDuration'),
-          method: 'get',
-          params: this.$http.adornParams({
-            'videoId': this.dataForm.id,
-            'videoTime':Math.ceil(this.dataForm.videoTime),
-          })
-         }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.visible = false
-            } else {
-            this.$message.error(data.msg)
-            }
-           })
-         }
-        else{
-        this.$message.warning('离开前请先看视频，以审核视频内容是否合格！')  
-       }
-      },
-      //获取总时长
-      getDuration(){
-      setTimeout(() =>{
-      this.dataForm.videoTime = document.getElementById('video-active').duration
-      },100);
+      dataFormSubmit(){
+      this.visible = false
       }
     }
   }
