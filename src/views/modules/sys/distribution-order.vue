@@ -21,13 +21,14 @@
 <el-table-column prop="user_id" header-align="center" align="center" label="用户ID"></el-table-column>
 <el-table-column prop="course_id" header-align="center" align="center" label="课程ID"></el-table-column>
 <el-table-column prop="grade" header-align="center" align="center" label="用户分销等级" width="120"></el-table-column>
-<el-table-column prop="brokerage" header-align="center" align="center" label="用户佣金" width="100"></el-table-column>
+<el-table-column prop="appBrokerage" header-align="center" align="center" label="用户佣金" width="100"></el-table-column>
 <el-table-column header-align="center" align="center" label="订单状态" width="120">
 <template slot-scope="scope"  prop="status">
 <el-tag v-if="scope.row.status === 1" size="small" type="info">未付款</el-tag>
 <el-tag v-else-if="scope.row.status === 2" size="small" type="warning">未提现</el-tag>
 <el-tag v-else-if="scope.row.status === 3" size="small" type="success">交易成功（已提现）</el-tag>
 </template>    
+
 </el-table-column>
 <el-table-column prop="create_time" header-align="center" align="center" label="创建时间"></el-table-column>
 <el-table-column prop="update_time" header-align="center" align="center" label="更新时间"></el-table-column>

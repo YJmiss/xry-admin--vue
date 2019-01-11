@@ -144,6 +144,7 @@ export default {
                             this.dataForm.catalogId = data.video.catalogId
                             this.dataForm.property = data.video.property
                             this.dataForm.status = data.video.status
+                            this.dataForm.videoTime = data.video.paramData
                         }
                     }) .then(() => {
                             // 查询目录树，需要根据选中课程的id查询出目录树
