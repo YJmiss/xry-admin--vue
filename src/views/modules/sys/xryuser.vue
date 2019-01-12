@@ -57,7 +57,7 @@
       <el-table-column prop="created" header-align="center" align="center" width="180" label="注册时间"></el-table-column>
       <el-table-column fixed="right" header-align="center" align="left" width="300" label="操作" prop="role">
         <template slot-scope="scope">
-          <el-button v-if="isAuth('xry:user:delete')"  type="danger" size="small" round icon="el-icon-delete" :disabled="scope.row.status === 2"  @click="deleteHandle(scope.row.id)">删除</el-button>
+          <el-button v-if="isAuth('xry:user:delete')"  type="danger" size="small" round icon="el-icon-delete" :disabled="scope.row.status === 2"  @click="deleteHandle(scope.row.id,scope.row.role)">删除</el-button>
           <el-button v-if="isAuth('xry:user:updateUserRoleToTeacher')" v-show="scope.row.role === 0" type="primary" size="small" round  @click="changeRoleHandle(scope.row.id)">置为讲师</el-button>
         </template>
       </el-table-column>
@@ -184,42 +184,31 @@
           })
         }).catch(() => {})
       },
-      // 删除
-      deleteHandle (id) {
+      // 删除前处理
+      deleteHandle (id,role) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
           return item.id
         })
-        this.$confirm(`确定对该用户进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.$http({
-            url: this.$http.adornUrl('/xry/user/delete'),
-            method: 'post',
-            data: this.$http.adornData(ids, false)
-          }).then(({ data }) => {
-            if (data && data.code === 0) {
-              this.$message({
-                message: '操作成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                  this.getDataList()
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
-        }).catch(() => {})
+       var roles = role? [ role]:this.dataListSelections.map(item => {
+          return item.role
+        })
+       for(let r=0;r<roles.length;r++){
+        if(1== roles[r] || role){
+          this.$confirm(`“讲师”用户，在这里不能删除！`, '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(() => {
+                return;
+            }).catch(() => {}); 
+        }else{
+         this.confirmDelete(id,ids) 
+        }
+       }
       },
-      // 删除
-      deleteHandle (id) {
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定对该用户进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+      //确认删除
+      confirmDelete(id,ids){
+       this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'

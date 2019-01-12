@@ -15,18 +15,20 @@
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50">
       </el-table-column>
+       <el-table-column prop="id" header-align="center" align="center" label="ID" >
+      </el-table-column>
       <el-table-column prop="nickname" header-align="center" align="center" label="昵称" width="100">
       </el-table-column>
       <el-table-column prop="real_name" header-align="center" align="center" label="讲师姓名" width="100"></el-table-column>
       <el-table-column prop="userPhone" header-align="center" align="center" label="手机号" width="120"></el-table-column>
-       <el-table-column  header-align="center" align="center" label="所属机构" width="200">
+       <el-table-column  header-align="center" align="center" label="所属机构">
          <template slot-scope="scope" prop="orgName">
          <span v-if="scope.row.orgName">{{scope.row.orgName}}</span>
          <el-tag type="primary" v-else>暂无组织</el-tag>
          </template>
        </el-table-column>
       <el-table-column prop="id_card" header-align="center" align="center" label="身份证号" width="170"></el-table-column>
-       <el-table-column  header-align="center" align="center" label="证件照正面" width="150">
+       <el-table-column  header-align="center" align="center" label="证件照正面" width="80">
          <template slot-scope="scope">
            <el-popover ref="imgPopover" placement="left" trigger="click">
             <img class="big-img" :src="scope.row.id_card_front"/>
@@ -34,7 +36,7 @@
           <img class="broadcst-img" v-popover:imgPopover :src="scope.row.id_card_front">
          </template>
        </el-table-column>
-        <el-table-column  header-align="center" align="center" label="证件照反面" width="150">
+        <el-table-column  header-align="center" align="center" label="证件照反面" width="80">
           <template slot-scope="scope">
            <el-popover ref="imgPopover" placement="left" trigger="click">
             <img class="big-img" :src="scope.row.id_card_back"/>
@@ -120,7 +122,7 @@ import addTeacherInfo from './teacher-list-addInfo'
         'limit': this.pageSize,
         'realName':this.dataForm.real_name,
         'userPhone':this.dataForm.userPhone,
-        'teacherListStatus':teacherListStatus
+        'teacherListStatus':''
       })
     }).then(({ data }) => {
       if (data && data.code === 0) {
@@ -154,36 +156,6 @@ import addTeacherInfo from './teacher-list-addInfo'
       this.$nextTick(() => {
       this.$refs.addTeacherInfo.init(id)
       })
-      },
-      //置为普通用户
-      changeRoleHandle(id){
-         var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定对该用户进行[${id ? '置为普通用户' : '批量置为普通用户'}]操作?`, '提示', {
-          confirmButtonText: '确定',
-          cancelButtonText: '取消',
-          type: 'warning'
-        }).then(() => {
-          this.$http({
-            url: this.$http.adornUrl('/xry/user/updateTeacherRoleToUser'),
-            method: 'post',
-            data: this.$http.adornData(ids, false)
-          }).then(({ data }) => {
-            if (data && data.code === 0){
-              this.$message({
-                message: '操作成功',
-                type: 'success',
-                duration: 1500,
-                onClose: () => {
-                this.getDataList()
-                }
-              })
-            } else {
-              this.$message.error(data.msg)
-            }
-          })
-        }).catch(() => {})
       },
       // 删除
       deleteHandle (id) {

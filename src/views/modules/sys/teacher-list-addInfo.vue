@@ -7,6 +7,9 @@
                 </el-option>
             </el-select>
         </el-form-item><br> -->
+         <el-form-item label="真实姓名：">
+            <el-input v-model="dataForm.realName" type="text"></el-input>
+        </el-form-item><br>
         <el-form-item label="身份证号：">
             <el-input v-model="dataForm.id_card" type="text"></el-input>
         </el-form-item><br>
@@ -46,6 +49,7 @@ export default {
             radio: 1,
             dataForm: {
                 orgName: '',
+                realName:'',
                 organizationId: '',
                 teacherId: '',
                 id_card: '',
@@ -100,24 +104,21 @@ export default {
                     url: this.$http.adornUrl('/xry/teacher/detail'),
                     method: 'get',
                     params: this.$http.adornParams({
-                        'id': this.dataForm.teacherId
+                    'id': this.dataForm.teacherId
                     })
                 }).then(({
                     data
                 }) => {
                     if (data && data.code === 0) {
-                        this.dataForm.organizationId = data.teacher.org_id,
-                        this.dataForm.id_card = data.teacher.id_card,
-                        this.dataForm.id_card_front = data.teacher.id_card_front,
-                        this.dataForm.id_card_back = data.teacher.id_card_back,
-                        this.dataForm.teacherIntro = data.teacher.brief_intro
+                    this.dataForm.organizationId = data.teacher.org_id,
+                    this.dataForm.realName = data.teacher.real_name,
+                    this.dataForm.id_card = data.teacher.id_card,
+                    this.dataForm.id_card_front = data.teacher.id_card_front,
+                    this.dataForm.id_card_back = data.teacher.id_card_back,
+                    this.dataForm.teacherIntro = data.teacher.brief_intro
                     }
                 })
             });
-        },
-        //机构选中处理
-        currentChangeHandle() {
-            console.log(this.dataForm.organizationId)
         },
         //提交表单
         dataFormSubmit() {
@@ -131,7 +132,9 @@ export default {
                             'idCard': this.dataForm.id_card,
                             'idCardFront': this.dataForm.id_card_front,
                             'idCardBack': this.dataForm.id_card_back,
-                            'orgId': this.dataForm.organizationId
+                            'orgId': this.dataForm.organizationId,
+                            'realName':this.dataForm.realName,
+                            'brief_intro':this.dataForm.teacherIntro
                         })
                     }).then(({
                         data
