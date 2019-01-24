@@ -18,9 +18,9 @@
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('xry:course:cat:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('xry:course:cat:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-        <el-button v-if="isAuth('xry:course:cat:toUse')" type="success" @click="courseCatToUse()" :disabled="dataListSelections.length <= 0">批量启用</el-button>
-        <el-button v-if="isAuth('xry:course:cat:toDisable')" type="warning" @click="courseCatToDisable()" :disabled="dataListSelections.length <= 0">批量禁用</el-button>
+        <el-button v-if="isAuth('xry:course:cat:delete')" type="danger" @click="deleteHandle()" >批量删除</el-button>
+        <el-button v-if="isAuth('xry:course:cat:toUse')" type="success" @click="courseCatToUse()">批量启用</el-button>
+        <el-button v-if="isAuth('xry:course:cat:toDisable')" type="warning" @click="courseCatToDisable()">批量禁用</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border @selection-change="selectionChangeHandle" style="width: 100%;">
@@ -159,12 +159,49 @@
           this.$refs.addOrUpdate.init(id)
         })
       },
-      // 删除
-      deleteHandle (id) {
-         var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+      //批量操作前判断
+      checkSelection(flag){
+      var ids = this.dataListSelections.map(item => {
+            return item.id
+            });
+       if(this.dataListSelections.length <= 0){
+         this.$message.error({
+          showClose: true,
+          message: '请先选择操作对象！'
+         }) 
+        }else{
+          switch (flag) {
+            case 0:
+            this.deleteHandle(ids)
+            break;
+            case 1:
+            this.courseCatToUse(ids)
+            break;
+            default:
+            this.courseCatToDisable(ids)
+            break;
+          } 
+        }
+      },
+      // 删除前处理
+       deleteHandle (id) {
+         let flag = 0;
+         let ids = [];
+         if(!id){
+         this.checkSelection(flag)
+          }else{ 
+          if(typeof id !== 'object'){
+          ids.push(id);
+          this.confirmDelete(ids)
+          }
+          else{
+          this.confirmDelete(id)  
+          }
+        }
+      },
+      //确认删除
+      confirmDelete(ids){
+       this.$confirm(`确定对[id=${ids}]进行删除操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -189,12 +226,25 @@
           })
         }).catch(() => {})
       },
-      // 课程类目的启用
+      // 课程类目启用前处理
       courseCatToUse (id) {
-         var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '启用' : '批量启用'}]操作?`, '提示', {
+         let flag = 1;
+         let ids = [];
+         if(!id){
+         this.checkSelection(flag)
+          }else{ 
+          if(typeof id !== 'object'){
+          ids.push(id);
+          this.confirmUse(ids)
+          }
+          else{
+          this.confirmUse(id)  
+          }
+        }
+      },
+      //确认启用
+      confirmUse(ids){
+        this.$confirm(`确定对[id=${ids}]进行“启用类目”操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -219,12 +269,25 @@
           })
         }).catch(() => {})
       },
-      // 课程类目的禁用
+      // 课程类目禁用前处理
       courseCatToDisable (id) {
-         var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '禁用' : '批量禁用'}]操作?`, '提示', {
+         let flag = 2;
+         let ids = [];
+         if(!id){
+         this.checkSelection(flag)
+         }else{ 
+          if(typeof id !== 'object'){
+          ids.push(id);
+          this.confirmDisable(ids)
+          }
+          else{
+          this.confirmDisable(id)  
+          }
+        }
+      },
+      //确认禁用类目
+      confirmDisable(ids){
+      this.$confirm(`确定对[id=${ids}]进行"禁用类目"操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'

@@ -28,7 +28,7 @@
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('xry:message:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('xry:message:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('xry:message:delete')" type="danger" @click="checkSelection()">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
@@ -203,6 +203,17 @@
         this.$nextTick(() => {
           this.$refs.addOrUpdate.init(id)
         })
+      },
+      //批量操作前判断
+      checkSelection(){
+       if(this.dataListSelections.length <= 0){
+         this.$message.error({
+          showClose: true,
+          message: '请先选择操作对象！'
+         }) 
+        }else{
+        this.deleteHandle()
+        }
       },
       // 删除
       deleteHandle (id) {

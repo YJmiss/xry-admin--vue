@@ -9,6 +9,7 @@
         </el-form-item>
         <el-form-item>
           <el-button v-if="isAuth('xry:organization:list')" type="primary" @click="getDataList()">查询</el-button>
+           <el-button v-if="isAuth('xry:record:examine')" type="primary" @click="checkSelection()">批量审核</el-button>
         </el-form-item>
       </el-form>
       <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
@@ -133,11 +134,25 @@
         this.$refs.OrganizCertificateInfo.init(id)
         })
         },
-        // 认证/记录认证
-       examine(id) {
+      //批量操作前判断
+      checkSelection(){
+       if(this.dataListSelections.length <= 0){
+        this.$message.error({
+        showClose: true,
+        message: '请先选择操作对象！'
+         }) 
+        }else{
+        this.examine()
+        }
+        },
+        // 认证/记录认证(审核详情)
+        examine(id) {
+        var ids = id ? [id] : this.dataListSelections.map(item => {
+        return item.id
+        })
         this.RecordVisible = true
         this.$nextTick(() => {
-        this.$refs.examineRecordAdd.init(id,this.examineType)
+        this.$refs.examineRecordAdd.init(ids,this.examineType)
         })
       },
       // 认证状态选择改变

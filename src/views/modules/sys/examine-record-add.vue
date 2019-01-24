@@ -12,7 +12,7 @@
     </el-form>
     <span slot="footer" class="dialog-footer">
       <el-button @click="visible = false">取消</el-button>
-      <el-button type="primary" @click="dataFormSubmit()">确定</el-button>
+      <el-button type="primary" @click="examineHandle()">确定</el-button>
     </span>
   </el-dialog>
 </template>
@@ -24,10 +24,11 @@
       return {
         visible: false,
         dataForm: {
-          id: 0,
+          id:'',
+          objectId:[],
           actionNumber:3,
           detail:'',
-          type: 1
+          type: 0
         },
         dataRule: {
         record:[
@@ -36,11 +37,19 @@
         }
       }
     },
+   
     methods: {
       init (id,examineType) {
-        this.dataForm.id = id || 0
+        this.visible = true
         this.dataForm.type = examineType
-        let urlType = '';
+        //除了讲师认证审核，其他审核支持批量，所以被审核对象id作为一个对象提交后台
+        if(1 == examineType || 2 == examineType || 4 == examineType){
+        this.dataForm.objectId = id
+        }else{
+        //如若审核对象为讲师，不支持批量，所以被审核对象id作为一个参数提交后台
+        this.dataForm.id = id
+        }
+       /*  let urlType = '';
         if (1 == examineType) {urlType = 'course'} 
         else if(2 == examineType){urlType = 'video'} 
         else if(3 == examineType){urlType = 'teacher'}
@@ -50,7 +59,6 @@
           method: 'get',
           params: this.$http.adornParams()
         }).then(({ data }) => {
-          this.visible = true
           if (data && data.code === 0) {
             if (data.course) {
               this.dataForm.id = data.course.id
@@ -62,8 +70,15 @@
               this.dataForm.id = data.org.id
             }
           }
-        })
-        
+        }) */
+      },
+      //审核提交前处理
+      examineHandle(){
+      if(3 == this.dataForm.examineType){
+        this.dataFormSubmit()
+      }else{
+      this.examineRecordSubmit()
+      }
       },
       // 审核记录提交
       dataFormSubmit () {
@@ -74,7 +89,7 @@
               url: this.$http.adornUrl(`/xry/record/examine`),
               method: 'post',
               data: this.$http.adornData({
-                'recordId': this.dataForm.id || undefined,
+                'recordId': this.dataForm.id,
                 'actionNumber': this.dataForm.actionNumber,
                 'type':this.dataForm.type,
                 'detail': this.dataForm.detail
@@ -97,7 +112,40 @@
             })
           }
         })
-      }
+      },
+    //支持批量操作
+    examineRecordSubmit(){
+      this.visible = false
+        this.$refs['dataForm'].validate((valid) => {
+          if (valid) {
+            this.$http({
+              url: this.$http.adornUrl(`/xry/record/examines`),
+              method: 'post',
+              data:this.$http.adornData({
+              'recordId':this.dataForm.objectId,
+              'actionNumber': this.dataForm.actionNumber,
+              'type':this.dataForm.type,
+              'detail': this.dataForm.detail
+              })
+            }).then(({ data }) => {
+              if (data && data.code === 0) {
+                this.$message({
+                  message: '操作成功',
+                  type: 'success',
+                  duration: 1500,
+                  onClose: () => {
+                    this.visible = false
+                    this.$emit('refreshDataList')
+                    this.dataForm.detail = ''
+                  }
+                })
+              } else {
+                this.$message.error(data.msg)
+              }
+            })
+          }
+        })
+    }
     }
   }
 </script>

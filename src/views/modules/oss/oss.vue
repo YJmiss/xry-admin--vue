@@ -4,7 +4,7 @@
       <el-form-item>
         <el-button type="primary" @click="configHandle()">云存储配置</el-button>
         <el-button type="primary" @click="uploadHandle()">上传文件</el-button>
-        <el-button type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button type="danger" @click="checkSelection()">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table
@@ -140,6 +140,17 @@
         this.$nextTick(() => {
           this.$refs.upload.init()
         })
+      },
+       //批量操作前判断
+      checkSelection(){
+       if(this.dataListSelections.length <= 0){
+         this.$message.error({
+          showClose: true,
+          message: '请先选择操作对象！'
+         }) 
+        }else{
+        this.deleteHandle()
+        }
       },
       // 删除
       deleteHandle (id) {

@@ -1,16 +1,18 @@
 <template>
 <el-dialog :visible.sync="visible" :close-on-click-modal="false">
-    <el-form :model="dataForm">
-        <p>反馈用户:&nbsp;<span style="color:red;">{{nickname}}{{phone}}</span></p>
-        <h3>反馈信息:</h3>
-        <div>{{feedbackInfo}}</div>
-        <p>反馈时间:&nbsp;{{feedbackTime}}</p>
+    <el-form>
+        <span class="title">反馈用户:</span>&nbsp;<span>{{nickname}}&nbsp;/&nbsp;{{phone}}</span>
+        <h3>反馈详情:</h3>
+        <div class="feedbackDetail">
+        <p>{{feedbackInfo}}</p>
+        <img :src="feedbackImg" v-show="feedbackImg">
+        </div>
+        <span class="title">反馈时间:</span>&nbsp;<span>{{feedbackTime}}</span>
     </el-form>
 </el-dialog>
 </template>
 
 <script>
-import Editor from '@/components/quill-editor.vue'
 export default {
     components: {Editor},
     data() {
@@ -19,6 +21,7 @@ export default {
             nickname:'',
             phone:'',
             feedbackInfo: '',
+            feedbackImg:'',
             feedbackTime: '',
             dataForm:{}
         }
@@ -36,7 +39,8 @@ export default {
                     this.feedbackInfo = data.userFeedback.feedback_info,
                     this.feedbackTime = data.userFeedback.create_time,
                     this.nickname = data.userFeedback.nickname,
-                    this.phone = data.userFeedback.phone         
+                    this.phone = data.userFeedback.phone,
+                    this.feedbackImg = data.feedback_img 
                 }
             })
         }
@@ -46,15 +50,21 @@ export default {
 
 <style scoped>
 .el-form-item {
-    margin-right: 30px;
+margin-right: 30px;
+font: 14px 微软雅黑;
+color: #333;
 }
-
-.editorStyle {
-    min-height: 450px;
+.feedbackDetail{
+border: 1px #dddddd solid;
+padding:4px;
+margin-bottom: 20px;
 }
-
-p {
-    font: 16px 微软雅黑;
-    color: #333;
+.feedbackDetail img{
+max-width:70%;
+height: auto;
+}
+.title{
+font-size:16px;
+font-weight: bold;
 }
 </style>

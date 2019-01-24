@@ -11,7 +11,7 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('xry:course:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('xry:course:delete')" type="danger" @click="checkSelection()">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
@@ -21,7 +21,7 @@
       <el-table-column prop="type" header-align="center" align="center" label="被审核对象类型" width="160">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.type === 1" size="small" type="success">课程审核</el-tag>
-          <el-tag v-else size="small" type="warning">视频审核</el-tag>
+          <el-tag v-else-if="scope.row.type === 2" size="small" type="warning">视频审核</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="type" header-align="center" align="center" label="被审核对象标题" width="300">
@@ -42,7 +42,7 @@
       <el-table-column prop="action_number" header-align="center" align="center" label="执行动作" width="100">
         <template slot-scope="scope">
           <el-tag v-if="scope.row.action_number === 3" size="small" type="success">通过</el-tag>
-          <el-tag v-else size="small" type="warning">驳回</el-tag>
+          <el-tag v-else-if="scope.row.action_number === 2" size="small" type="warning">驳回</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="创建时间"></el-table-column>
@@ -158,6 +158,17 @@
         this.$nextTick(() => {
           this.$refs.courseDetail.init(id)
         })
+      },
+      //批量操作前判断
+      checkSelection(){
+       if(this.dataListSelections.length <= 0){
+         this.$message.error({
+          showClose: true,
+          message: '请先选择操作对象！'
+         }) 
+        }else{
+        this.deleteHandle()
+        }
       },
       // 删除
       deleteHandle (id) {

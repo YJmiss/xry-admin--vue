@@ -35,7 +35,7 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('xry:comment:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
+        <el-button v-if="isAuth('xry:comment:delete')" type="danger" @click="checkSelection()">批量删除</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
@@ -80,7 +80,7 @@
       <el-table-column fixed="right" header-align="center" align="left" width="260" label="操作" prop="status">
         <template slot-scope="scope">
           <el-button v-if="isAuth('xry:comment:delete')" type="danger" size="small" icon="el-icon-delete" circle @click="deleteHandle(scope.row.id)"></el-button>
-          <el-button v-if="isAuth('xry:comment:hideComment')" type="warning" round size="small" @click="hideComment(scope.row.id)" v-show="scope.row.status == 1">删除评论</el-button>
+          <el-button v-if="isAuth('xry:comment:hideComment')" type="warning" round size="small" @click="hideComment(scope.row.id)" v-show="scope.row.status == 1">隐藏评论</el-button>
           <el-button v-if="isAuth('xry:comment:recoverComment')" type="primary" round size="small" @click="recoverComment(scope.row.id)" v-show="scope.row.status == 0">恢复显示</el-button>
           <el-button v-if="isAuth('xry:comment:reply')" type="info" round size="small" @click="reply(scope.row.id)" v-show="scope.row.reply === ''">回复</el-button>
           <el-button v-if="isAuth('xry:comment:reply')" type="success" round size="small" @click="reply(scope.row.id)" v-show="scope.row.reply !== ''">已回复</el-button>
@@ -231,6 +231,17 @@
       selectionChangeHandle (val) {
         this.dataListSelections = val
       },
+       //批量操作前判断
+      checkSelection(){
+       if(this.dataListSelections.length <= 0){
+         this.$message.error({
+          showClose: true,
+          message: '请先选择操作对象！'
+         }) 
+        }else{
+        this.deleteHandle()
+        }
+      },
       // 删除
       deleteHandle (id) {
         var ids = id ? [id] : this.dataListSelections.map(item => {
@@ -266,7 +277,7 @@
         var ids = id ? [id] : this.dataListSelections.map(item => {
           return item.id
         })
-        this.$confirm(`确定要进行[${id ? '删除' : '批量删除'}]评论操作?`, '提示', {
+        this.$confirm(`确定要对[id=${ids}]进行隐藏评论操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -296,7 +307,7 @@
         var ids = id ? [id] : this.dataListSelections.map(item => {
           return item.id
         })
-        this.$confirm(`确定要进行[${id ? '恢复显示' : '批量恢复显示'}]评论操作?`, '提示', {
+        this.$confirm(`确定要对[id=${id}]恢复评论操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'

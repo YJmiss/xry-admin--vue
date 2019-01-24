@@ -134,7 +134,7 @@ export default {
                             'idCardBack': this.dataForm.id_card_back,
                             'orgId': this.dataForm.organizationId,
                             'realName':this.dataForm.realName,
-                            'brief_intro':this.dataForm.teacherIntro
+                            'briefIntro':this.dataForm.teacherIntro
                         })
                     }).then(({
                         data

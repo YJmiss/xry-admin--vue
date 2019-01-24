@@ -258,7 +258,7 @@ export default {
                                 status: this.dataForm.status
                             },
                             courseDesc: {
-                                courseDesc: this.dataForm.courseDesc
+                            courseDesc: this.dataForm.courseDesc
                             },
                         })
                     }).then(({

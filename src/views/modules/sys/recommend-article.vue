@@ -10,7 +10,12 @@
         <el-input v-model="dataForm.parentName" v-popover:courseCatListPopover :readonly="true" placeholder="点击选择文章分类" class="cat-list__input"></el-input>
       </el-form-item>
       <el-form-item label="文章标题">
-        <el-input v-model="dataForm.title" placeholder="文章标题" clearable></el-input>
+      <el-input v-model="dataForm.title" placeholder="文章标题" clearable></el-input>
+      </el-form-item>
+      <el-form-item label="推荐状态">
+          <el-select v-model="dataForm.recommend" placeholder="请选择状态" @change="socialSourceCurrentSel">
+            <el-option v-for="item in recommendValues" :key="item.value" :label="item.label" :value="item.value"></el-option>
+          </el-select>
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
@@ -76,7 +81,11 @@
         courseCatListTreeProps: {
           label: 'name',
           children: 'children'
-        }
+        },
+        recommendValues: [
+          { value: '0', label: '未推荐' }, 
+          { value: '1', label: '已推荐' },
+        ]
       }
     },
     components: {
@@ -107,7 +116,8 @@
               'page': this.pageIndex,
               'limit': this.pageSize,
               'type':this.dataForm.type,
-              'title': this.dataForm.title
+              'title': this.dataForm.title,
+              'recommend': this.dataForm.recommend
             })
           }).then(({ data }) => {
             if (data && data.code === 0) {

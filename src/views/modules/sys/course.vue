@@ -28,9 +28,9 @@
       </el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button  class="button" v-if="isAuth('xry:course:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button  class="button" v-if="isAuth('xry:course:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-        <el-button  class="button" v-if="isAuth('xry:course:addToCourse')" type="primary" @click="addToCourse()" :disabled="dataListSelections.length <= 0">批量上架</el-button>
-        <el-button class="button" v-if="isAuth('xry:course:delFromCourse')" type="warning" @click="delFromCourse()" :disabled="dataListSelections.length <= 0">批量下架</el-button>
+        <el-button  class="button" v-if="isAuth('xry:course:delete')" type="danger" @click="deleteHandle()">批量删除</el-button>
+        <el-button  class="button" v-if="isAuth('xry:course:addToCourse')" type="primary" @click="addToCourse()">批量上架</el-button>
+        <el-button class="button" v-if="isAuth('xry:course:delFromCourse')" type="warning" @click="delFromCourse()">批量下架</el-button>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
@@ -249,7 +249,31 @@
         })
         }
       },
-      // 删除
+      //批量操作前判断
+      checkSelection(flag){
+      var ids = this.dataListSelections.map(item => {
+            return item.id
+            });
+       if(this.dataListSelections.length <= 0){
+         this.$message.error({
+          showClose: true,
+          message: '请先选择操作对象！'
+         }) 
+        }else{
+          switch (flag) {
+            case 0:
+            this.deleteHandle(ids)
+            break;
+            case 1:
+            this.addToCourse(ids)
+            break;
+            default:
+            this.delFromCourse(ids)
+            break;
+          } 
+        }
+      },
+      // 删除前处理
       deleteHandle (id,status) {
         if(4 == status){
         this.$message.error({
@@ -258,10 +282,24 @@
         });
         }
         else{
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+        let flag = 0;
+        let ids = [];
+        if(!id){
+        this.checkSelection(flag)
+        }else{ 
+          if(typeof id !== 'object'){
+          ids.push(id);
+          this.confirmDelete(ids)
+          }
+          else{
+          this.confirmDelete(id)  
+          }
+        }
+        }
+      },
+      //确认删除
+       confirmDelete(ids){
+        this.$confirm(`确定对[id=${ids}]进行删除操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -285,14 +323,26 @@
             }
           })
         }).catch(() => {})
+       },
+      // 课程上架操作前处理
+      addToCourse(id) {
+        let flag = 1;
+        let ids = [];
+        if(!id){
+        this.checkSelection(flag)
+        }else{ 
+        if(typeof id !== 'object'){
+        ids.push(id);
+        this.confirmToCourse(ids)
+        }
+        else{
+        this.confirmToCourse(id)  
+        }
         }
       },
-      // 课程上架操作
-      addToCourse(id) {
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '上架' : '批量上架'}]操作?`, '提示', {
+      //确认上架
+      confirmToCourse(ids){
+      this.$confirm(`确定对[id=${ids}]进行"上架"操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -319,10 +369,23 @@
       },
       // 课程下架操作
       delFromCourse(id) {
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '下架' : '批量下架'}]操作?`, '提示', {
+      let flag = 2;
+      let ids = [];
+      if(!id){
+      this.checkSelection(flag)
+      }else{ 
+      if(typeof id !== 'object'){
+      ids.push(id);
+      this.confirmHideCourse(ids)
+      }
+      else{
+      this.confirmHideCourse(id)  
+      }
+    }
+      },
+    //确认下架
+    confirmHideCourse(ids){
+       this.$confirm(`确定对[id=${ids}]进行下架操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -345,9 +408,9 @@
               this.$message.error(data.msg)
             }
           })
-        }).catch(() => {})
-      }
+      }).catch(() => {})
     }
+  }
   }
 </script>
 <style scoped>

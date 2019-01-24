@@ -64,85 +64,83 @@ export default {
         feedbackDetail,
         replyAddOrView
     },
-    data() {
-        return {
-            replyAddOrViewVisible: false,
-            feedbackDetailVisible: false,
-            dataList: [],
-            pageIndex: 1,
-            pageSize: 10,
-            totalPage: 0,
-            dataForm: {
-                nickname: '',
-                phone: '',
-                feedback_info: '',
-                check_status: '',
-                userId: '',
-                create_time: '',
-                reply_status: '',
-                reply_info: '',
-                reply_time: ''
+    data(){
+    return {
+        replyAddOrViewVisible: false,
+        feedbackDetailVisible: false,
+        dataList: [],
+        pageIndex: 1,
+        pageSize: 10,
+        totalPage: 0,
+        dataForm: {
+            nickname: '',
+            phone: '',
+            feedback_info: '',
+            check_status: '',
+            userId: '',
+            create_time: '',
+            reply_status: '',
+            reply_info: '',
+            reply_time: ''
+        },
+        dataRule: {
+            replyContent: [{
+                required: true,
+                message: "请填写回复内容",
+                trigger: "blur"
+            }]
+        },
+        replyStatusValue: [{
+            value: '0',
+            label: '未回复'
+        }, {
+            value: '1',
+            label: '已回复'
+        }],
+        pickerOptions: {
+            disabledDate(time) {
+                return time.getTime() > Date.now();
             },
-            dataRule: {
-                replyContent: [{
-                    required: true,
-                    message: "请填写回复内容",
-                    trigger: "blur"
-                }]
-            },
-            replyStatusValue: [{
-                value: '0',
-                label: '未回复'
+            shortcuts: [{
+                text: '今天',
+                onClick(picker) {
+                    picker.$emit('pick', new Date());
+                }
             }, {
-                value: '1',
-                label: '已回复'
-            }],
-            pickerOptions: {
-                disabledDate(time) {
-                    return time.getTime() > Date.now();
-                },
-                shortcuts: [{
-                    text: '今天',
-                    onClick(picker) {
-                        picker.$emit('pick', new Date());
-                    }
-                }, {
-                    text: '昨天',
-                    onClick(picker) {
-                        const date = new Date();
-                        date.setTime(date.getTime() - 3600 * 1000 * 24);
-                        picker.$emit('pick', date);
-                    }
-                }, {
-                    text: '一周前',
-                    onClick(picker) {
-                        const date = new Date();
-                        date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
-                        picker.$emit('pick', date);
-                    }
-                }]
-            }
+                text: '昨天',
+                onClick(picker) {
+                    const date = new Date();
+                    date.setTime(date.getTime() - 3600 * 1000 * 24);
+                    picker.$emit('pick', date);
+                }
+            }, {
+                text: '一周前',
+                onClick(picker) {
+                    const date = new Date();
+                    date.setTime(date.getTime() - 3600 * 1000 * 24 * 7);
+                    picker.$emit('pick', date);
+                }
+            }]
         }
+    }
     },
     activated() {
-        this.getDataList()
+    this.getDataList()
     },
     methods: {
         //获取数据表
-        getDataList() {
+        getDataList(){
             this.$http({
                 url: this.$http.adornUrl('/xry/feedback/list'),
                 method: 'get',
                 params: this.$http.adornParams({
-                    'page': this.pageIndex,
-                    'limit': this.pageSize,
-                    'userInfo': this.dataForm.nickname,
-                    'checkStatus': this.dataForm.check_status,
-                    'createTime': this.dataForm.create_time
+                'page': this.pageIndex,
+                'limit': this.pageSize,
+                'userInfo': this.dataForm.nickname,
+                'checkStatus': this.dataForm.check_status,
+                'createTime': this.dataForm.create_time 
                 })
-            }).then(({
-                data
-            }) => {
+            }).then(({data}) => {
                 if (data && data.code === 0) {
                     this.dataList = data.page.list
                     this.totalPage = data.page.totalCount
@@ -156,7 +154,7 @@ export default {
         viewFeedbackInfo(id) {
             this.feedbackDetailVisible = true
             this.$nextTick(() => {
-                this.$refs.feedbackDetail.init(id)
+            this.$refs.feedbackDetail.init(id)
             })
         },
         // 点击->详情弹出框
@@ -222,6 +220,6 @@ export default {
 
 <style scoped>
 .el-form-item {
-    margin-right: 30px;
+margin-right: 30px;
 }
 </style>

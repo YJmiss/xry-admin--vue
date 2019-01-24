@@ -24,7 +24,7 @@
       </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <!-- <el-button v-if="isAuth('xry:video:examine:pass')" type="success" @click="examine()" :disabled="dataListSelections.length <= 0">批量审核</el-button> -->
+        <el-button v-if="isAuth('xry:record:examine')" type="primary" @click="checkSelection()">批量审核</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
@@ -194,14 +194,28 @@
       videoPlay (id) {
         this.videoPlayVisible = true
         this.$nextTick(() => {
-          this.$refs.videoPlay.init(id)
+        this.$refs.videoPlay.init(id)
         })
+      },
+       //批量操作前判断
+      checkSelection(){
+       if(this.dataListSelections.length <= 0){
+         this.$message.error({
+          showClose: true,
+          message: '请先选择操作对象！'
+         }) 
+        }else{
+        this.examine()
+        }
       },
       // 审核/记录审核
       examine(id) {
-       this.examineRecordAddVisible = true
+       var ids= id ? [id] :this.dataListSelections.map(item => {
+        return item.id
+        }) 
+        this.examineRecordAddVisible = true
         this.$nextTick(() => {
-          this.$refs.examineRecordAdd.init(id,this.examineType)
+        this.$refs.examineRecordAdd.init(ids,this.examineType)
         })
       }
     }

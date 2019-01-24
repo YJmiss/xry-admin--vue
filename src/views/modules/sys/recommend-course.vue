@@ -21,10 +21,15 @@
       <el-form-item label="课程标题">
         <el-input v-model="dataForm.title" placeholder="课程标题" clearable></el-input>
       </el-form-item>
+      <el-form-item label="推荐状态">
+          <el-select v-model="dataForm.recommend" placeholder="请选择状态" @change="socialSourceCurrentSel">
+            <el-option v-for="item in recommendValues" :key="item.value" :label="item.label" :value="item.value"></el-option>
+          </el-select>
+      </el-form-item>
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
-        <el-button v-if="isAuth('xry:course:recommendCourse')" type="primary" @click="recommendCourse()" :disabled="dataListSelections.length <= 0">批量推荐</el-button>
-        <el-button v-if="isAuth('xry:course:cancelRecommend')" type="warning" @click="cancelRecommend()" :disabled="dataListSelections.length <= 0">取消批量推荐</el-button>
+        <el-button v-if="isAuth('xry:course:recommendCourse')" type="primary" @click="recommendCourse()">批量推荐</el-button>
+        <el-button v-if="isAuth('xry:course:cancelRecommend')" type="warning" @click="cancelRecommend()">批量取消推荐</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
@@ -100,7 +105,11 @@
         teacherListTreeProps: {
           label: 'realName',
           children: 'children'
-        }
+        },
+        recommendValues: [
+          { value: '0', label: '未推荐' }, 
+          { value: '1', label: '已推荐' },
+        ]
       }
     },
     components: {
@@ -140,6 +149,7 @@
                 'title': this.dataForm.title,
                 'cid': this.dataForm.parentId,
                 'tid': this.dataForm.teacherId,
+                'recommend': this.dataForm.recommend,
                 'status':status
               })
             }).then(({ data }) => {
@@ -197,13 +207,46 @@
           this.$refs.addOrUpdate.init(id)
         })
       },
-      // 推荐课程、批量推荐操作
+       //批量操作前判断
+      checkSelection(flag){
+      var ids = this.dataListSelections.map(item => {
+            return item.id
+            });
+       if(this.dataListSelections.length <= 0){
+         this.$message.error({
+          showClose: true,
+          message: '请先选择操作对象！'
+         }) 
+        }else{
+          switch (flag) {
+            case 1:
+            this.recommendCourse(ids)
+            break;
+            default:
+            this.cancelRecommend(ids)
+            break;
+          } 
+        }
+      },
+      // 推荐操作前处理
       recommendCourse(id) {
         let flag = 1;
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '课程推荐' : '批量推荐'}]操作?`, '提示', {
+        let ids = [];
+        if(!id){
+        this.checkSelection(flag)
+        }else{ 
+        if(typeof id !== 'object'){
+        ids.push(id);
+        this.confirmRecommend(ids)
+        }
+        else{
+        this.confirmRecommend(id)  
+        }
+        } 
+      },
+      //确认推荐
+      confirmRecommend(ids){
+      this.$confirm(`确定对[id=${ids}]进行“推荐”操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -228,12 +271,25 @@
           })
         }).catch(() => {})
       },
-      // 取消推荐课程、批量取消推荐操作
+      // 取消推荐操作前处理
       cancelRecommend(id) {
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.id
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '取消推荐' : '批量取消推荐'}]操作?`, '提示', {
+      let flag = 2;
+      let ids = [];
+      if(!id){
+      this.checkSelection(flag)
+      }else{ 
+      if(typeof id !== 'object'){
+      ids.push(id);
+      this.confirmCancel(ids)
+      }
+      else{
+      this.confirmCancel(id)  
+      }
+      }   
+      },
+      //确认取消推荐
+      confirmCancel(ids){
+      this.$confirm(`确定对[id=${ids}]进行"取消推荐"操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'

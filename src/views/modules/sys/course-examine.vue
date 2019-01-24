@@ -19,13 +19,12 @@
         </el-select> 
       </el-form-item>
       <el-form-item>
-        <el-button @click="getDataList()">查询</el-button>
-        <!-- <el-button v-if="isAuth('xry:course:examine')" type="success" @click="examinePass()" :disabled="dataListSelections.length <= 0">批量审核</el-button> -->
+      <el-button @click="getDataList()">查询</el-button>
+      <el-button v-if="isAuth('xry:record:examine')" type="primary" @click="checkSelection()">批量审核</el-button>
       </el-form-item>
     </el-form>
     <el-table :data="dataList" border v-loading="dataListLoading" @selection-change="selectionChangeHandle" style="width: 100%;">
       <el-table-column type="selection" header-align="center" align="center" width="50"></el-table-column>
-      
       <el-table-column prop="title" header-align="center" align="center" label="课程标题" width="380"></el-table-column>
       <el-table-column prop="realName" header-align="center" align="center" label="所属讲师" width="160"></el-table-column>
       <el-table-column prop="price" header-align="center" align="center" label="课程价格（元）" width="160">
@@ -44,7 +43,6 @@
         <template slot-scope="scope">
           <el-button v-if="isAuth('xry:course:detail')" round size="small" @click="viewDetail(scope.row.id)">详情</el-button>
           <el-button v-if="isAuth('xry:record:examine')" round :disabled="scope.row.status == 3 || scope.row.status == 4 || scope.row.status == 5" type="primary" size="small" @click="examine(scope.row.id)" >审核</el-button> 
-          <!-- <el-button v-if="isAuth('xry:course:examine:reject')" type="danger" size="small" @click="examineReject(scope.row.id)">审核驳回</el-button> -->
         </template>
       </el-table-column>
     </el-table>
@@ -176,12 +174,26 @@
       currentSel(selVal){
         this.dataForm.status = selVal;
       },
+       //批量操作前判断
+      checkSelection(){
+       if(this.dataListSelections.length <= 0){
+        this.$message.error({
+        showClose: true,
+        message: '请先选择操作对象！'
+        }) 
+        }else{
+        this.examine()
+        }
+      },
       // 审核/记录审核
       examine(id) {
-       this.examineRecordAddVisible = true
-        this.$nextTick(() => {
-          this.$refs.examineRecordAdd.init(id,this.examineType)
-        })
+      var ids = id ? [id] : this.dataListSelections.map(item => {
+          return item.id
+      }) 
+      this.examineRecordAddVisible = true
+      this.$nextTick(() => {
+      this.$refs.examineRecordAdd.init(ids,this.examineType)
+      })
       }
     }
   }
