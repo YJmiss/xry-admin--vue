@@ -5,7 +5,7 @@
         <h3>反馈详情:</h3>
         <div class="feedbackDetail">
         <p>{{feedbackInfo}}</p>
-        <img :src="feedbackImg" v-show="feedbackImg">
+        <img :src="feedbackImg" v-show="feedbackImg"> 
         </div>
         <span class="title">反馈时间:</span>&nbsp;<span>{{feedbackTime}}</span>
     </el-form>
@@ -14,14 +14,13 @@
 
 <script>
 export default {
-    components: {Editor},
     data() {
         return {
             visible: false,
             nickname:'',
             phone:'',
             feedbackInfo: '',
-            feedbackImg:'',
+            feedbackImg:[],
             feedbackTime: '',
             dataForm:{}
         }
@@ -40,7 +39,8 @@ export default {
                     this.feedbackTime = data.userFeedback.create_time,
                     this.nickname = data.userFeedback.nickname,
                     this.phone = data.userFeedback.phone,
-                    this.feedbackImg = data.feedback_img 
+                    this.feedbackImg = data.userFeedback.feedback_img  
+                    console.log(data.userFeedback.feedback_img) 
                 }
             })
         }

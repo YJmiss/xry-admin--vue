@@ -211,8 +211,8 @@ export default {
         },
         // 当前页
         currentChangeHandle(val) {
-            this.pageIndex = val
-            this.getDataList()
+        this.pageIndex = val
+        this.getDataList()
         }
     }
 }
