@@ -27,7 +27,7 @@
         <el-table-column prop="create_time" header-align="center" align="center" label="创建时间" ></el-table-column>
         <el-table-column fixed="right" header-align="center" align="center" label="操作">
             <template slot-scope="scope" porp="question_status">
-                <el-button v-if="isAuth('xry:question:update')" type="primary" size="small" icon="el-icon-edit" round @click="addOrUpdateHandle(scope.row.id)" :disabled="scope.row.question_status === 1">详情</el-button>
+                <el-button v-if="isAuth('xry:question:update')" type="primary" size="small" icon="el-icon-edit" round @click="addOrUpdateHandle(scope.row.id)">详情</el-button>
                 <el-button v-if="isAuth('xry:question:delete')" type="danger" size="small" icon="el-icon-delete" round @click="deleteHandle(scope.row.id)" :disabled="scope.row.question_status === 1">删除</el-button>
                 <el-button v-if="isAuth('xry:question:cancelPublish')" type="danger" size="small" @click="cancelPublish(scope.row.id)" v-show="scope.row.question_status ===1">撤回</el-button>
                 <el-button v-if="isAuth('xry:question:publishQuestion')" type="success" size="small"  @click="publishQuestion(scope.row.id)" v-show="scope.row.question_status ===0">发布</el-button>

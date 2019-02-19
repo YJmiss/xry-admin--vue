@@ -7,10 +7,10 @@
       <el-form-item>
         <el-button @click="getDataList()">查询</el-button>
         <el-button v-if="isAuth('sys:schedule:save')" type="primary" @click="addOrUpdateHandle()">新增</el-button>
-        <el-button v-if="isAuth('sys:schedule:delete')" type="danger" @click="deleteHandle()" :disabled="dataListSelections.length <= 0">批量删除</el-button>
-        <el-button v-if="isAuth('sys:schedule:pause')" type="danger" @click="pauseHandle()" :disabled="dataListSelections.length <= 0">批量暂停</el-button>
-        <el-button v-if="isAuth('sys:schedule:resume')" type="danger" @click="resumeHandle()" :disabled="dataListSelections.length <= 0">批量恢复</el-button>
-        <el-button v-if="isAuth('sys:schedule:run')" type="danger" @click="runHandle()" :disabled="dataListSelections.length <= 0">批量立即执行</el-button>
+        <el-button v-if="isAuth('sys:schedule:delete')" type="danger" @click="deleteHandle()">批量删除</el-button>
+        <el-button v-if="isAuth('sys:schedule:pause')" type="danger" @click="pauseHandle()">批量暂停</el-button>
+        <el-button v-if="isAuth('sys:schedule:resume')" type="danger" @click="resumeHandle()">批量恢复</el-button>
+        <el-button v-if="isAuth('sys:schedule:run')" type="danger" @click="runHandle()">批量立即执行</el-button>
         <el-button v-if="isAuth('sys:schedule:log')" type="success" @click="logHandle()">日志列表</el-button>
       </el-form-item>
     </el-form>
@@ -175,12 +175,52 @@
           this.$refs.addOrUpdate.init(id)
         })
       },
-      // 删除
+      //批量操作前判断
+      checkSelection(flag){
+      var ids = this.dataListSelections.map(item => {
+            return item.jobId
+            });
+       if(this.dataListSelections.length <= 0){
+         this.$message.error({
+          showClose: true,
+          message: '请先选择操作对象！'
+         }) 
+        }else{
+          switch (flag) {
+            case 0:
+            this.deleteHandle(ids)
+            break;
+            case 1:
+            this.pauseHandle(ids)
+            break;
+            case 2:
+            this.resumeHandle(ids)
+            break;
+            default:
+            this.runHandle(ids)
+            break;
+          } 
+        }
+      },
+      // 删除前处理
       deleteHandle (id) {
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.jobId
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '删除' : '批量删除'}]操作?`, '提示', {
+        let flag = 0;
+        let ids = [];
+        if(!id){
+        this.checkSelection(flag)
+        }else{ 
+          if(typeof id !== 'object'){
+          ids.push(id);
+          this.confirmDelete(ids)
+          }
+          else{
+          this.confirmDelete(id)  
+          }
+        }
+      },
+      //确认删除
+       confirmDelete(ids){
+        this.$confirm(`确定对[id=${ids}]进行删除操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -204,13 +244,26 @@
             }
           })
         }).catch(() => {})
-      },
-      // 暂停
+       },
+      // 暂停操作前处理
       pauseHandle (id) {
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.jobId
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '暂停' : '批量暂停'}]操作?`, '提示', {
+      let flag = 1;
+      let ids = [];
+      if(!id){
+      this.checkSelection(flag)
+      }else{ 
+        if(typeof id !== 'object'){
+        ids.push(id);
+        this.confirmPause(ids)
+        }
+        else{
+        this.confirmPause(id)  
+        }
+      } 
+      },
+      //确认暂停
+      confirmPause(ids){
+       this.$confirm(`确定对[id=${ids}]进行暂停操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -235,12 +288,25 @@
           })
         }).catch(() => {})
       },
-      // 恢复
+      // 恢复操作前处理
       resumeHandle (id) {
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.jobId
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '恢复' : '批量恢复'}]操作?`, '提示', {
+      let flag = 2;
+      let ids = [];
+      if(!id){
+      this.checkSelection(flag)
+      }else{ 
+        if(typeof id !== 'object'){
+        ids.push(id);
+        this.confirmResume(ids)
+        }
+        else{
+        this.confirmResume(id)  
+        }
+      }
+      },
+      //确认恢复
+      confirmResume(ids){
+        this.$confirm(`确定对[id=${ids}]进行恢复操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'
@@ -265,12 +331,25 @@
           })
         }).catch(() => {})
       },
-      // 立即执行
+      // 立即执行操作前处理
       runHandle (id) {
-        var ids = id ? [id] : this.dataListSelections.map(item => {
-          return item.jobId
-        })
-        this.$confirm(`确定对[id=${ids.join(',')}]进行[${id ? '立即执行' : '批量立即执行'}]操作?`, '提示', {
+      let flag = 3;
+      let ids = [];
+      if(!id){
+      this.checkSelection(flag)
+      }else{ 
+      if(typeof id !== 'object'){
+      ids.push(id);
+      this.confirmRun(ids)
+      }
+      else{
+      this.confirmRun(id)  
+      }
+      }  
+      },
+      //确认立即执行
+      confirmRun(ids){
+        this.$confirm(`确定对[id=${ids}]进行立即执行操作?`, '提示', {
           confirmButtonText: '确定',
           cancelButtonText: '取消',
           type: 'warning'

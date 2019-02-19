@@ -7,7 +7,7 @@
 <span class="textTips">指佣金占课程价格的比例</span>
 </el-form-item>
 <el-form-item label="可提现金额：" prop="cashWithdrawal">
-<el-input type="number"  v-model="dataForm.cashWithdrawal"></el-input>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+<el-input type="number"  v-model="dataForm.cashWithdrawal"></el-input>&nbsp;&nbsp;&nbsp;元&nbsp;&nbsp;&nbsp;
 <span class="textTips">用户佣金余额为多少时可以提现</span>
 </el-form-item>
 <el-button type="primary" @click="dataFormSubmit()" v-if="isAuth('sys:distribution:all')">配置</el-button>
@@ -60,7 +60,7 @@ if (valid) {
       method: 'post',
       data: this.$http.adornData({
        'distributeFee' :this.dataForm.distributeFee,
-       'cashWithdrawal' :this.dataForm.cashWithdrawal
+       'cashWithdrawal':this.dataForm.cashWithdrawal
       })
     }).then(({ data }) => {
       if (data && data.code === 0) {
