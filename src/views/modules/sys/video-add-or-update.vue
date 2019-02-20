@@ -120,14 +120,14 @@ export default {
             }) => {
                 this.courseList = treeDataTranslate(data.courseList, 'id')
             }).then(() => {
-           this.visible = true
-            this.$nextTick(() => {
-              // 重置form表单（清空form表单的内容）
-              this.$refs['dataForm'].resetFields()
-            })
+                this.visible = true
+                this.$nextTick(() => {
+                    // 重置form表单（清空form表单的内容）
+                    this.$refs['dataForm'].resetFields()
+                })
             }).then(() => {
                 if (this.dataForm.id) {
-                   //可进行修改操作
+                    //可进行修改操作
                     this.$http({
                         url: this.$http.adornUrl(`/xry/video/info/${this.dataForm.id}`),
                         method: 'get',
@@ -146,20 +146,20 @@ export default {
                             this.dataForm.status = data.video.status
                             this.dataForm.videoTime = data.video.paramData
                         }
-                    }) .then(() => {
-                            // 查询目录树，需要根据选中课程的id查询出目录树
-                            this.$http({
-                                url: this.$http.adornUrl('/xry/course/catalog/treeCourseCatalog'),
-                                method: 'get',
-                                params: this.$http.adornParams({
-                                    'courseId': this.dataForm.courseId,
-                                })
-                            }).then(({
-                                data
-                            }) => {
-                                this.courseCatalogList = treeDataTranslate(data.courseCatalogList,'id') 
+                    }).then(() => {
+                        // 查询目录树，需要根据选中课程的id查询出目录树
+                        this.$http({
+                            url: this.$http.adornUrl('/xry/course/catalog/treeCourseCatalog'),
+                            method: 'get',
+                            params: this.$http.adornParams({
+                                'courseId': this.dataForm.courseId,
                             })
-                            }) 
+                        }).then(({
+                            data
+                        }) => {
+                            this.courseCatalogList = treeDataTranslate(data.courseCatalogList, 'id')
+                        })
+                    })
                 } else {
                     //新增操作
                     this.dataForm.videoUrl = ''
@@ -170,23 +170,23 @@ export default {
         // 课程树选中
         courseListTreeCurrentChangeHandle() {
             //判断课程是否付费
-            for(let i=0;i<this.courseList.length;i++){
-                if(this.dataForm.courseId == this.courseList[i].id){
-                 this.dataForm.fee = this.courseList[i].property
+            for (let i = 0; i < this.courseList.length; i++) {
+                if (this.dataForm.courseId == this.courseList[i].id) {
+                    this.dataForm.fee = this.courseList[i].property
                 }
             }
             // 根据选中课程id查询出目录
-            this.dataForm.catalogId =''
+            this.dataForm.catalogId = ''
             this.$http({
                 url: this.$http.adornUrl('/xry/course/catalog/treeCourseCatalog'),
                 method: 'get',
                 params: this.$http.adornParams({
-                'courseId': this.dataForm.courseId,
+                    'courseId': this.dataForm.courseId,
                 })
             }).then(({
                 data
             }) => {
-               this.courseCatalogList = treeDataTranslate(data.courseCatalogList,'id') 
+                this.courseCatalogList = treeDataTranslate(data.courseCatalogList, 'id')
             })
         },
         // 上传之前
@@ -203,11 +203,11 @@ export default {
             this.successNum++;
             this.dataForm.videoUrl = response.url;
         },
-      //获取视频总时长
-        getDuration(){
-        setTimeout(() =>{
-        this.dataForm.videoTime = document.getElementById('video-active').duration
-            },100);
+        //获取视频总时长
+        getDuration() {
+            setTimeout(() => {
+                this.dataForm.videoTime = document.getElementById('video-active').duration
+            }, 100);
         },
         // 表单提交
         dataFormSubmit() {
@@ -233,14 +233,14 @@ export default {
                             'catalogId': this.dataForm.catalogId,
                             'property': this.dataForm.property,
                             'status': this.dataForm.status,
-                            'paramData':Math.ceil(this.dataForm.videoTime),
+                            'paramData': Math.ceil(this.dataForm.videoTime),
                         })
                     }).then(({
                         data
                     }) => {
                         if (data && data.code === 0) {
-                          // 重置form表单（清空form表单的内容）
-                           this.$refs["dataForm"].resetFields();
+                            // 重置form表单（清空form表单的内容）
+                            this.$refs["dataForm"].resetFields();
                             this.$message({
                                 message: '操作成功',
                                 type: 'success',
@@ -278,13 +278,15 @@ export default {
 
 <style scoped>
 video {
-width: 830px;
+    width: 830px;
 }
+
 .red {
     color: red;
 }
-#video-active{
-max-height: 200px;
-max-width:400px;
+
+#video-active {
+    max-height: 200px;
+    max-width: 400px;
 }
 </style>
