@@ -1,13 +1,17 @@
 <template>
 <el-dialog :visible.sync="visible" :close-on-click-modal="false">
     <el-form>
-        <span class="title">反馈用户:</span>&nbsp;<span>{{nickname}}&nbsp;/&nbsp;{{phone}}</span>
+        <span class="title">反馈用户:</span>&nbsp;&nbsp;
+        <span class="content" v-if="nickname">{{nickname}}&nbsp;/&nbsp;{{phone}}</span>
+        <span class="content" v-else>{{phone}}</span>
         <h3>反馈详情:</h3>
         <div class="feedbackDetail">
         <p>{{feedbackInfo}}</p>
-        <img :src="feedbackImg" v-show="feedbackImg"> 
+        <template v-for="(item,index) in feedbackImg" v-show="feedbackImg">
+        <img :src="item" key="index"> 
+        </template>
         </div>
-        <span class="title">反馈时间:</span>&nbsp;<span>{{feedbackTime}}</span>
+        <span class="title">反馈时间:</span>&nbsp;&nbsp;&nbsp;<span class="content">{{feedbackTime}}</span>
     </el-form>
 </el-dialog>
 </template>
@@ -39,8 +43,8 @@ export default {
                     this.feedbackTime = data.userFeedback.create_time,
                     this.nickname = data.userFeedback.nickname,
                     this.phone = data.userFeedback.phone,
-                    this.feedbackImg = data.userFeedback.feedback_img  
-                    console.log(data.userFeedback.feedback_img) 
+                    this.feedbackImg = data.userFeedback.feedbackImgArray  
+                    console.log(data.userFeedback) 
                 }
             })
         }
@@ -66,5 +70,9 @@ height: auto;
 .title{
 font-size:16px;
 font-weight: bold;
+}
+.content{
+font-size: 16px;
+color: #999;
 }
 </style>
