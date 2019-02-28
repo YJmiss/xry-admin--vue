@@ -10,7 +10,7 @@
           <el-radio :label="1">是</el-radio>
         </el-radio-group>
       </el-form-item>
-      <el-form-item label="父类目" prop="parentName" v-show="dataForm.flag === 1"> 
+      <el-form-item label="父类目" prop="parentName" v-show="dataForm.flag === 0"> 
         <el-popover ref="courseCatListPopover" placement="bottom-start" trigger="click">
           <el-tree :data="courseCatList" :props="courseCatListTreeProps" node-key="id" ref="courseCatListTree" @current-change="courseCatListTreeCurrentChangeHandle" :default-expand-all="true"
             :highlight-current="true" :expand-on-click-node="false">

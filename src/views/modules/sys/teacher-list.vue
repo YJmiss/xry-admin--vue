@@ -54,7 +54,9 @@
        </el-table-column>
       <el-table-column prop="status" header-align="center" align="center" label="认证状态" width="100">
          <template slot-scope="scope">
+         <el-tag v-if="scope.row.status === 1" size="small"  type="primary" >认证中</el-tag>
          <el-tag v-if="scope.row.status === 3" size="small"  type="success" >认证通过</el-tag>
+         <el-tag v-if="scope.row.status === 2" size="small"  type="danger" >未通过</el-tag>
         </template>
       </el-table-column>
       <el-table-column prop="created" header-align="center" align="center" width="180" label="认证时间"></el-table-column>
